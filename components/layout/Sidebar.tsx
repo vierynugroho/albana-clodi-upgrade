@@ -30,17 +30,17 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "Order",
-    href: "/order",
+    href: "/orders",
     icon: ShoppingCart,
   },
   {
-    title: "Produk",
-    href: "/produk",
+    title: "Product",
+    href: "/products",
     icon: Package,
   },
   {
     title: "Data Customer",
-    href: "/customer",
+    href: "/customers",
     icon: Users,
   },
   {
@@ -49,19 +49,19 @@ const menuItems: MenuItem[] = [
     icon: FileText,
   },
   {
-    title: "Pengeluaran",
-    href: "/pengeluaran",
+    title: "Expenses",
+    href: "/expenses",
     icon: Wallet,
   },
   {
-    title: "Pengaturan",
-    href: "/pengaturan",
+    title: "Settings",
+    href: "/settings",
     icon: Settings,
     submenu: [
-      { title: "Umum", href: "/pengaturan" },
-      { title: "Rekening", href: "/pengaturan/rekening" },
-      { title: "Asal Pengiriman", href: "/pengaturan/pengiriman" },
-      { title: "Sales Channel", href: "/pengaturan/sales-channel" },
+      { title: "General", href: "/settings" },
+      { title: "Accounts", href: "/settings/payment-accounts" },
+      { title: "Shipping Origin", href: "/settings/shipping-origins" },
+      { title: "Sales Channel", href: "/settings/sales-channels" },
     ],
   },
 ];
