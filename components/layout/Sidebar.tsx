@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState, useCallback, memo } from "react";
+import Image from "next/image";
 
 interface MenuItem {
   title: string;
@@ -203,9 +204,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex h-16 items-center justify-between border-b px-5">
           <Link href="/dashboard" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="h-10 w-10 rounded-xl gradient-primary shadow-lg shadow-primary/25 flex items-center justify-center">
-                <span className="text-lg font-bold text-white">A</span>
-              </div>
+              {/* <div className="h-10 w-10 rounded-xl gradient-primary shadow-lg shadow-primary/25 flex items-center justify-center"> */}
+                {/* <span className="text-lg font-bold text-white">A</span> */}
+                <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} height={45} width={45} alt="logo"/>
+              {/* </div> */}
               <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-warning animate-pulse-subtle" />
             </div>
             <div>

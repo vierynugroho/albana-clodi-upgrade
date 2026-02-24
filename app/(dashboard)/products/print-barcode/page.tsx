@@ -323,9 +323,9 @@ export default function PrintBarcodePage() {
                                         Mencari produk...
                                     </div>
                                 ) : displayProducts.length > 0 ? (
-                                    displayProducts.map((product) => (
+                                    displayProducts.map((product, index) => (
                                         <div
-                                            key={product.id}
+                                            key={index}
                                             onClick={() => handleSelectProduct(product)}
                                             className="px-4 py-2 hover:bg-muted cursor-pointer text-sm"
                                         >
