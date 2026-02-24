@@ -12,7 +12,9 @@ import type { ApiCustomer } from "@/types/api";
 /**
  * Maps ApiCustomer to CustomerFormValues for the edit form
  */
-function mapApiCustomerToFormValues(apiCustomer: ApiCustomer): CustomerFormValues & { id: string } {
+function mapApiCustomerToFormValues(
+  apiCustomer: ApiCustomer,
+): CustomerFormValues & { id: string } {
   // Map category from API to form format
   const categoryMap: Record<string, string> = {
     CUSTOMER: "customer",
@@ -26,6 +28,10 @@ function mapApiCustomerToFormValues(apiCustomer: ApiCustomer): CustomerFormValue
     id: apiCustomer.id,
     kategori: categoryMap[apiCustomer.category] || "customer",
     namaLengkap: apiCustomer.name,
+    provinsiId: "",
+    kotaId: "",
+    kecamatanId: "",
+    desaId: "",
     provinsi: apiCustomer.province || "",
     kota: apiCustomer.city || "",
     kecamatan: apiCustomer.district || apiCustomer.subdistrict || "",
@@ -66,7 +72,11 @@ export default function EditCustomerPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => router.push("/customers")} variant="outline" className="gap-2">
+          <Button
+            onClick={() => router.push("/customers")}
+            variant="outline"
+            className="gap-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             Kembali
           </Button>
@@ -84,18 +94,17 @@ export default function EditCustomerPage() {
   return (
     <Card className="space-y-6 border-0">
       <div className="flex items-center gap-4 p-2">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/customers")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push("/customers")}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <CardTitle className="text-2xl font-bold">
-          Edit Customer
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold">Edit Customer</CardTitle>
       </div>
 
-      <CustomerForm
-        initialData={initialData}
-        isEditMode={true}
-      />
+      <CustomerForm initialData={initialData} isEditMode={true} />
     </Card>
   );
 }
