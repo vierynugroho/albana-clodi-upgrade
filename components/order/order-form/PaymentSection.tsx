@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { UseOrderFormReturn } from "../../hooks/useOrderStateForm";
+import type { UseOrderFormReturn } from "@/hooks/useOrderStateForm";
 
 type PaymentSectionProps = Pick<
     UseOrderFormReturn,

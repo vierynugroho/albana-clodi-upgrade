@@ -1,6 +1,7 @@
 // lib/services/shipping.service.ts
 import api from "@/lib/api";
 import type { ApiResponse, ShippingCostParams, ShippingCostResponse } from "@/types/api";
+export type { ShippingCostParams } from "@/types/api";
 
 
 export async function calculateShippingCost(params: ShippingCostParams): Promise<ShippingCostResponse> {

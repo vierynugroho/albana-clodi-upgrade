@@ -12,6 +12,7 @@ import type {
     ProductWholesalerPayload,
     ProductCreatePayload,
 } from "@/types/api";
+export type { ProductCreatePayload } from "@/types/api";
 
 
 // Convert ProductCreatePayload to FormData for multipart/form-data upload, This follows the exact structure expected by the API

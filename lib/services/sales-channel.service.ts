@@ -7,6 +7,7 @@ import type {
     SalesChannelCreatePayload,
     SalesChannelQueryParams,
 } from "@/types/api";
+export type { SalesChannelCreatePayload, SalesChannelQueryParams } from "@/types/api";
 
 
 export async function fetchSalesChannels(params?: SalesChannelQueryParams): Promise<ApiSalesChannel[]> {

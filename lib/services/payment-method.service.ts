@@ -7,6 +7,7 @@ import type {
     PaymentMethodCreatePayload,
     PaymentMethodQueryParams,
 } from "@/types/api";
+export type { PaymentMethodCreatePayload, PaymentMethodQueryParams } from "@/types/api";
 
 
 export async function fetchPaymentMethods(params?: PaymentMethodQueryParams): Promise<ApiPaymentMethod[]> {

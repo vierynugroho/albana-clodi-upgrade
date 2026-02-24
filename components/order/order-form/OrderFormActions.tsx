@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import type { UseOrderFormReturn } from "../../hooks/useOrderStateForm";
+import type { UseOrderFormReturn } from "@/hooks/useOrderStateForm";
 
 type OrderFormActionsProps = Pick<
     UseOrderFormReturn,

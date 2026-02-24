@@ -5,6 +5,7 @@ import type {
     UpdateProfilePayload,
     UpdateProfileResponse,
 } from "@/types/api";
+export type { CurrentUserResponse, UpdateProfilePayload, UpdateProfileResponse } from "@/types/api";
 
 
 // Get current user data

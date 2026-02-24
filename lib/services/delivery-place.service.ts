@@ -7,6 +7,7 @@ import type {
     DeliveryPlaceCreatePayload,
     DeliveryPlaceQueryParams,
 } from "@/types/api";
+export type { DeliveryPlaceCreatePayload, DeliveryPlaceQueryParams } from "@/types/api";
 
 
 export async function fetchDeliveryPlaces(params?: DeliveryPlaceQueryParams): Promise<ApiDeliveryPlace[]> {

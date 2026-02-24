@@ -7,6 +7,7 @@ import type {
     PaginatedResponse,
     CustomerCreatePayload,
 } from "@/types/api";
+export type { CustomerCreatePayload } from "@/types/api";
 
 
 export async function fetchCustomers(params?: CustomerQueryParams): Promise<ApiCustomer[]> {
