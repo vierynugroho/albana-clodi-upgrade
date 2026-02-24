@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { saveToken } from "@/lib/auth";
 import Link from "next/link";
+import Image from "next/image";
 
 interface AuthFormProps {
   auth_method: "login" | "register";
@@ -67,9 +68,10 @@ const LoginForm = memo(function LoginForm() {
 
   return (
     <div className="w-full max-w-md rounded-2xl border p-8 flex flex-col items-center space-y-6 bg-card shadow-lg">
-      <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center">
-        <Fingerprint className="h-8 w-8 text-white" />
-      </div>
+      {/* <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center"> */}
+        {/* <Fingerprint className="h-8 w-8 text-white" /> */}
+        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" />
+      {/* </div> */}
       <div className="text-center">
         <h1 className="text-2xl font-bold">Selamat Datang</h1>
         <p className="text-sm text-muted-foreground mt-1">Masuk ke akun Anda</p>
@@ -140,9 +142,10 @@ const RegisterForm = memo(function RegisterForm() {
 
   return (
     <div className="w-full max-w-md rounded-2xl border p-8 flex flex-col items-center space-y-6 bg-card shadow-lg">
-      <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center">
-        <Fingerprint className="h-8 w-8 text-white" />
-      </div>
+      {/* <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center"> */}
+        {/* <Fingerprint className="h-8 w-8 text-white" /> */}
+        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" />
+      {/* </div> */}
       <div className="text-center">
         <h1 className="text-2xl font-bold">Buat Akun Baru</h1>
         <p className="text-sm text-muted-foreground mt-1">
