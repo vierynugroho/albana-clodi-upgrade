@@ -189,7 +189,7 @@ const RegisterForm = memo(function RegisterForm() {
           >
             <option value="superadmin">Super Admin</option>
             <option value="admin">Admin</option>
-            <option value="staff">Staff</option>
+            {/* <option value="staff">Staff</option> */}
           </select>
           {errors.role && (
             <span className="text-xs text-destructive">
@@ -213,8 +213,9 @@ const RegisterForm = memo(function RegisterForm() {
           className="w-full"
           type="submit"
           isLoading={isSubmitting}
+          disabled
         >
-          Register
+          Fitur Belum Tersedia
         </Button>
       </form>
     </div>

@@ -13,6 +13,7 @@ import { useProvinces, useCities, useDistricts, useVillages } from "@/hooks/useR
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import type { CustomerCreatePayload } from "@/types/api";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const CustomerLabelCard = ({
   title,
@@ -215,11 +216,60 @@ const CustomerForm = ({
   useEffect(() => {
     if (initialData) {
       reset(initialData);
-      if (initialData.provinsiId) setSelectedProvinceId(initialData.provinsiId);
-      if (initialData.kotaId) setSelectedCityId(initialData.kotaId);
-      if (initialData.kecamatanId) setSelectedDistrictId(initialData.kecamatanId);
     }
   }, [initialData, reset]);
+
+  // Resolve province name → ID when provinces load (edit mode)
+  useEffect(() => {
+    if (!isEditMode || !initialData?.provinsi || provinces.length === 0) return;
+    if (selectedProvinceId) return; // already resolved
+    const match = provinces.find(
+      (p) => p.name.toLowerCase() === initialData.provinsi.toLowerCase()
+    );
+    if (match) {
+      setSelectedProvinceId(match.id);
+      setValue("provinsiId", match.id);
+    }
+  }, [isEditMode, initialData?.provinsi, provinces, selectedProvinceId, setValue]);
+
+  // Resolve city name → ID when cities load (edit mode)
+  useEffect(() => {
+    if (!isEditMode || !initialData?.kota || cities.length === 0) return;
+    if (selectedCityId) return;
+    const match = cities.find(
+      (c) => c.name.toLowerCase() === initialData.kota.toLowerCase()
+    );
+    if (match) {
+      setSelectedCityId(match.id);
+      setValue("kotaId", match.id);
+    }
+  }, [isEditMode, initialData?.kota, cities, selectedCityId, setValue]);
+
+  // Resolve district name → ID when districts load (edit mode)
+  useEffect(() => {
+    if (!isEditMode || !initialData?.kecamatan || districts.length === 0) return;
+    if (selectedDistrictId) return;
+    const match = districts.find(
+      (d) => d.name.toLowerCase() === initialData.kecamatan.toLowerCase()
+    );
+    if (match) {
+      setSelectedDistrictId(match.id);
+      setValue("kecamatanId", match.id);
+    }
+  }, [isEditMode, initialData?.kecamatan, districts, selectedDistrictId, setValue]);
+
+  // Resolve village name → ID when villages load (edit mode)
+  useEffect(() => {
+    if (!isEditMode || !initialData?.desa || villages.length === 0) return;
+    const currentDesaId = watch("desaId");
+    if (currentDesaId) return;
+    const match = villages.find(
+      (v) => v.name.toLowerCase() === initialData.desa?.toLowerCase()
+    );
+    if (match) {
+      setValue("desaId", match.id);
+    }
+  }, [isEditMode, initialData?.desa, villages, watch, setValue]);
 
   // Update destinationId when kecamatanId changes
   useEffect(() => {
@@ -280,10 +330,9 @@ const CustomerForm = ({
       onSuccess?.();
       router.push("/customers");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
       toast({
         title: "Gagal",
-        description: errorMessage,
+        description: getApiErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -386,7 +435,7 @@ const CustomerForm = ({
 
             {/* Provinsi - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">Provinsi *</label>
+              <label className="text-sm font-medium">Provinsi <span className="text-destructive">*</span></label>
               <Controller
                 name="provinsiId"
                 control={control}
@@ -408,7 +457,7 @@ const CustomerForm = ({
 
             {/* Kota - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">Kota / Kabupaten *</label>
+              <label className="text-sm font-medium">Kota / Kabupaten <span className="text-destructive">*</span></label>
               <Controller
                 name="kotaId"
                 control={control}
@@ -431,7 +480,7 @@ const CustomerForm = ({
 
             {/* Kecamatan - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">Kecamatan *</label>
+              <label className="text-sm font-medium">Kecamatan <span className="text-destructive">*</span></label>
               <Controller
                 name="kecamatanId"
                 control={control}
@@ -508,7 +557,7 @@ const CustomerForm = ({
 
           {/* TEXTAREA */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Alamat *</label>
+            <label className="text-sm font-medium">Alamat <span className="text-destructive">*</span></label>
 
             <textarea
               {...register("alamat")}

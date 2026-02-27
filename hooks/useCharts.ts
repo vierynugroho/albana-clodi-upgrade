@@ -16,7 +16,8 @@ export function useOrderChartData(orderYear?: number) {
   const { data: monthlyReport, isLoading, isError, refetch } = useOrders({ orderYear: year });
 
   // hitung chartData jika data sudah ada
-  const chartData: ChartDataItem[] = (monthlyReport ?? [])
+  const orders = Array.isArray(monthlyReport) ? monthlyReport : [];
+  const chartData: ChartDataItem[] = orders
     .reduce<ChartItem[]>((acc, item) => {
       const date = new Date(item.orderDate);
       const month = date.toLocaleDateString("id-ID", { month: "long", timeZone: "UTC" });
@@ -53,7 +54,7 @@ export function useCustomerChartData(customerYear?: number) {
   } = useCustomers({ year });
 
   // ✅ ambil array customer dengan aman
-  const customers = customersResponse ?? [];
+  const customers = Array.isArray(customersResponse) ? customersResponse : [];
 
   const chartData: ChartDataItem[] = customers
     .reduce<ChartItem[]>((acc, customer) => {
@@ -101,8 +102,8 @@ export function useProductChartData(productYear?: number) {
     refetch,
   } = useProducts({ year: year });
 
-  // ✅ ambil array customer dengan aman
-  const products = productResponse ?? [];
+  // ✅ ambil array product dengan aman
+  const products = Array.isArray(productResponse) ? productResponse : [];
 
   const chartData: ChartDataItem[] = products
     .reduce<ChartItem[]>((acc, product) => {
@@ -151,7 +152,8 @@ export function useExpensesChartData(expensesYear?: number) {
   } = useExpenses({ year });
 
   // ambil array expenses dengan aman
-  const expenses = expensesResponse?.data || [];
+  const expensesData = expensesResponse?.data;
+  const expenses = Array.isArray(expensesData) ? expensesData : [];
 
   const chartData: ChartDataItem[] = expenses
     .reduce<ChartItem[]>((acc, item) => {

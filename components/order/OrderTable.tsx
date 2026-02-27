@@ -83,178 +83,6 @@ interface OrderCardProps {
   onCancel?: (orderId: string) => void;
 }
 
-// ==================== OLD OrderCard (replaced — versi tanpa null-safety) ====================
-// const OrderCard = memo(function OrderCard({
-//   order,
-//   isSelected,
-//   index,
-//   onToggleSelect,
-//   onView,
-//   onEdit,
-//   onPrint,
-//   onDelete,
-//   onCancel,
-// }: OrderCardProps) {
-//   const statusConfig = getPaymentStatusConfig(order.paymentStatus);
-
-//   // @debug — commented for production
-//   // console.log(order);
-
-//   return (
-//     <Card
-//       className="p-4 hover:bg-muted/30 transition group animate-fade-in"
-//       style={{ animationDelay: `${index * 30}ms` }}
-//     >
-//       {/* ================= Header ================= */}
-//       <div className="flex items-start justify-between gap-4">
-//         <div className="flex gap-3">
-//           <input
-//             type="checkbox"
-//             checked={isSelected}
-//             onChange={() => onToggleSelect(order.id)}
-//             className="mt-1 h-4 w-4 accent-primary"
-//           />
-
-//           <div>
-//             <p className="font-semibold text-sm text-primary">
-//               #{order.orderNumber}
-//             </p>
-//             <p className="text-xs text-muted-foreground">
-//               dari {order.salesChannel} ({formatDate(order.date)})
-//             </p>
-//           </div>
-//         </div>
-
-//         <Badge variant={statusConfig.variant}>
-//           {statusConfig.label}
-//         </Badge>
-//       </div>
-
-//       {/* ================= Content ================= */}
-//       <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
-//         {/* ===== Customer Info ===== */}
-//         <div>
-//           <p className="text-xs text-muted-foreground mb-1">Pemesan</p>
-//           <p className="text-sm font-medium">{order.customer.name}</p>
-
-//           <span className="inline-block mt-1 text-xs font-semibold uppercase text-primary">
-//             {order.customer.category}
-//           </span>
-
-//           <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-//             {order.customer.address}, {order.customer.village},{" "}
-//             {order.customer.district}, {order.customer.city},{" "}
-//             {order.customer.province} {order.customer.postalCode}
-//           </p>
-
-//           <p className="mt-1 text-xs text-muted-foreground">
-//             📞 {order.customer.phone}
-//           </p>
-
-//           <p className="mt-1 text-xs text-muted-foreground">
-//             🧾 {order.note ?? (<span>Catatan tidak tersedia</span>)}
-//           </p>
-
-//         </div>
-
-//         {/* ===== Cost Summary ===== */}
-//         <div>
-//           <p className="text-xs text-muted-foreground mb-1">Ringkasan Biaya</p>
-
-//           <ul className="text-xs space-y-1">
-//             <li className="flex justify-between">
-//               <span>Subtotal</span>
-//               <span>{formatCurrency(order.subtotal)}</span>
-//             </li>
-//             <li className="flex justify-between">
-//               <span>Ongkir</span>
-//               <span>{formatCurrency(order.shippingCost)}</span>
-//             </li>
-//             <li className="flex justify-between">
-//               <span>Asuransi</span>
-//               <span>{formatCurrency(order.insurance)}</span>
-//             </li>
-//             <li className="flex justify-between text-destructive">
-//               <span>Diskon</span>
-//               <span>-{formatCurrency(order.discount)}</span>
-//             </li>
-//           </ul>
-
-//           <div className="mt-2 pt-2 border-t">
-//             <p className="text-sm font-bold">
-//               Total: {formatCurrency(order.total)}
-//             </p>
-//           </div>
-//         </div>
-
-//         {/* ===== Products (Scrollable) ===== */}
-//         <div>
-//           <p className="text-xs text-muted-foreground mb-1">
-//             Produk ({order.products.length})
-//           </p>
-
-//           <div className="max-h-32 overflow-y-auto pr-2 space-y-1">
-//             {order.products.length === 0 ? (
-//               <p className="text-xs text-muted-foreground italic">
-//                 Tidak ada produk
-//               </p>
-//             ) : (
-//               order.products.map((product, idx) => (
-//                 <div
-//                   key={idx}
-//                   className="text-xs p-2 rounded bg-muted/50"
-//                 >
-//                   <p className="font-medium truncate">
-//                     {product.name}
-//                   </p>
-//                   <p className="text-muted-foreground">
-//                     {product.quantity}x
-//                   </p>
-//                 </div>
-//               ))
-//             )}
-//           </div>
-//         </div>
-
-//         {/* ===== Actions ===== */}
-//         <div className="flex lg:justify-end items-start gap-1 opacity-0 group-hover:opacity-100 transition">
-//           <IconButton size="sm" color="info" onClick={() => onView(order)}>
-//             <Eye className="h-4 w-4" />
-//           </IconButton>
-//           <IconButton size="sm" color="warning" onClick={() => onEdit(order)}>
-//             <Edit className="h-4 w-4" />
-//           </IconButton>
-//           <IconButton
-//             size="sm"
-//             color="purple"
-//             onClick={() => onPrint([order.id])}
-//           >
-//             <Printer className="h-4 w-4" />
-//           </IconButton>
-//           {order.paymentStatus !== "dibatalkan" && onCancel && (
-//             <IconButton
-//               size="sm"
-//               color="orange"
-//               onClick={() => onCancel(order.id)}
-//               title="Batalkan Order"
-//             >
-//               <XCircle className="h-4 w-4" />
-//             </IconButton>
-//           )}
-//           <IconButton
-//             size="sm"
-//             color="destructive"
-//             onClick={() => onDelete(order.id)}
-//           >
-//             <Trash2 className="h-4 w-4" />
-//           </IconButton>
-//         </div>
-//       </div>
-//     </Card>
-//   );
-// });
-// ==================== END OLD OrderCard ====================
-
 const OrderCard = memo(function OrderCard({
   order,
   isSelected,
@@ -455,6 +283,8 @@ interface PaginationProps {
   endIndex: number;
   totalItems: number;
   onPageChange: (page: number) => void;
+  hasNext?: boolean;
+  hasPrev?: boolean;
 }
 
 const Pagination = memo(function Pagination({
@@ -464,7 +294,12 @@ const Pagination = memo(function Pagination({
   endIndex,
   totalItems,
   onPageChange,
+  hasNext,
+  hasPrev,
 }: PaginationProps) {
+  const prevDisabled = typeof hasPrev === "boolean" ? !hasPrev : currentPage === 1;
+  const nextDisabled = typeof hasNext === "boolean" ? !hasNext : currentPage === totalPages;
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border-t bg-muted/20">
       <p className="text-sm text-muted-foreground">
@@ -480,7 +315,7 @@ const Pagination = memo(function Pagination({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={prevDisabled}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -493,7 +328,7 @@ const Pagination = memo(function Pagination({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={nextDisabled}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -512,6 +347,16 @@ interface OrderTableProps {
   onView: (order: Order) => void;
   onPrint: (orderIds: string[]) => void;
   onCancel?: (orderId: string) => void;
+  // Cursor-based pagination props (optional, for server-side pagination)
+  serverPagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+    onPageChange: (page: number) => void;
+  };
 }
 
 export function OrderTable({
@@ -521,17 +366,48 @@ export function OrderTable({
   onView,
   onPrint,
   onCancel,
+  serverPagination,
 }: OrderTableProps) {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 10;
+  // === Old client-side pagination (commented out — replaced by server-side) ===
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const itemsPerPage = 10;
+  // const totalPages = Math.ceil(orders.length / itemsPerPage);
+  // const startIndex = (currentPage - 1) * itemsPerPage;
+  // const endIndex = startIndex + itemsPerPage;
+  // const paginatedOrders = orders.slice(startIndex, endIndex);
+  // ============================================================================
 
-  // Use orders directly - filtering is now done server-side via API
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedOrders = orders.slice(startIndex, endIndex);
+  // Server-side pagination: display orders as-is (already paginated from API)
+  // Fallback to client-side if serverPagination not provided
+  const [clientPage, setClientPage] = useState(1);
+  const clientItemsPerPage = 10;
+
+  const useServerPagination = !!serverPagination;
+  const displayOrders = useServerPagination
+    ? orders
+    : orders.slice((clientPage - 1) * clientItemsPerPage, clientPage * clientItemsPerPage);
+
+  const paginationProps = useServerPagination
+    ? {
+        currentPage: serverPagination.currentPage,
+        totalPages: serverPagination.totalPages,
+        startIndex: (serverPagination.currentPage - 1) * serverPagination.itemsPerPage,
+        endIndex: (serverPagination.currentPage - 1) * serverPagination.itemsPerPage + orders.length,
+        totalItems: serverPagination.totalItems,
+        onPageChange: serverPagination.onPageChange,
+        hasNext: serverPagination.hasNext,
+        hasPrev: serverPagination.hasPrev,
+      }
+    : {
+        currentPage: clientPage,
+        totalPages: Math.ceil(orders.length / clientItemsPerPage),
+        startIndex: (clientPage - 1) * clientItemsPerPage,
+        endIndex: clientPage * clientItemsPerPage,
+        totalItems: orders.length,
+        onPageChange: setClientPage,
+      };
 
   const toggleSelectOrder = useCallback((orderId: string) => {
     setSelectedOrders((prev) =>
@@ -549,7 +425,7 @@ export function OrderTable({
       />
 
       <div className="space-y-3">
-        {paginatedOrders.length === 0 ? (
+        {displayOrders.length === 0 ? (
           <Card className="p-12 text-center">
             <Search className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
             <p className="font-semibold">Tidak ada order</p>
@@ -558,7 +434,7 @@ export function OrderTable({
             </p>
           </Card>
         ) : (
-          paginatedOrders.map((order, index) => (
+          displayOrders.map((order, index) => (
             <OrderCard
               key={order.id}
               order={order}
@@ -575,15 +451,8 @@ export function OrderTable({
         )}
       </div>
 
-      {orders.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          totalItems={orders.length}
-          onPageChange={setCurrentPage}
-        />
+      {(useServerPagination ? serverPagination.totalItems > 0 : orders.length > 0) && (
+        <Pagination {...paginationProps} />
       )}
     </div>
   );

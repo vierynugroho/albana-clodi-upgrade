@@ -5,6 +5,7 @@ import { WelcomeCard } from "@/components/dashboards/WelcomeCard";
 import { FilterButtons, FilterType } from "@/components/dashboards/FilterButton";
 import { QuickActions } from "@/components/dashboards/QuickActions";
 import { StatsGrid } from "@/components/dashboards/StatGrid";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
   const [filter, setFilter] = useState<FilterType>("Today");

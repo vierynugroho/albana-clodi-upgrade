@@ -22,6 +22,7 @@ import { generateSKUFromName, getApiErrorMessage } from "@/lib/utils";
 import { productFormSchema, ProductFormValues } from "@/schemas/zod.schemas";
 import { ToggleSwitch } from "./ToggleSwitchProduct";
 import VariantCards from "./VariantCards";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 // Product type options matching API
 const PRODUCT_TYPE_OPTIONS = [
@@ -64,6 +65,7 @@ export function ProductForm({
   const router = useRouter();
   const { toast } = useToast();
   const existingSkus = useRef(new Set<string>());
+
 
   // Mutation hooks
   const createProduct = useCreateProduct();
@@ -236,10 +238,20 @@ export function ProductForm({
       onSuccess?.();
       router.push("/products");
     } catch (error) {
-      const message = getApiErrorMessage(
+      let message = getApiErrorMessage(
         error,
         "Terjadi kesalahan saat menyimpan produk"
       );
+
+      // Translate specific backend errors to be more informative
+      if (
+        message.toLowerCase().includes("insufficient stock") || 
+        message.toLowerCase().includes("tidak cukup") ||
+        message.toLowerCase().includes("kurang")
+      ) {
+        message = "Gagal memperbarui: Stok yang dimasukkan tidak valid atau lebih kecil dari stok sebelumnya.";
+      }
+
       toast({
         title: "Gagal",
         description: message,
@@ -590,11 +602,11 @@ export function ProductForm({
         </div>
       </div>
 
-      {/* Variant Section */}
       <VariantCards
         control={control}
         register={register}
         setValue={setValue}
+        errors={errors}
         showVariantToggle={showVariantToggle}
         variantImages={variantImages}
         setVariantImages={setVariantImages}

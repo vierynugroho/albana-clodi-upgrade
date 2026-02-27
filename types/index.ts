@@ -166,7 +166,7 @@ export interface PrintSetting {
   showNoOrder: boolean;
   showDate: boolean;
   showFragile: boolean;
-  showOrderStatus: boolean;
+  // showOrderStatus: boolean;
   showPaymentStatus: boolean;
   showInstallmentAmount: boolean;
 }

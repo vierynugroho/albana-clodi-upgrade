@@ -5,8 +5,9 @@ import { OrderTable } from "@/components/order/OrderTable";
 import { OrderFilters } from "@/components/order/OrderFilters";
 import { Plus, ShoppingCart, Loader2, RefreshCw, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
-import { useOrders, useDeleteOrder, useCancelOrder } from "@/hooks/useOrders";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useDeleteOrder, useCancelOrder } from "@/hooks/useOrders";
+import { useOrdersPaginated } from "@/hooks/useOrders";
 import { useSalesChannels } from "@/hooks/useSalesChannels";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useCustomers } from "@/hooks/useCustomers";
@@ -15,6 +16,13 @@ import { mapApiOrdersToOrders } from "@/lib/mappers";
 import { exportOrders } from "@/lib/services/order.service";
 import type { Order } from "@/types";
 import type { OrderQueryParams } from "@/types/api";
+import { LoadingState } from "@/components/shared/LoadingState";
+
+// === Old import (commented out — replaced by useOrdersPaginated) ===
+// import { useOrders } from "@/hooks/useOrders";
+// ===================================================================
+
+const ITEMS_PER_PAGE = 20;
 
 export default function OrderPage() {
   const router = useRouter();
@@ -24,9 +32,25 @@ export default function OrderPage() {
   const [filters, setFilters] = useState<OrderQueryParams>({});
   const [isExporting, setIsExporting] = useState(false);
 
-  // Memoize query params to prevent unnecessary re-fetches
+  // === Cursor-based pagination state ===
+  const [currentPage, setCurrentPage] = useState(1);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasNext, setHasNext] = useState(false);
+  const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([null]);
+  const [totalItems, setTotalItems] = useState(0);
+
+  // Current cursor for the active page
+  const currentCursor = cursorHistory[currentPage - 1] ?? null;
+
+  // Memoize query params
   const queryParams = useMemo(() => {
-    const params: OrderQueryParams = { ...filters };
+    const params: OrderQueryParams = {
+      ...filters,
+      limit: ITEMS_PER_PAGE,
+    };
+    if (currentCursor) {
+      params.cursor = currentCursor;
+    }
     // Remove empty values
     Object.keys(params).forEach((key) => {
       const value = params[key as keyof OrderQueryParams];
@@ -35,15 +59,55 @@ export default function OrderPage() {
       }
     });
     return params;
-  }, [filters]);
+  }, [filters, currentCursor]);
 
-  // Fetch orders with filters
+  // === Old useOrders (commented out — replaced by useOrdersPaginated) ===
+  // const {
+  //   data: apiOrders = [],
+  //   isLoading,
+  //   isError,
+  //   refetch
+  // } = useOrders(queryParams);
+  // =====================================================================
+
+  // Fetch orders with cursor-based pagination
   const {
-    data: apiOrders = [],
+    data: paginatedResult,
     isLoading,
     isError,
-    refetch
-  } = useOrders(queryParams);
+    refetch,
+  } = useOrdersPaginated(queryParams);
+
+  // Extract data and meta from paginated result
+  const apiOrders = paginatedResult?.data ?? [];
+  const meta = paginatedResult?.meta ?? {};
+
+  // Update cursor state when data arrives
+  const prevMetaRef = useRef(meta);
+  useEffect(() => {
+    if (meta !== prevMetaRef.current) {
+      prevMetaRef.current = meta;
+      const nc = meta.nextCursor ?? null;
+      setNextCursor(nc);
+      setHasNext(Boolean(nc) && apiOrders.length > 0);
+      if (meta.totalItems !== undefined) {
+        setTotalItems(meta.totalItems);
+      }
+    }
+  }, [meta, apiOrders.length]);
+
+  // Reset pagination when filters change
+  const filtersRef = useRef(filters);
+  useEffect(() => {
+    if (filtersRef.current !== filters) {
+      filtersRef.current = filters;
+      setCurrentPage(1);
+      setCursorHistory([null]);
+      setNextCursor(null);
+      setHasNext(false);
+      setTotalItems(0);
+    }
+  }, [filters]);
 
   // Fetch filter options
   const { data: salesChannels = [], isLoading: isLoadingSalesChannels } = useSalesChannels();
@@ -58,6 +122,43 @@ export default function OrderPage() {
 
   // Map API orders to frontend Order type
   const orders: Order[] = mapApiOrdersToOrders(apiOrders);
+
+  // Pagination handler (cursor-based)
+  const totalPages = totalItems > 0
+    ? Math.ceil(totalItems / ITEMS_PER_PAGE)
+    : currentPage + (hasNext ? 1 : 0);
+
+  const handlePageChange = useCallback((page: number) => {
+    if (isLoading) return;
+    if (page < 1) return;
+
+    // Go to first page
+    if (page === 1) {
+      setCursorHistory([null]);
+      setCurrentPage(1);
+      return;
+    }
+
+    // Previous page
+    if (page < currentPage) {
+      const cursorForPage = cursorHistory[page - 1] ?? null;
+      setCurrentPage(page);
+      // Cursor is already in history, the queryParams memo will pick it up
+      return;
+    }
+
+    // Next page (must be sequential for cursor)
+    if (page === currentPage + 1) {
+      if (!hasNext || !nextCursor) return;
+      setCursorHistory((prev) => {
+        const copy = [...prev];
+        copy[page - 1] = nextCursor;
+        return copy;
+      });
+      setCurrentPage(page);
+      return;
+    }
+  }, [isLoading, currentPage, hasNext, nextCursor, cursorHistory]);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -142,12 +243,9 @@ export default function OrderPage() {
   };
 
   // Loading state
-  if (isLoading) {
+  if (isLoading && apiOrders.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Memuat data orders...</p>
-      </div>
+      <LoadingState />
     );
   }
 
@@ -209,10 +307,19 @@ export default function OrderPage() {
       {/* Order Count Info */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Menampilkan <span className="font-semibold text-foreground">{orders.length}</span> order
-          {Object.keys(queryParams).length > 0 && " (dengan filter)"}
+          {totalItems > 0 ? (
+            <>
+              Menampilkan <span className="font-semibold text-foreground">{orders.length}</span> dari{" "}
+              <span className="font-semibold text-foreground">{totalItems}</span> order
+            </>
+          ) : (
+            <>
+              Menampilkan <span className="font-semibold text-foreground">{orders.length}</span> order
+            </>
+          )}
+          {Object.keys(filters).length > 0 && " (dengan filter)"}
         </p>
-        {Object.keys(queryParams).length > 0 && (
+        {Object.keys(filters).length > 0 && (
           <Button
             variant="ghost"
             size="sm"
@@ -224,7 +331,7 @@ export default function OrderPage() {
         )}
       </div>
 
-      {/* Order Table */}
+      {/* Order Table with Server-Side Pagination */}
       <OrderTable
         orders={orders}
         onEdit={handleEdit}
@@ -232,6 +339,15 @@ export default function OrderPage() {
         onView={handleView}
         onPrint={handlePrint}
         onCancel={handleCancel}
+        serverPagination={{
+          currentPage,
+          totalPages,
+          totalItems: totalItems || orders.length,
+          itemsPerPage: ITEMS_PER_PAGE,
+          hasNext,
+          hasPrev: currentPage > 1,
+          onPageChange: handlePageChange,
+        }}
       />
     </div>
   );

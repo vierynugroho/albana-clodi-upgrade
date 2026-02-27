@@ -9,6 +9,7 @@ interface StatsGridProps {
   totalOrders: number;
   successOrders: number;
   isLoading: boolean;
+  hideExpenses?: boolean;
 }
 
 export const StatsGrid = memo(function StatsGrid({
@@ -17,14 +18,15 @@ export const StatsGrid = memo(function StatsGrid({
   totalOrders,
   successOrders,
   isLoading,
+  hideExpenses = false,
 }: StatsGridProps) {
-  const stats = [
-    {
+  const allStats = [
+    ...(!hideExpenses ? [{
       label: "Pengeluaran",
       value: formatCurrency(expenses),
       icon: DollarSign,
       color: "orange" as const,
-    },
+    }] : []),
     {
       label: "Total Item Terjual",
       value: itemsSold.toLocaleString(),
@@ -45,10 +47,12 @@ export const StatsGrid = memo(function StatsGrid({
     },
   ];
 
+  const gridCols = hideExpenses ? "lg:grid-cols-3" : "lg:grid-cols-4";
+
   if (isLoading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
+      <div className={`grid gap-4 sm:grid-cols-2 ${gridCols}`}>
+        {allStats.map((_, i) => (
           <Card key={i} className="h-32 animate-pulse">
             <CardContent className="flex items-center justify-center h-full">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -60,8 +64,8 @@ export const StatsGrid = memo(function StatsGrid({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {stats.map((item) => {
+    <div className={`grid gap-4 sm:grid-cols-2 ${gridCols}`}>
+      {allStats.map((item) => {
         const Icon = item.icon;
         return (
           <StatCard

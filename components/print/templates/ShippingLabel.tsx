@@ -48,11 +48,11 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
                 {order.salesChannel}
               </p>
             )}
-            {setting.showOrderStatus && (
+            {/* {setting.showOrderStatus && (
               <span className="inline-block mt-0.5 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider border border-gray-400 rounded-sm">
                 {orderStatus}
               </span>
-            )}
+            )} */}
             {setting.showPaymentStatus && (
               <span className="inline-block ml-1 mt-0.5 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider border border-gray-400 rounded-sm">
                 {paymentStatus}

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BankAccFormValues, bankAccountSchema } from "@/schemas/zod.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FormField, RadioBtnField } from "@/components/field/FormField";
+import { FormField } from "@/components/field/FormField";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreatePaymentMethod, useUpdatePaymentMethod } from "@/hooks/usePaymentMethods";
@@ -36,7 +36,6 @@ const PaymentAccountForm = ({
   const updateMutation = useUpdatePaymentMethod();
 
   const {
-    control,
     register,
     handleSubmit,
     reset,
@@ -146,20 +145,15 @@ const PaymentAccountForm = ({
               error={errors.accountName?.message}
             />
 
-            {/* Radio boolean */}
-            <div className="flex flex-col gap-1">
-              <RadioBtnField<BankAccFormValues>
-                label="Status Aktif"
-                name="status"
-                control={control}
-                error={errors.status?.message}
-              />
-
-              {errors.status && (
-                <span className="text-xs text-red-500">
-                  {errors.status.message}
+            {/* Info: status otomatis aktif */}
+            <div className="flex flex-col gap-1 justify-center">
+              <label className="text-sm font-medium">Status</label>
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2.5">
+                <div className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
+                <span className="text-sm text-muted-foreground">
+                  Rekening otomatis berstatus <strong className="text-foreground">aktif</strong> saat ditambahkan
                 </span>
-              )}
+              </div>
             </div>
           </div>
 

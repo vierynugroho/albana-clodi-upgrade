@@ -3,6 +3,7 @@ import { StatCard, StatCardColor } from "../ui";
 import { FilterType } from "./FilterButton";
 import { ReportQueryParams } from "@/types/api";
 import { useReportOrders } from "@/hooks/useReports";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { BanknoteArrowDown, BanknoteX, DollarSign, PackageCheckIcon, Wallet, WalletCards } from "lucide-react";
 
 interface Stat {
@@ -16,6 +17,8 @@ interface Stat {
 export const StatsGrid = memo(function StatsGrid({
   filter,
 }: {filter: FilterType}) {
+  const { data: userData } = useCurrentUser();
+  const isSuperAdmin = userData?.responseObject?.role?.toLowerCase() === "superadmin";
   const queryParams: ReportQueryParams = useMemo(() => {
     const today = new Date();
     const formatDate = (d: Date) =>
@@ -93,9 +96,18 @@ export const StatsGrid = memo(function StatsGrid({
     },
   ];
 
+  // Filter: admin hanya lihat non-keuangan
+  const visibleStats = isSuperAdmin
+    ? stats
+    : stats.filter(s => ![
+        "Amount Expenses",
+        "Total Expenses",
+        "Transactions",
+      ].includes(s.title));
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {stats.map(({ title, icon: Icon, ...stat }) => (
+      {visibleStats.map(({ title, icon: Icon, ...stat }) => (
         <StatCard
           key={title}
           title={title}

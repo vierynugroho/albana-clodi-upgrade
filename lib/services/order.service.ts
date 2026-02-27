@@ -5,7 +5,9 @@ import type {
     ApiOrder,
     OrderCreatePayload,
     OrderQueryParams,
-    PaginatedResponse
+    PaginatedResponse,
+    CursorPaginatedResponse,
+    CursorPaginationMeta,
 } from "@/types/api";
 
 export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]> {
@@ -16,6 +18,47 @@ export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]
     };
     const res = await api.get<PaginatedResponse<ApiOrder>>("/orders", { params: queryParams });
     return res.data?.responseObject || [];
+}
+
+const ITEMS_PER_PAGE = 20;
+
+/**
+ * Fetch orders with cursor-based pagination.
+ * Returns { data, meta } with nextCursor for navigation.
+ */
+export async function fetchOrdersPaginated(
+    params?: OrderQueryParams
+): Promise<{ data: ApiOrder[]; meta: CursorPaginationMeta }> {
+    const queryParams = {
+        limit: ITEMS_PER_PAGE,
+        ...params,
+    };
+    const res = await api.get<CursorPaginatedResponse<ApiOrder>>("/orders", { params: queryParams });
+
+    const ro = res.data?.responseObject;
+
+    // Normalize: backend may return { data, meta } object or flat array
+    if (ro && typeof ro === "object" && !Array.isArray(ro) && Array.isArray(ro.data)) {
+        return {
+            data: ro.data,
+            meta: ro.meta || {},
+        };
+    }
+
+    // Fallback: flat array response
+    if (Array.isArray(ro)) {
+        return {
+            data: ro,
+            meta: {
+                totalItems: ro.length,
+                limit: ITEMS_PER_PAGE,
+                nextCursor: null,
+                usedCursor: false,
+            },
+        };
+    }
+
+    return { data: [], meta: {} };
 }
 
 export async function getOrder(id: string): Promise<ApiOrder | null> {

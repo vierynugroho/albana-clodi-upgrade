@@ -20,6 +20,13 @@ export function useOrders(params?: OrderQueryParams) {
     });
 }
 
+export function useOrdersPaginated(params?: OrderQueryParams) {
+    return useQuery({
+        queryKey: [...orderKeys.lists(), "paginated", params] as const,
+        queryFn: () => orderService.fetchOrdersPaginated(params),
+    });
+}
+
 export function useOrder(id: string) {
     return useQuery({
         queryKey: orderKeys.detail(id),

@@ -80,6 +80,7 @@ export default function ReportPage() {
   const {chartData: productData, isLoading: isLoadingProductChart} = useProductChartData();
 
   const {data} = useCurrentUser();
+  const isSuperAdmin = data?.responseObject?.role?.toLowerCase() === "superadmin";
 
   const isLoading = isLoadingOrders || isLoadingExpenses;
 
@@ -135,13 +136,15 @@ export default function ReportPage() {
         <p className="page-description">Semua data laporan penjualan</p>
       </div>
 
-      {/* Summary Header */}
-      <SummaryHeader
-        totalPendapatan={ordersReport?.penjualan_bersih || 0}
-        labaBersih={ordersReport?.laba_bersih || 0}
-        filterInfo={ordersReport?.filterInfo || ""}
-        isLoading={isLoading}
-      />
+      {/* Summary Header - Superadmin only */}
+      {isSuperAdmin && (
+        <SummaryHeader
+          totalPendapatan={ordersReport?.penjualan_bersih || 0}
+          labaBersih={ordersReport?.laba_bersih || 0}
+          filterInfo={ordersReport?.filterInfo || ""}
+          isLoading={isLoading}
+        />
+      )}
 
       {/* Filter Section */}
       <FilterSection
@@ -158,25 +161,28 @@ export default function ReportPage() {
         filterInfo={ordersReport?.filterInfo || ""}
       />
 
-      {/* Profit Summary */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Ringkasan Keuangan</h3>
-        <ProfitCards
-          penjualanKotor={ordersReport?.penjualan_kotor || 0}
-          penjualanBersih={ordersReport?.penjualan_bersih || 0}
-          labaKotor={ordersReport?.laba_kotor || 0}
-          labaBersih={ordersReport?.laba_bersih || 0}
-          isLoading={isLoading}
-        />
-      </div>
+      {/* Profit Summary - Superadmin only */}
+      {isSuperAdmin && (
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Ringkasan Keuangan</h3>
+          <ProfitCards
+            penjualanKotor={ordersReport?.penjualan_kotor || 0}
+            penjualanBersih={ordersReport?.penjualan_bersih || 0}
+            labaKotor={ordersReport?.laba_kotor || 0}
+            labaBersih={ordersReport?.laba_bersih || 0}
+            isLoading={isLoading}
+          />
+        </div>
+      )}
 
-      {/* Stats Grid */}
+      {/* Stats Grid - hide expenses for admin */}
       <StatsGrid
         expenses={expensesReport?.totalExpenses || ordersReport?.expenses_amount || 0}
         itemsSold={ordersReport?.total_item_terjual || 0}
         totalOrders={ordersReport?.total_transactions || 0}
         successOrders={ordersReport?.total_transaction_success || 0}
         isLoading={isLoading}
+        hideExpenses={!isSuperAdmin}
       />
 
       {/* Transaction Status */}
@@ -187,53 +193,47 @@ export default function ReportPage() {
         isLoading={isLoading}
       />
 
-      {
-        data?.responseObject?.role?.toLocaleLowerCase() === "superadmin" ? (
-          <div>
-            <div className="grid gap-6 lg:grid-cols-2">
-              <ChartPlaceholder
-                title="Grafik Order"
-                description="Tren Jumlah Data Order"
-                icon={TrendingUp}
-                color="border-primary/20"
-                data={orderData}
-                isLoading={isLoadingOrderChart}
-              />
-              <ChartPlaceholder
-                title="Grafik Pengeluaran"
-                description="Tren Jumlah Data Pengeluaran"
-                icon={TrendingUp}
-                color="border-primary/20"
-                data={expensesData}
-                isLoading={isLoadingExpensesChart}
-              />
-            </div>
+      {/* Charts Keuangan - Superadmin only */}
+      {isSuperAdmin && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ChartPlaceholder
+            title="Grafik Order"
+            description="Tren Jumlah Data Order"
+            icon={TrendingUp}
+            color="border-primary/20"
+            data={orderData}
+            isLoading={isLoadingOrderChart}
+          />
+          <ChartPlaceholder
+            title="Grafik Pengeluaran"
+            description="Tren Jumlah Data Pengeluaran"
+            icon={TrendingUp}
+            color="border-primary/20"
+            data={expensesData}
+            isLoading={isLoadingExpensesChart}
+          />
+        </div>
+      )}
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <ChartPlaceholder
-                title="Grafik Customer"
-                description="Tren Jumlah Data Customer"
-                icon={TrendingUp}
-                color="border-primary/20"
-                data={customerData}
-                isLoading={isLoadingCustomerChart}
-              />
-
-              <ChartPlaceholder
-                title="Grafik Product"
-                description="Tren Jumlah Data Product"
-                icon={TrendingUp}
-                color="border-primary/20"
-                data={productData}
-                isLoading={isLoadingProductChart}
-              />
-        
-            </div>
-          </div>
-        ) : data?.responseObject?.role?.toLocaleLowerCase() === "admin" ?(
-          <p></p>
-        ) : null
-      }
+      {/* Charts Non-Keuangan - Semua role */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ChartPlaceholder
+          title="Grafik Customer"
+          description="Tren Jumlah Data Customer"
+          icon={TrendingUp}
+          color="border-primary/20"
+          data={customerData}
+          isLoading={isLoadingCustomerChart}
+        />
+        <ChartPlaceholder
+          title="Grafik Product"
+          description="Tren Jumlah Data Product"
+          icon={TrendingUp}
+          color="border-primary/20"
+          data={productData}
+          isLoading={isLoadingProductChart}
+        />
+      </div>
 
      
       

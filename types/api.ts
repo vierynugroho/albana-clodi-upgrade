@@ -21,6 +21,26 @@ export interface PaginatedResponse<T> {
     statusCode: number;
 }
 
+// Cursor-based pagination response (used by orders)
+export interface CursorPaginationMeta {
+    currentPage?: number;
+    totalPages?: number;
+    totalItems?: number;
+    limit?: number;
+    nextCursor?: string | null;
+    usedCursor?: boolean;
+}
+
+export interface CursorPaginatedResponse<T> {
+    success: boolean;
+    message: string;
+    responseObject: {
+        data: T[];
+        meta: CursorPaginationMeta;
+    } | T[];
+    statusCode: number;
+}
+
 // Order types matching actual API structure
 export interface ApiCustomer {
     id: string;
@@ -298,6 +318,7 @@ export interface OrderCreatePayload {
 export interface OrderQueryParams {
     page?: number;
     limit?: number;
+    cursor?: string;
     ordererCustomerId?: string;
     deliveryTargetCustomerId?: string;
     salesChannelId?: string;
@@ -315,6 +336,15 @@ export interface OrderQueryParams {
     search?: string;
     sort?: string;
     order?: "asc" | "desc";
+    // Field-specific search (from old app)
+    customerName?: string;
+    orderId?: string;
+    code?: string;
+    productName?: string;
+    sku?: string;
+    receiptNumber?: string;
+    phoneNumber?: string;
+    shipperTrackingId?: string;
 }
 
 export interface CustomerQueryParams {

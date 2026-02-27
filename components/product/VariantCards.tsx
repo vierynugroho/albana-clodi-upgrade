@@ -77,13 +77,15 @@ const ImageUpload = memo(function ImageUpload({
 });
 
 import { Card, CardContent, FormFieldWrapper, Input } from "../ui";
-import { Controller, Control, UseFormRegister, UseFormSetValue, FieldArrayWithId } from "react-hook-form";
+import { Controller, Control, UseFormRegister, UseFormSetValue, FieldArrayWithId, FieldErrors } from "react-hook-form";
 import type { ProductFormValues } from "@/schemas/zod.schemas";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 interface VariantCardsProps {
   control: Control<ProductFormValues>;
   register: UseFormRegister<ProductFormValues>;
   setValue: UseFormSetValue<ProductFormValues>;
+  errors: FieldErrors<ProductFormValues>;
   showVariantToggle: boolean;
   variantImages: (string | null)[];
   setVariantImages: React.Dispatch<React.SetStateAction<(string | null)[]>>;
@@ -113,6 +115,7 @@ const VariantCards = ({
   control,
   register,
   setValue,
+  errors,
   showVariantToggle,
   variantImages,
   setVariantImages,
@@ -124,6 +127,9 @@ const VariantCards = ({
     append(defaultVariant());
     setVariantImages(prev => [...prev, null]);
   }, [append, setVariantImages]);
+
+  const {data} = useCurrentUser()
+  const role = data?.responseObject.role
 
   const handleRemoveVariant = useCallback(
     (index: number) => {
@@ -159,9 +165,6 @@ const VariantCards = ({
     [setValue, setVariantImages]
   );
 
-  // @debug — commented for production
-  // console.log(variantImages)
-
   return (
     <div className="flex flex-col gap-4 overflow-x-auto">
       {fields.map((field, index) => (
@@ -178,9 +181,14 @@ const VariantCards = ({
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
               {/* Column 1: SKU */}
               <div>
-                <FormFieldWrapper label="SKU" required>
+                <FormFieldWrapper
+                  label="SKU"
+                  required
+                  error={errors.productVariants?.[index]?.sku?.message}
+                >
                   <Input
                     placeholder="T003"
+                    error={!!errors.productVariants?.[index]?.sku}
                     {...register(`productVariants.${index}.sku`)}
                   />
                 </FormFieldWrapper>
@@ -192,6 +200,7 @@ const VariantCards = ({
                   <FormFieldWrapper
                     key={priceKey}
                     label={`Harga ${priceKey.charAt(0).toUpperCase() + priceKey.slice(1)}`}
+                    error={errors.productVariants?.[index]?.productPrices?.[priceKey]?.message}
                   >
                     <Controller
                       name={`productVariants.${index}.productPrices.${priceKey}`}
@@ -200,6 +209,7 @@ const VariantCards = ({
                         <Input
                           type="text"
                           placeholder="0"
+                          error={!!errors.productVariants?.[index]?.productPrices?.[priceKey]}
                           value={field.value as number}
                           onChange={e => field.onChange(Number(e.target.value))}
                         />
@@ -211,15 +221,23 @@ const VariantCards = ({
 
               {/* Column 3: Size & Color */}
               <div className="space-y-2">
-                <FormFieldWrapper label="Ukuran">
+                <FormFieldWrapper
+                  label="Ukuran"
+                  error={errors.productVariants?.[index]?.size?.message}
+                >
                   <Input
                     placeholder="XL"
+                    error={!!errors.productVariants?.[index]?.size}
                     {...register(`productVariants.${index}.size`)}
                   />
                 </FormFieldWrapper>
-                <FormFieldWrapper label="Warna">
+                <FormFieldWrapper
+                  label="Warna"
+                  error={errors.productVariants?.[index]?.color?.message}
+                >
                   <Input
                     placeholder="Merah"
+                    error={!!errors.productVariants?.[index]?.color}
                     {...register(`productVariants.${index}.color`)}
                   />
                 </FormFieldWrapper>
@@ -227,13 +245,25 @@ const VariantCards = ({
 
               {/* Column 4: Stock */}
               <div>
-                <FormFieldWrapper label="Stok">
+                <FormFieldWrapper
+                  label="Stok"
+                  error={errors.productVariants?.[index]?.stock?.message}
+                >
                   <Input
                     type="number"
-                    placeholder="0"
                     min={0}
+                    error={!!errors.productVariants?.[index]?.stock}
                     {...register(`productVariants.${index}.stock`, {
                       valueAsNumber: true,
+                      validate: (value) => {
+                        const originalStock = field.stock ?? 0;
+
+                        if (role === "admin" && value < originalStock) {
+                          return "Admin tidak boleh mengurangi stok";
+                        }
+
+                        return true;
+                      },
                     })}
                   />
                 </FormFieldWrapper>

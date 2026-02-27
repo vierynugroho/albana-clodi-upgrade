@@ -18,6 +18,7 @@ import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types";
 import DropdownButton from "../ui/DropdownButton";
 import { useCategories } from "@/hooks/useCategories";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 interface ProductTableProps {
   products: Product[];
@@ -135,6 +136,9 @@ const ProductRow = memo(function ProductRow({
   ];
   const gradientIndex = index % gradientColors.length;
 
+  const {data} = useCurrentUser()
+  const role = data?.responseObject.role
+
   return (
     <tr
       className="border-b transition-colors hover:bg-muted/50 group animate-fade-in"
@@ -182,20 +186,25 @@ const ProductRow = memo(function ProductRow({
         <Badge variant={stockConf.variant}>{stockConf.label}</Badge>
       </td>
       <td className="p-4">
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 transition-opacity">
           <IconButton color="info" size="sm" onClick={() => onView(product)}>
             <Eye className="h-4 w-4" />
           </IconButton>
           <IconButton color="warning" size="sm" onClick={() => onEdit(product)}>
             <Edit className="h-4 w-4" />
           </IconButton>
-          <IconButton
-            color="destructive"
-            size="sm"
-            onClick={() => onDelete(product.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </IconButton>
+
+          {
+            role === "superadmin" ? 
+            <IconButton
+              color="destructive"
+              size="sm"
+              onClick={() => onDelete(product.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </IconButton>
+            : <></>
+          }
         </div>
       </td>
     </tr>
