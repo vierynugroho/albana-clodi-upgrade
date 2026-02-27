@@ -310,7 +310,7 @@ export async function deleteProduct(id: string): Promise<ApiProduct | null> {
 
 //Export products to file format (simple version)
 export async function exportProducts(format: "excel" = "excel"): Promise<Blob> {
-    const res = await api.get(`/products/export/${format}`, { responseType: "blob" });
+    const res = await api.post(`/products/export/${format}`, { responseType: "blob" });
     return res.data;
 }
 
