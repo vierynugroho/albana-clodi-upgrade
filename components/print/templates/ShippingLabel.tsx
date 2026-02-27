@@ -25,6 +25,7 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
                 width={100}
                 height={44}
                 alt="Albana Grosir"
+                style={{ width: "auto", height: "auto", maxWidth: "100px", maxHeight: "44px" }}
               />
             )}
             {setting.showShopInfo && (

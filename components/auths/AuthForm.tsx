@@ -73,7 +73,7 @@ const LoginForm = memo(function LoginForm() {
     <div className="w-full max-w-md rounded-2xl border p-8 flex flex-col items-center space-y-6 bg-card shadow-lg">
       {/* <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center"> */}
         {/* <Fingerprint className="h-8 w-8 text-white" /> */}
-        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" />
+        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" style={{ width: "auto", height: "auto", maxWidth: "90px", maxHeight: "90px" }} />
       {/* </div> */}
       <div className="text-center">
         <h1 className="text-2xl font-bold">Selamat Datang</h1>
@@ -147,7 +147,7 @@ const RegisterForm = memo(function RegisterForm() {
     <div className="w-full max-w-md rounded-2xl border p-8 flex flex-col items-center space-y-6 bg-card shadow-lg">
       {/* <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center"> */}
         {/* <Fingerprint className="h-8 w-8 text-white" /> */}
-        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" />
+        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" style={{ width: "auto", height: "auto", maxWidth: "90px", maxHeight: "90px" }} />
       {/* </div> */}
       <div className="text-center">
         <h1 className="text-2xl font-bold">Buat Akun Baru</h1>

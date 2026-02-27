@@ -27,7 +27,7 @@ export const QuickActions = memo(function QuickActions() {
       icon: BarChart3,
       label: "Laporan",
       color: "bg-purple/10 text-purple hover:bg-purple/20",
-      link: "/report/add",
+      link: "/report",
     },
   ];
 

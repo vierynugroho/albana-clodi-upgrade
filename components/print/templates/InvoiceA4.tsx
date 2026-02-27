@@ -23,6 +23,7 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
                 width={130}
                 height={55}
                 alt="Albana Grosir"
+                style={{ width: "auto", height: "auto", maxWidth: "130px", maxHeight: "55px" }}
               />
             )}
             {setting.showShopInfo && (
