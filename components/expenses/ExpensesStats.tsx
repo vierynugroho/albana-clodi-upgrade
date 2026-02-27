@@ -2,6 +2,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Calendar, Loader2, PieChart, TrendingDown, Wallet } from "lucide-react";
 import { memo } from "react";
 import { StatCard } from "../ui";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 interface ExpenseStatsProps {
   totalExpenses: number;
@@ -22,6 +23,14 @@ export const ExpenseStats = memo(function ExpenseStats({
   largestPercentage,
   isLoading,
 }: ExpenseStatsProps) {
+  const { data: userData } = useCurrentUser();
+  const isSuperAdmin = userData?.responseObject?.role?.toLowerCase() === "superadmin";
+
+  // Hide financial metrics if not superadmin
+  if (!isSuperAdmin) {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -63,7 +72,7 @@ export const ExpenseStats = memo(function ExpenseStats({
       isPositive: false,
     },
     {
-      title: "Terbesar",
+      title: "Pembelian Terbesar",
       value: largestCategory.length > 12
         ? largestCategory.slice(0, 12) + "..."
         : largestCategory,

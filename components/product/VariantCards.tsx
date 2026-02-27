@@ -80,6 +80,7 @@ import { Card, CardContent, FormFieldWrapper, Input } from "../ui";
 import { Controller, Control, UseFormRegister, UseFormSetValue, FieldArrayWithId, FieldErrors } from "react-hook-form";
 import type { ProductFormValues } from "@/schemas/zod.schemas";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { formatCurrency, parseRupiah } from "@/lib/utils";
 
 interface VariantCardsProps {
   control: Control<ProductFormValues>;
@@ -208,10 +209,10 @@ const VariantCards = ({
                       render={({ field }) => (
                         <Input
                           type="text"
-                          placeholder="0"
+                          placeholder="Rp 0"
                           error={!!errors.productVariants?.[index]?.productPrices?.[priceKey]}
-                          value={field.value as number}
-                          onChange={e => field.onChange(Number(e.target.value))}
+                          value={field.value ? formatCurrency(field.value as number) : ""}
+                          onChange={e => field.onChange(parseRupiah(e.target.value))}
                         />
                       )}
                     />

@@ -229,7 +229,7 @@ const OrderCard = memo(function OrderCard({
         </div>
 
         {/* ===== Actions ===== */}
-        <div className="flex lg:justify-end items-start gap-1 opacity-0 group-hover:opacity-100 transition">
+        <div className="flex lg:justify-end items-start gap-1  transition">
           <IconButton size="sm" color="info" onClick={() => onView(order)}>
             <Eye className="h-4 w-4" />
           </IconButton>
