@@ -41,7 +41,7 @@ export function PrintManager({
     showSalesChannel: true,
     showDate: true,
     showFragile: false,
-    showOrderStatus: true,
+    // showOrderStatus: true,
     showPaymentStatus: false,
     showInstallmentAmount: false,
   });
