@@ -195,7 +195,7 @@ const ProductRow = memo(function ProductRow({
           </IconButton>
 
           {
-            role === "superadmin" ? 
+            role?.toLocaleLowerCase() === "superadmin" ? 
             <IconButton
               color="destructive"
               size="sm"

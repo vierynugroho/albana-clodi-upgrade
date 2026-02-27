@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { removeToken } from "@/lib/auth";
 import { LogOut } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface LogoutButtonProps {
     variant?: "default" | "icon" | "menu";
@@ -11,9 +12,11 @@ interface LogoutButtonProps {
 
 export default function LogoutButton({ variant = "default", className = "" }: LogoutButtonProps) {
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     function handleLogout() {
         removeToken();
+        queryClient.clear();
         router.replace("/login");
     }
 

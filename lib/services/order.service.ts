@@ -17,7 +17,14 @@ export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]
         ...params,
     };
     const res = await api.get<PaginatedResponse<ApiOrder>>("/orders", { params: queryParams });
-    return res.data?.responseObject || [];
+    const ro = res.data?.responseObject;
+    
+    // Normalize: backend may return { data, meta } object or flat array
+    if (ro && typeof ro === "object" && !Array.isArray(ro) && Array.isArray((ro as any).data)) {
+        return (ro as any).data;
+    }
+
+    return Array.isArray(ro) ? ro : [];
 }
 
 const ITEMS_PER_PAGE = 20;

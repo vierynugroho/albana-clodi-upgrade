@@ -17,6 +17,7 @@ import api from "@/lib/api";
 import { saveToken } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AuthFormProps {
   auth_method: "login" | "register";
@@ -28,6 +29,7 @@ const AuthForm = ({ auth_method }: AuthFormProps) => {
 
 const LoginForm = memo(function LoginForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -57,6 +59,7 @@ const LoginForm = memo(function LoginForm() {
       }
 
       saveToken(token);
+      queryClient.clear();
       router.replace("/dashboard");
     } catch (err: unknown) {
       console.error("login error", err);

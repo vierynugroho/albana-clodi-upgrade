@@ -235,7 +235,7 @@ const ExpenseRow = memo(function ExpenseRow({
         </p>
       </td>
       <td className="p-4">
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1  transition-opacity">
           <IconButton color="info" size="sm" onClick={() => onView(expense)}>
             <Eye className="h-4 w-4" />
           </IconButton>

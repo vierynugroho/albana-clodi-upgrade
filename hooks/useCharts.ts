@@ -11,17 +11,21 @@ export const monthOrder = [
 ];
 
 
+import { mapApiOrdersToOrders } from "@/lib/mappers";
+
 export function useOrderChartData(orderYear?: number) {
   const year = orderYear ?? new Date().getFullYear();
   const { data: monthlyReport, isLoading, isError, refetch } = useOrders({ orderYear: year });
 
-  // hitung chartData jika data sudah ada
-  const orders = Array.isArray(monthlyReport) ? monthlyReport : [];
+  // Map API orders to frontend Order type to get consistent total calculations
+  const rawOrders = Array.isArray(monthlyReport) ? monthlyReport : [];
+  const orders = mapApiOrdersToOrders(rawOrders);
+  
   const chartData: ChartDataItem[] = orders
     .reduce<ChartItem[]>((acc, item) => {
-      const date = new Date(item.orderDate);
+      const date = new Date(item.date);
       const month = date.toLocaleDateString("id-ID", { month: "long", timeZone: "UTC" });
-      const price = item.OrderDetail?.finalPrice ?? 0;
+      const price = item.total ?? 0;
 
       const existing = acc.find(d => d.month === month);
       if (existing) {

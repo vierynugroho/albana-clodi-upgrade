@@ -10,6 +10,7 @@ import { useCurrentUser } from "@/hooks/useAuth";
 import { removeToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -81,6 +82,7 @@ const UserMenu = memo(function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Get user info from response
   const user = data?.responseObject;
@@ -109,9 +111,10 @@ const UserMenu = memo(function UserMenu() {
 
   const handleLogout = useCallback(() => {
     removeToken();
+    queryClient.clear();
     setIsOpen(false);
     router.push("/login");
-  }, [router]);
+  }, [router, queryClient]);
 
   const toggleDropdown = useCallback(() => {
     setIsOpen((prev) => !prev);
