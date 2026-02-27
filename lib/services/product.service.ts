@@ -310,14 +310,14 @@ export async function deleteProduct(id: string): Promise<ApiProduct | null> {
 
 //Export products to file format (simple version)
 export async function exportProducts(format: "excel" = "excel"): Promise<Blob> {
-    const res = await api.post(`/products/export/${format}`, { responseType: "blob" });
+    const res = await api.post(`/products/export/${format}`, null, { responseType: "blob" });
     return res.data;
 }
 
 //Download products as Excel file, Creates a download link and triggers the download
 export async function downloadProductExcel(): Promise<{ success: boolean; message?: string }> {
     try {
-        const res = await api.post("/products/export/excel", "", {
+        const res = await api.post("/products/export/excel", null, {
             headers: {
                 Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             },
