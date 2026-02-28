@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, UseFormRegister, FieldValues, Resolver } from "react-hook-form";
+import { useForm, UseFormRegister, FieldValues, Resolver, Controller } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { expensesSchema } from "@/schemas/zod.schemas";
 import { Input } from "../ui/input";
@@ -12,6 +12,7 @@ import { useCreateExpense, useUpdateExpense } from "@/hooks/useExpenses";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
+import { formatCurrency, parseRupiah } from "@/lib/utils";
 
 type ExpensesFormValues = z.infer<typeof expensesSchema>;
 
@@ -36,7 +37,7 @@ const FormField = <T extends FieldValues>({
 }: FormFieldProps<T>) => (
   <div className="flex flex-col gap-1">
     <label className="text-sm font-medium">
-      {label} {!nullable && "*"}
+      {label} {!nullable && <span className="text-destructive">*</span>}
     </label>
 
     <Input type={type} placeholder={placeholder} {...register(name as never)} />
@@ -74,8 +75,10 @@ const ExpensesForm = ({
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ExpensesFormValues>({
     resolver: zodResolver(expensesSchema) as Resolver<ExpensesFormValues>,
@@ -201,15 +204,30 @@ const ExpensesForm = ({
               error={errors.expenseDate?.message}
             />
 
-            <FormField
-              label="Harga per Item"
-              name="itemPrice"
-              type="number"
-              placeholder="Masukan harga"
-              nullable={false}
-              register={register}
-              error={errors.itemPrice?.message}
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">
+                Harga per Item <span className="text-destructive">*</span>
+              </label>
+
+              <Controller
+                name="itemPrice"
+                control={control}
+                rules={{ required: "Harga per item wajib diisi" }}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    placeholder="Rp 0"
+                    {...field}
+                    value={field.value ? formatCurrency(field.value) : ""}
+                    onChange={(e) => field.onChange(parseRupiah(e.target.value))}
+                  />
+                )}
+              />
+
+              {errors.itemPrice && (
+                <span className="text-xs text-red-500">{errors.itemPrice.message}</span>
+              )}
+            </div>
 
             <FormField
               label="Jumlah (Qty)"
@@ -220,6 +238,21 @@ const ExpensesForm = ({
               register={register}
               error={errors.qty?.message}
             />
+          </div>
+
+          {/* TOTAL PENGELUARAN (Read-only) */}
+          <div className="w-full">
+            <div className="flex flex-col gap-1 bg-muted/20 p-4 rounded-xl border border-muted-foreground/20">
+              <label className="text-sm font-medium text-muted-foreground">
+                Total Biaya Pengeluaran
+              </label>
+              <p className="text-2xl font-bold">
+                <span className="text-xs text-muted-foreground font-normal align-top mr-1">Rp</span>
+                {new Intl.NumberFormat("id-ID").format(
+                  parseRupiah(String(watch("itemPrice") || 0)) * Number(watch("qty") || 1)
+                )}
+              </p>
+            </div>
           </div>
 
           {/* RESPONSIBLE */}

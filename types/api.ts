@@ -209,6 +209,7 @@ export interface ApiOrderDetail {
         installments?: { amount: number; paymentDate: string; paymentMethodId: string };
     };
     finalPrice: number;
+    originalFinalPrice?: number;
     paymentStatus: "PENDING" | "SETTLEMENT" | "CANCEL";
     paymentDate: string;
     receiptNumber: string;

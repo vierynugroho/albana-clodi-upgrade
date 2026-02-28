@@ -25,7 +25,7 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
                 width={100}
                 height={44}
                 alt="Albana Grosir"
-                style={{ width: "auto", height: "auto", maxWidth: "100px", maxHeight: "44px" }}
+                // style={{ width: "auto", height: "auto", maxWidth: "100px", maxHeight: "44px" }}
               />
             )}
             {setting.showShopInfo && (
@@ -133,7 +133,7 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
               <span className="text-gray-600">Ongkir</span>
               <span>{formatCurrency(order.shippingCost)}</span>
             </div>
-            {order.discount > 0 && (
+            {setting.showDiscount && order.discount > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">Diskon</span>
                 <span>-{formatCurrency(order.discount)}</span>

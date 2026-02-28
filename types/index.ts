@@ -158,6 +158,7 @@ export interface PrintSetting {
   showWarehouse: boolean;
   showSKU: boolean;
   showBarcodeResi: boolean;
+  showDiscount: boolean;
   showWeight: boolean;
   showInsurance: boolean;
   showAdminName: boolean;

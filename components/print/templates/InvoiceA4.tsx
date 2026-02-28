@@ -23,7 +23,7 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
                 width={130}
                 height={55}
                 alt="Albana Grosir"
-                style={{ width: "auto", height: "auto", maxWidth: "130px", maxHeight: "55px" }}
+                // style={{ width: "auto", height: "auto", maxWidth: "130px", maxHeight: "55px" }}
               />
             )}
             {setting.showShopInfo && (
@@ -102,7 +102,7 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
                 <span className="text-gray-600">Subtotal</span>
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
-              {order.discount > 0 && (
+              {setting.showDiscount && order.discount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Diskon</span>
                   <span>-{formatCurrency(order.discount)}</span>

@@ -246,7 +246,7 @@ const OrderCard = memo(function OrderCard({
             <Printer className="h-4 w-4" />
           </IconButton>
 
-          {order.paymentStatus !== "dibatalkan" && onCancel && (
+          {/* {order.paymentStatus !== "dibatalkan" && onCancel && (
             <IconButton
               size="sm"
               color="orange"
@@ -255,7 +255,7 @@ const OrderCard = memo(function OrderCard({
             >
               <XCircle className="h-4 w-4" />
             </IconButton>
-          )}
+          )} */}
 
           <IconButton
             size="sm"

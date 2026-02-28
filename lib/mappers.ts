@@ -113,14 +113,30 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         total: 0,
     })) || [];
 
-    // Calculate totals from orderDetail
-    const subtotal = orderDetail?.finalPrice || 0;
+    // ==========================================
+    // RUMUS PERHITUNGAN SUBTOTAL, DISKON & TOTAL
+    // ==========================================
+
+    // 1. Subtotal: Diambil dari originalFinalPrice (harga sebelum diskon).
+    // Jika originalFinalPrice tidak tersedia, fallback ke finalPrice.
+    const subtotal = orderDetail?.originalFinalPrice ?? orderDetail?.finalPrice ?? 0;
     const shippingCost = shippingService?.shippingCost || 0;
     const insurance = orderDetail?.otherFees?.insurance || 0;
-    const discount =
-        orderDetail?.otherFees?.discount?.type === "nominal"
-            ? orderDetail.otherFees.discount.value
-            : 0;
+    
+    let discount = 0;
+    const finalPrice = orderDetail?.finalPrice || 0;
+
+    // 2. Menghitung Diskon (Prioritas Pertama = Selisih Harga):
+    // Jika originalFinalPrice lebih besar dari finalPrice, maka dipastikan ada potongan diskon,
+    // Rumus: Diskon = originalFinalPrice - finalPrice
+    if (orderDetail?.originalFinalPrice !== undefined && orderDetail.originalFinalPrice > finalPrice) {
+        discount = orderDetail.originalFinalPrice - finalPrice;
+    } 
+    // 3. Menghitung Diskon (Prioritas Kedua = Diskon Nominal Teks):
+    // Jika tidak mendapat selisih di atas, cek apakah ada nilai discount berupa nominal di dalam otherFees.
+    else if (orderDetail?.otherFees?.discount?.type === "nominal") {
+        discount = orderDetail.otherFees.discount.value || 0;
+    }
 
     return {
         id: apiOrder.id,
@@ -142,6 +158,8 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         insurance,
         discount,
         subtotal,
+        // 4. Perhitungan Total Pembayaran Akhir:
+        // Rumus: Total = Subtotal + Ongkir + Asuransi - Diskon
         total: subtotal + shippingCost + insurance - discount,
         paymentStatus: mapPaymentStatus(orderDetail?.paymentStatus),
         orderStatus: "pending" as Order["orderStatus"],

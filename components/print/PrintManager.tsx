@@ -33,6 +33,7 @@ export function PrintManager({
     showWarehouse: false,
     showSKU: false,
     showBarcodeResi: true,
+    showDiscount: true,
     showWeight: true,
     showInsurance: false,
     showAdminName: false,
