@@ -20,10 +20,11 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
             {setting.showLogo && (
               <Image
                 src="https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg"
-                width={130}
-                height={55}
+                width={140}
+                height={75}
                 alt="Albana Grosir"
-                // style={{ width: "auto", height: "auto", maxWidth: "130px", maxHeight: "55px" }}
+                style={{ width: "140px", height: "75px", objectFit: "contain" }}
+                priority
               />
             )}
             {setting.showShopInfo && (
@@ -96,8 +97,7 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
 
         {/* ================= SUMMARY ================= */}
         <div className="px-6 py-3 border-t border-dashed border-gray-300">
-          <div className="flex justify-end">
-            <div className="w-60 space-y-1 text-[10px]">
+          <div className="w-full space-y-1 text-[10px]">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
                 <span>{formatCurrency(order.subtotal)}</span>
@@ -112,7 +112,7 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
                 <span className="text-gray-600">Ongkir</span>
                 <span>{formatCurrency(order.shippingCost)}</span>
               </div>
-              {setting.showInsurance && order.insurance > 0 && (
+              {setting.showInsurance && order.insurance > 0 || order.insurance == 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Asuransi</span>
                   <span>{formatCurrency(order.insurance)}</span>
@@ -129,7 +129,6 @@ export function InvoiceA4({ order, setting, adminName }: Props) {
                 </div>
               )}
             </div>
-          </div>
         </div>
 
         {/* ================= ADMIN NAME ================= */}

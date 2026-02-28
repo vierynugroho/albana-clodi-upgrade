@@ -202,7 +202,7 @@
 
 "use client";
 
-import { memo, useCallback, useMemo, useEffect, useState } from "react";
+import { memo, useCallback, useMemo, useEffect, useState, useRef } from "react";
 import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui";
 import {
@@ -212,7 +212,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Brush,
 } from "recharts";
 import { InfoIcon } from "lucide-react";
@@ -295,10 +294,33 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
   const isDark = resolvedTheme === "dark";
 
   const [mounted, setMounted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted || isLoading || data.length === 0 || !containerRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          setDimensions({
+            width: entry.contentRect.width,
+            height: entry.contentRect.height,
+          });
+        }
+      }
+    });
+    
+    observer.observe(containerRef.current);
+    
+    return () => {
+       observer.disconnect();
+    };
+  }, [mounted, isLoading, data.length]);
 
   const hasData = data.length > 0;
 
@@ -352,9 +374,11 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
 
           {/* CHART */}
           {!isLoading && hasData && mounted && (
-            <div className="h-[360px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+            <div ref={containerRef} className="h-[360px] w-full">
+              {dimensions.width > 0 && dimensions.height > 0 && (
                 <AreaChart
+                  width={dimensions.width}
+                  height={dimensions.height}
                   data={data}
                   margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
                 >
@@ -418,7 +442,7 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
                     />
                   )}
                 </AreaChart>
-              </ResponsiveContainer>
+              )}
             </div>
           )}
         </div>

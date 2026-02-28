@@ -28,7 +28,8 @@ export function InvoiceThermal58({ order, setting, adminName }: Props) {
               height={32}
               alt="Albana Grosir"
               className="mx-auto"
-              style={{ width: "auto", height: "auto", maxWidth: "75px", maxHeight: "32px" }}
+              style={{ width: "75px", height: "32px", objectFit: "contain" }}
+              priority
             />
           )}
           {setting.showShopInfo && (

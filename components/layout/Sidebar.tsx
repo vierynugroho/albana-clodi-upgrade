@@ -206,7 +206,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="relative">
               {/* <div className="h-10 w-10 rounded-xl gradient-primary shadow-lg shadow-primary/25 flex items-center justify-center"> */}
                 {/* <span className="text-lg font-bold text-white">A</span> */}
-                <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} height={45} width={45} alt="logo" style={{ width: "auto", height: "auto", maxWidth: "45px", maxHeight: "45px" }} />
+                <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} height={45} width={45} alt="logo" style={{ width: "45px", height: "45px", objectFit: "contain" }} priority />
               {/* </div> */}
               <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-warning animate-pulse-subtle" />
             </div>

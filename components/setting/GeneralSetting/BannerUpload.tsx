@@ -21,7 +21,15 @@ export const BannerUpload = memo(function BannerUpload({
         className="relative h-32 w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed"
       >
         {banner ? (
-          <Image src={banner} alt="Banner" fill className="object-cover" unoptimized />
+          <Image 
+            src={banner} 
+            alt="Banner" 
+            width={768} 
+            height={128} 
+            className="object-cover" 
+            style={{ width: "100%", height: "auto" }} 
+            unoptimized 
+          />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground">
             <Upload />

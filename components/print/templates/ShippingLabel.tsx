@@ -22,10 +22,11 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
             {setting.showLogo && (
               <Image
                 src="https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg"
-                width={100}
-                height={44}
+                width={120}
+                height={54}
                 alt="Albana Grosir"
-                // style={{ width: "auto", height: "auto", maxWidth: "100px", maxHeight: "44px" }}
+                style={{ width: "140px", height: "74px", objectFit: "contain" }}
+                priority
               />
             )}
             {setting.showShopInfo && (
