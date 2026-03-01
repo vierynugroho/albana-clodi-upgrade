@@ -110,10 +110,17 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                 const otherFees = orderDetail.otherFees;
                 if (otherFees) {
                     setInsurance(otherFees.insurance || 0);
+                    if (otherFees.insurance) {
+                        setShowInsurance(true);
+                    }
                     if (otherFees.discount) {
                         setShowDiscount(true);
                         setOrderDiscount(otherFees.discount.value || 0);
                         setOrderDiscountType(otherFees.discount.type || "nominal");
+                    }
+                    if (otherFees.shippingDiscountPerKg) {
+                        setShowShippingDiscount(true);
+                        setShippingDiscount(otherFees.shippingDiscountPerKg);
                     }
 
                     // Set installment data from otherFees
@@ -189,8 +196,10 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
             }
             setNote(existingOrder.note || "");
 
-            // Set order products
-            const existingProducts = orderDetail?.OrderProducts || [];
+            // Extract product discounts from otherFees
+            const productDiscounts = existingOrder.OrderDetail?.otherFees?.productDiscount || [];
+            const existingProducts = existingOrder.OrderDetail?.OrderProducts || [];
+
             if (existingProducts.length > 0) {
                 const mappedProducts: OrderProductItem[] = existingProducts.map((op) => {
                     // Find product data to get weight and price
@@ -216,6 +225,21 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                         }
                     }
 
+                    // Check for existing discount
+                    const existingDiscount = productDiscounts.find(pd => pd.produkVariantId === op.productVariantId);
+                    const discountAmt = existingDiscount ? existingDiscount.discountAmount : 0;
+                    const discType = existingDiscount ? existingDiscount.discountType : "nominal";
+                    
+                    // Recompute subtotal with discount
+                    let subtotal = price * op.productQty;
+                    if (discountAmt > 0) {
+                        if (discType === "percent") {
+                            subtotal = subtotal - (subtotal * discountAmt / 100);
+                        } else {
+                            subtotal = subtotal - discountAmt;
+                        }
+                    }
+
                     return {
                         productId: op.productId,
                         variantId: op.productVariantId || variantData?.id || "",
@@ -224,9 +248,9 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                         quantity: op.productQty,
                         price: price,
                         weight: productData?.product.weight || 0,
-                        discount: 0,
-                        discountType: "nominal" as const,
-                        subtotal: price * op.productQty,
+                        discount: discountAmt,
+                        discountType: discType as "percent" | "nominal",
+                        subtotal: Math.max(0, subtotal),
                     };
                 });
                 setOrderProducts(mappedProducts);
@@ -301,19 +325,31 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
 
     // Calculate totals
     const totalWeight = orderProducts.reduce((sum, p) => sum + (p.weight * p.quantity), 0);
+    const grossSubtotal = orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
     const subtotal = orderProducts.reduce((sum, p) => sum + p.subtotal, 0);
+    const totalProductDiscount = grossSubtotal - subtotal;
 
-    const effectiveShippingCost = useMemo(() => {
+    const grossShippingCost = useMemo(() => {
         if (shippingMode === "free") return 0;
         if (shippingMode === "manual") return manualShippingCost;
+        if (shippingMode === "calculate" && selectedShipping) return selectedShipping.shipping_cost;
+        return 0;
+    }, [shippingMode, manualShippingCost, selectedShipping]);
+
+    const totalShippingDiscount = useMemo(() => {
         if (shippingMode === "calculate" && selectedShipping) {
-            // Apply shipping discount per kg
             const weightInKg = totalWeight / 1000;
-            const discount = shippingDiscount * weightInKg;
-            return Math.max(0, selectedShipping.shipping_cost - discount);
+            return shippingDiscount * weightInKg;
+        }
+        if (shippingMode === "manual") {
+            return shippingDiscount;
         }
         return 0;
-    }, [shippingMode, manualShippingCost, selectedShipping, totalWeight, shippingDiscount]);
+    }, [shippingMode, selectedShipping, totalWeight, shippingDiscount]);
+
+    const effectiveShippingCost = useMemo(() => {
+        return Math.max(0, grossShippingCost - totalShippingDiscount);
+    }, [grossShippingCost, totalShippingDiscount]);
 
     const grandTotal = subtotal - calculateOrderDiscount(orderDiscount, subtotal, orderDiscountType) + insurance + effectiveShippingCost;
 
@@ -415,12 +451,55 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
             return;
         }
 
-        if (!selectedShipping) {
+        if (shippingMode === "none") {
             toast({ title: "Error", description: "Pilih jasa pengiriman", variant: "destructive" });
             return;
         }
 
+        if (shippingMode === "calculate" && !selectedShipping) {
+            toast({ title: "Error", description: "Pilih jasa pengiriman dari pilihan yang tersedia", variant: "destructive" });
+            return;
+        }
+
+        if (shippingMode === "manual" && !manualShippingCourier.trim()) {
+            toast({ title: "Error", description: "Input nama kurir untuk pengiriman manual", variant: "destructive" });
+            return;
+        }
+
         try {
+            // Determine shipping details based on mode
+            let shippingServiceType = "reguler";
+            let shippingServiceName = "";
+            let shippingServiceDetail = "";
+            let shippingCostAmt = 0;
+            let isCod = false;
+            let cashback = 0;
+            let serviceFee = 0;
+            let netIncome = grandTotal;
+            let etd = "-";
+
+            if (shippingMode === "calculate" && selectedShipping) {
+                shippingServiceType = selectedShippingType;
+                shippingServiceName = selectedShipping.shipping_name;
+                shippingServiceDetail = selectedShipping.service_name;
+                shippingCostAmt = selectedShipping.shipping_cost;
+                isCod = selectedShipping.is_cod ?? false;
+                cashback = selectedShipping.shipping_cashback ?? 0;
+                serviceFee = selectedShipping.service_fee ?? 0;
+                netIncome = selectedShipping.net_income ?? grandTotal;
+                etd = selectedShipping.etd ?? "-";
+            } else if (shippingMode === "manual") {
+                shippingServiceType = "manual";
+                shippingServiceName = manualShippingCourier;
+                shippingServiceDetail = "Manual";
+                shippingCostAmt = manualShippingCost;
+            } else if (shippingMode === "free") {
+                shippingServiceType = "free";
+                shippingServiceName = "Ambil di Toko";
+                shippingServiceDetail = "Free";
+                shippingCostAmt = 0;
+            }
+
             /* =========================
             * otherFees (WAJIB LENGKAP)
             * ========================= */
@@ -430,11 +509,15 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                 weight: totalWeight,
 
                 shippingCost: {
-                    shippingService: selectedShipping.shipping_name,
-                    cost: selectedShipping.shipping_cost,
-                    type: selectedShippingType,
+                    shippingService: shippingMode === "calculate" ? shippingServiceName : `${shippingServiceName} - ${shippingServiceDetail}`,
+                    cost: shippingCostAmt,
+                    type: shippingServiceType,
                 },
             } as OrderCreatePayload["orderDetail"]["detail"]["otherFees"];
+
+            if (shippingDiscount > 0) {
+                otherFees.shippingDiscountPerKg = shippingDiscount;
+            }
 
             // Order discount
             if (orderDiscount > 0) {
@@ -480,7 +563,7 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                 },
                 orderDetail: {
                     detail: {
-                        originalFinalPrice: subtotal,
+                        originalFinalPrice: subtotal - calculateOrderDiscount(orderDiscount, subtotal, orderDiscountType),
                         otherFees,
                         receiptNumber: receiptNumber || undefined,
                     },
@@ -502,18 +585,18 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                     })),
                     shippingServices: [
                         {
-                            shippingName: selectedShipping.shipping_name,
-                            serviceName: selectedShipping.service_name,
+                            shippingName: shippingServiceName,
+                            serviceName: shippingServiceDetail,
                             weight: totalWeight,
-                            isCod: selectedShipping.is_cod ?? false,
-                            shippingCost: selectedShipping.shipping_cost,
-                            shippingCashback: selectedShipping.shipping_cashback ?? 0,
-                            shippingCostNet: selectedShipping.shipping_cost_net ?? selectedShipping.shipping_cost,
+                            isCod: isCod,
+                            shippingCost: shippingCostAmt,
+                            shippingCashback: cashback,
+                            shippingCostNet: effectiveShippingCost,
                             grandtotal: grandTotal,
-                            serviceFee: selectedShipping.service_fee ?? 0,
-                            netIncome: selectedShipping.net_income ?? grandTotal,
-                            etd: selectedShipping.etd ?? "-",
-                            type: selectedShippingType,
+                            serviceFee: serviceFee,
+                            netIncome: netIncome,
+                            etd: etd,
+                            type: shippingServiceType,
                         },
                     ],
                 },
@@ -639,6 +722,10 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
         // Computed values
         totalWeight,
         subtotal,
+        grossSubtotal,
+        totalProductDiscount,
+        grossShippingCost,
+        totalShippingDiscount,
         effectiveShippingCost,
         grandTotal,
 

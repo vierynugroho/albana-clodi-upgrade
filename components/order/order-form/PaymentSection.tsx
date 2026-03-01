@@ -60,12 +60,14 @@ export function PaymentSection({
                                 Jumlah Cicilan
                             </label>
                             <input
-                                type="number"
-                                value={installmentAmount}
-                                onChange={(e) => setInstallmentAmount(Number(e.target.value))}
+                                type="text"
+                                value={installmentAmount > 0 ? "Rp " + installmentAmount.toLocaleString("id-ID") : ""}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/[^0-9]/g, "");
+                                    setInstallmentAmount(val ? Number(val) : 0);
+                                }}
                                 className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
                                 placeholder="Masukkan jumlah cicilan"
-                                min={0}
                             />
                         </div>
                     )}

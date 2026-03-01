@@ -14,6 +14,7 @@ interface FilterSectionProps {
   endDate: string;
   onEndDateChange: (date: string) => void;
   filterInfo: string;
+  onApplyFilter: () => void;
 }
 
 const FILTER_PRESETS = [
@@ -64,6 +65,7 @@ export const FilterSection = memo(function FilterSection({
   endDate,
   onEndDateChange,
   filterInfo,
+  onApplyFilter,
 }: FilterSectionProps) {
   return (
     <Card>
@@ -148,10 +150,15 @@ export const FilterSection = memo(function FilterSection({
           </div>
         )}
 
-        {/* Current Filter Info */}
-        <p className="text-sm text-muted-foreground">
-          Menampilkan data: <span className="font-medium text-foreground">{filterInfo || "Semua data"}</span>
-        </p>
+        {/* Current Filter Info and Apply Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t">
+          <p className="text-sm text-muted-foreground mt-2">
+            Menampilkan data: <span className="font-medium text-foreground">{filterInfo || "Semua data"}</span>
+          </p>
+          <Button onClick={onApplyFilter} className="w-full sm:w-auto mt-2">
+            Terapkan Filter
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

@@ -21,8 +21,10 @@ export default function ReportPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const [appliedQueryParams, setAppliedQueryParams] = useState<ReportQueryParams>({});
+
   // Build query params based on filter settings
-  const queryParams: ReportQueryParams = useMemo(() => {
+  const draftQueryParams: ReportQueryParams = useMemo(() => {
     const today = new Date();
 
     switch (filterPreset) {
@@ -58,26 +60,30 @@ export default function ReportPage() {
     }
   }, [filterPreset, selectedMonth, selectedYear, startDate, endDate]);
 
+  const handleApplyFilter = () => {
+    setAppliedQueryParams(draftQueryParams);
+  };
+
   // Fetch report data
   const {
     data: ordersReport,
     isLoading: isLoadingOrders,
     isError: isErrorOrders,
     refetch: refetchOrders,
-  } = useReportOrders(queryParams);
+  } = useReportOrders(appliedQueryParams);
 
   const {
     data: expensesReport,
     isLoading: isLoadingExpenses,
-  } = useReportExpenses(queryParams);
+  } = useReportExpenses(appliedQueryParams);
 
-  const {chartData: orderData, isLoading: isLoadingOrderChart } = useOrderChartData();
+  const {chartData: orderData, isLoading: isLoadingOrderChart } = useOrderChartData(appliedQueryParams);
 
-  const {chartData: expensesData, isLoading: isLoadingExpensesChart} = useExpensesChartData();
+  const {chartData: expensesData, isLoading: isLoadingExpensesChart} = useExpensesChartData(appliedQueryParams);
 
-  const {chartData: customerData, isLoading: isLoadingCustomerChart} = useCustomerChartData();
+  const {chartData: customerData, isLoading: isLoadingCustomerChart} = useCustomerChartData(appliedQueryParams);
 
-  const {chartData: productData, isLoading: isLoadingProductChart} = useProductChartData();
+  const {chartData: productData, isLoading: isLoadingProductChart} = useProductChartData(appliedQueryParams);
 
   const {data} = useCurrentUser();
   const isSuperAdmin = data?.responseObject?.role?.toLowerCase() === "superadmin";
@@ -159,6 +165,7 @@ export default function ReportPage() {
         endDate={endDate}
         onEndDateChange={setEndDate}
         filterInfo={ordersReport?.filterInfo || ""}
+        onApplyFilter={handleApplyFilter}
       />
 
       {/* Profit Summary - Superadmin only */}

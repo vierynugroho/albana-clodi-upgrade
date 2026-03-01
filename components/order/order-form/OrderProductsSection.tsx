@@ -159,45 +159,108 @@ export function OrderProductsSection({
 
                 {/* Product Discount Modal */}
                 {editingProductIndex !== null && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-background rounded-lg p-6 w-full max-w-sm space-y-4">
-                            <h3 className="font-semibold">Edit Diskon Produk</h3>
-                            <div className="space-y-3">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Tipe Diskon</label>
-                                    <select
-                                        value={orderProducts[editingProductIndex].discountType}
-                                        onChange={(e) => updateProduct(editingProductIndex, {
-                                            discountType: e.target.value as "percent" | "nominal"
-                                        })}
-                                        className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                                    >
-                                        <option value="nominal">Nominal (Rp)</option>
-                                        <option value="percent">Persen (%)</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Nilai Diskon</label>
-                                    <input
-                                        type="number"
-                                        value={orderProducts[editingProductIndex].discount}
-                                        onChange={(e) => updateProduct(editingProductIndex, {
-                                            discount: Number(e.target.value)
-                                        })}
-                                        className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                                        min={0}
-                                    />
-                                </div>
+                    <div className="fixed inset-0 z-50 flex items-start justify-center pt-32 sm:pt-40">
+                        {/* Backdrop */}
+                        <div 
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                            onClick={() => setEditingProductIndex(null)}
+                        />
+                        
+                        {/* Modal Panel */}
+                        <div className="relative w-full sm:w-full max-w-sm bg-background sm:rounded-2xl rounded-t-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+                            
+                            {/* Drag handle area for mobile aesthetic */}
+                            <div className="w-full flex justify-center pt-3 pb-1 sm:hidden">
+                                <div className="w-12 h-1.5 bg-muted rounded-full" />
                             </div>
-                            <div className="flex gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setEditingProductIndex(null)}
-                                    className="flex-1"
-                                >
-                                    Tutup
-                                </Button>
+
+                            <div className="p-6 space-y-6">
+                                <div className="space-y-1">
+                                    <h3 className="text-lg font-semibold tracking-tight">Edit Diskon</h3>
+                                    <p className="text-sm text-muted-foreground line-clamp-1">
+                                        {orderProducts[editingProductIndex].productName}
+                                    </p>
+                                </div>
+                                
+                                <div className="space-y-5">
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-medium">Tipe Diskon</label>
+                                        
+                                        {/* Segmented Control for Discount Type */}
+                                        <div className="grid grid-cols-2 p-1 bg-muted rounded-xl">
+                                            <button
+                                                type="button"
+                                                onClick={() => updateProduct(editingProductIndex, { discountType: "nominal" })}
+                                                className={`py-2 text-sm font-medium rounded-lg transition-all ${
+                                                    orderProducts[editingProductIndex].discountType === "nominal" 
+                                                    ? "bg-background text-foreground shadow-sm" 
+                                                    : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                Nominal (Rp)
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => updateProduct(editingProductIndex, { discountType: "percent" })}
+                                                className={`py-2 text-sm font-medium rounded-lg transition-all ${
+                                                    orderProducts[editingProductIndex].discountType === "percent" 
+                                                    ? "bg-background text-foreground shadow-sm" 
+                                                    : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                Persen (%)
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-medium">Nilai Diskon</label>
+                                        <div className="relative">
+                                            {orderProducts[editingProductIndex].discountType === "nominal" ? (
+                                                <>
+                                                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        value={orderProducts[editingProductIndex].discount > 0 ? orderProducts[editingProductIndex].discount.toLocaleString("id-ID") : ""}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/[^0-9]/g, "");
+                                                            updateProduct(editingProductIndex, {
+                                                                discount: val ? Number(val) : 0
+                                                            });
+                                                        }}
+                                                        className="w-full h-12 pl-12 pr-4 rounded-xl border border-input bg-background/50 focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all font-medium text-lg"
+                                                        placeholder="0"
+                                                    />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <input
+                                                        type="number"
+                                                        value={orderProducts[editingProductIndex].discount || ""}
+                                                        onChange={(e) => updateProduct(editingProductIndex, {
+                                                            discount: Number(e.target.value)
+                                                        })}
+                                                        className="w-full h-12 pl-4 pr-12 rounded-xl border border-input bg-background/50 focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all font-medium text-lg text-right"
+                                                        placeholder="0"
+                                                        min={0}
+                                                        max={100}
+                                                    />
+                                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">%</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="pt-2">
+                                    <Button
+                                        type="button"
+                                        onClick={() => setEditingProductIndex(null)}
+                                        className="w-full h-12 rounded-xl font-medium"
+                                    >
+                                        Simpan Diskon
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>

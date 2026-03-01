@@ -138,6 +138,51 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         discount = orderDetail.otherFees.discount.value || 0;
     }
 
+    // 4. Extract specific discounts for UI breakdown
+    let productDiscountTotal = 0;
+    if (orderDetail?.otherFees?.productDiscount && Array.isArray(orderDetail.otherFees.productDiscount)) {
+        orderDetail.otherFees.productDiscount.forEach(pd => {
+            const qty = products.find(p => p.variant === pd.produkVariantId)?.quantity || 1;
+            if (pd.discountType === "percent") {
+                // If it's a percent, we calculate based on original subtotal for this product
+                // Since we don't strictly have the original price here, we estimate nominal as fallback or fetch it if needed.
+                // For simplicity, we assume nominal tracking is safer or it's pre-calculated if possible.
+                // As a fallback for API mapper, we'll try to just show the nominal amount if available.
+                // Assuming discountAmount is the actual deducted value when percent is used, or we just leave it 0 if it's strictly a % rate we can't apply here without price.
+                // Let's assume API `discountAmount` for nominal is the direct value.
+            } else {
+                productDiscountTotal += (pd.discountAmount * qty);
+            }
+        });
+    }
+
+    let orderDiscountVal = 0;
+    let netSubtotal = finalPrice;
+
+    if (orderDetail?.otherFees?.discount) {
+        if (orderDetail.otherFees.discount.type === "nominal") {
+            orderDiscountVal = orderDetail.otherFees.discount.value;
+            netSubtotal = finalPrice + orderDiscountVal;
+        } else if (orderDetail.otherFees.discount.type === "percent") {
+            const pct = orderDetail.otherFees.discount.value / 100;
+            // Reverse-engineer netSubtotal (Subtotal after Product Discount)
+            if (pct < 1 && pct >= 0) {
+                netSubtotal = finalPrice / (1 - pct);
+                orderDiscountVal = netSubtotal - finalPrice;
+            }
+        }
+    }
+
+    let shippingDiscountVal = 0;
+    if (orderDetail?.otherFees?.shippingDiscountPerKg) {
+        shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * Math.max(1, Math.ceil((orderDetail.otherFees.weight || 0) / 1000));
+    }
+
+    // 5. Reconstruct TRUE Subtotal (Gross Subtotal)
+    // Backend's originalFinalPrice is flawed because it ignores tier prices.
+    // True Gross Subtotal = (Net Subtotal before Order Discount) + Product Discount.
+    const trueSubtotal = netSubtotal + productDiscountTotal;
+
     return {
         id: apiOrder.id,
         orderNumber: orderDetail?.code || apiOrder.id.slice(0, 8).toUpperCase(),
@@ -157,10 +202,13 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         weight: orderDetail?.otherFees?.weight || 0,
         insurance,
         discount,
-        subtotal,
+        productDiscount: productDiscountTotal,
+        orderDiscount: orderDiscountVal, // Fallback if needed
+        shippingDiscount: shippingDiscountVal,
+        subtotal: trueSubtotal,
         // 4. Perhitungan Total Pembayaran Akhir:
-        // Rumus: Total = Subtotal + Ongkir + Asuransi - Diskon
-        total: subtotal + shippingCost + insurance - discount,
+        // Rumus: Total = Subtotal + Ongkir + Asuransi - Diskon - Diskon Ongkir
+        total: subtotal + shippingCost + insurance - discount - shippingDiscountVal,
         paymentStatus: mapPaymentStatus(orderDetail?.paymentStatus),
         orderStatus: "pending" as Order["orderStatus"],
         note: apiOrder.note,

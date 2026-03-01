@@ -175,27 +175,57 @@ const OrderCard = memo(function OrderCard({
 
           <ul className="text-xs space-y-1">
             <li className="flex justify-between">
-              <span>Subtotal</span>
+              <span>Subtotal Produk</span>
               <span>{formatCurrency(order.subtotal ?? 0)}</span>
             </li>
+            
+            {(order.productDiscount ?? 0) > 0 && (
+              <li className="flex justify-between text-green-600">
+                <span>Diskon Produk</span>
+                <span>-{formatCurrency(order.productDiscount ?? 0)}</span>
+              </li>
+            )}
+            
+            {(order.orderDiscount ?? 0) > 0 && (
+              <li className="flex justify-between text-green-600">
+                <span>Diskon Order</span>
+                <span>-{formatCurrency(order.orderDiscount ?? 0)}</span>
+              </li>
+            )}
+
+            {/* Fallback original generic discount if specific discounts are all zero but generic exists logically */}
+            {!(order.productDiscount || order.orderDiscount) && (order.discount ?? 0) > 0 && (
+              <li className="flex justify-between text-green-600">
+                <span>Diskon</span>
+                <span>-{formatCurrency(order.discount ?? 0)}</span>
+              </li>
+            )}
+
+            {(order.insurance ?? 0) > 0 && (
+              <li className="flex justify-between">
+                <span>Asuransi</span>
+                <span>{formatCurrency(order.insurance ?? 0)}</span>
+              </li>
+            )}
+
             <li className="flex justify-between">
               <span>Ongkir</span>
               <span>{formatCurrency(order.shippingCost ?? 0)}</span>
             </li>
-            <li className="flex justify-between">
-              <span>Asuransi</span>
-              <span>{formatCurrency(order.insurance ?? 0)}</span>
-            </li>
-            <li className="flex justify-between text-destructive">
-              <span>Diskon</span>
-              <span>-{formatCurrency(order.discount ?? 0)}</span>
-            </li>
+
+            {(order.shippingDiscount ?? 0) > 0 && (
+              <li className="flex justify-between text-green-600">
+                <span>Diskon Ongkir</span>
+                <span>-{formatCurrency(order.shippingDiscount ?? 0)}</span>
+              </li>
+            )}
           </ul>
 
           <div className="mt-2 pt-2 border-t">
-            <p className="text-sm font-bold">
-              Total: {formatCurrency(order.total ?? 0)}
-            </p>
+            <div className="flex justify-between font-bold text-sm">
+              <span>Grand Total</span>
+              <span className="text-primary">{formatCurrency(order.total ?? 0)}</span>
+            </div>
           </div>
         </div>
 

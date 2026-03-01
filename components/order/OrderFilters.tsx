@@ -167,6 +167,11 @@ export function OrderFilters({
   isLoadingOptions = false,
 }: OrderFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [localFilters, setLocalFilters] = useState<OrderQueryParams>(filters);
+  
+  // Sync localFilters if external filters prop changes entirely (e.g., from reset on parent)
+  // Optional, but good practice when parent state might wipe out children state.
+  // useEffect(() => { setLocalFilters(filters); }, [filters]);
 
   // Convert API data to FilterOption format
   const salesChannelOptions: FilterOption[] = [
@@ -187,28 +192,49 @@ export function OrderFilters({
     ...customers.map((c) => ({ value: c.id, label: c.name })),
   ];
 
-  // Update individual filter
+  // Update individual local filter (does not trigger fetch yet)
   const updateFilter = useCallback(
     (key: keyof OrderQueryParams, value: string | number | undefined) => {
-      const newFilters: Record<string, string | number | undefined> = { ...filters };
-
-      if (value === "" || value === undefined) {
-        delete newFilters[key];
-      } else {
-        newFilters[key] = value;
-      }
-
-      onFiltersChange(newFilters as OrderQueryParams);
+      setLocalFilters((prev) => {
+        const newFilters = { ...prev };
+        if (value === "" || value === undefined) {
+          delete newFilters[key];
+        } else {
+          newFilters[key] = value as any;
+        }
+        return newFilters;
+      });
     },
-    [filters, onFiltersChange]
+    []
   );
+
+  // Apply filters (triggers fetch)
+  const applyFilters = useCallback(() => {
+    onFiltersChange(localFilters);
+  }, [localFilters, onFiltersChange]);
+
+  // Handle enter key specifically for search
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      applyFilters();
+    }
+  };
+
+  // Remove tag applies instantly for immediate UX or require submit? Let's make it instant.
+  const handleRemoveTag = (key: keyof OrderQueryParams) => {
+      const newFilters = { ...filters };
+      delete newFilters[key];
+      setLocalFilters(newFilters); // sync local
+      onFiltersChange(newFilters); // sync parent instantly
+  };
 
   // Reset all filters
   const resetFilters = useCallback(() => {
+    setLocalFilters({});
     onFiltersChange({});
   }, [onFiltersChange]);
 
-  // Count active filters
+  // Count active filters from actual PARENT state so the badge reflects what's actively loaded
   const activeFilterCount = Object.keys(filters).filter(
     (key) => key !== "page" && key !== "limit" && filters[key as keyof OrderQueryParams]
   ).length;
@@ -222,8 +248,9 @@ export function OrderFilters({
           <div className="relative">
             <Input
               placeholder="Cari order..."
-              value={filters.search || ""}
+              value={localFilters.search || ""}
               onChange={(e) => updateFilter("search", e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               className="w-64"
               leftIcon={<Search className="h-4 w-4" />}
             />
@@ -251,18 +278,30 @@ export function OrderFilters({
           </Button>
         </div>
 
-        {/* Reset Button */}
-        {activeFilterCount > 0 && (
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Apply Button */}
           <Button
-            variant="ghost"
             size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground"
-            onClick={resetFilters}
+            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={applyFilters}
           >
-            <RotateCcw className="h-4 w-4" />
-            Reset Filter
+            Terapkan Filter
           </Button>
-        )}
+
+          {/* Reset Button */}
+          {activeFilterCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 text-muted-foreground hover:text-foreground"
+              onClick={resetFilters}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Expanded Filters */}
@@ -280,19 +319,19 @@ export function OrderFilters({
               {/* Date Range */}
               <FilterDateInput
                 label="Tanggal Mulai"
-                value={filters.startDate || ""}
+                value={localFilters.startDate || ""}
                 onChange={(v) => updateFilter("startDate", v)}
               />
               <FilterDateInput
                 label="Tanggal Akhir"
-                value={filters.endDate || ""}
+                value={localFilters.endDate || ""}
                 onChange={(v) => updateFilter("endDate", v)}
               />
 
               {/* Month & Year */}
               <FilterSelect
                 label="Bulan"
-                value={filters.orderMonth?.toString() || ""}
+                value={localFilters.orderMonth?.toString() || ""}
                 onChange={(v) =>
                   updateFilter("orderMonth", v ? Number(v) : undefined)
                 }
@@ -300,7 +339,7 @@ export function OrderFilters({
               />
               <FilterSelect
                 label="Tahun"
-                value={filters.orderYear?.toString() || ""}
+                value={localFilters.orderYear?.toString() || ""}
                 onChange={(v) =>
                   updateFilter("orderYear", v ? Number(v) : undefined)
                 }
@@ -310,7 +349,7 @@ export function OrderFilters({
               {/* Sales Channel */}
               <FilterSelect
                 label="Sales Channel"
-                value={filters.salesChannelId || ""}
+                value={localFilters.salesChannelId || ""}
                 onChange={(v) => updateFilter("salesChannelId", v)}
                 options={salesChannelOptions}
               />
@@ -318,7 +357,7 @@ export function OrderFilters({
               {/* Customer Pemesan */}
               <FilterSelect
                 label="Customer Pemesan"
-                value={filters.ordererCustomerId || ""}
+                value={localFilters.ordererCustomerId || ""}
                 onChange={(v) => updateFilter("ordererCustomerId", v)}
                 options={customerOptions}
               />
@@ -326,7 +365,7 @@ export function OrderFilters({
               {/* Payment Status */}
               <FilterSelect
                 label="Status Pembayaran"
-                value={filters.paymentStatus || ""}
+                value={localFilters.paymentStatus || ""}
                 onChange={(v) => updateFilter("paymentStatus", v)}
                 options={PAYMENT_STATUS_OPTIONS}
               />
@@ -334,7 +373,7 @@ export function OrderFilters({
               {/* Customer Category */}
               <FilterSelect
                 label="Kategori Customer"
-                value={filters.customerCategory || ""}
+                value={localFilters.customerCategory || ""}
                 onChange={(v) => updateFilter("customerCategory", v)}
                 options={CUSTOMER_CATEGORY_OPTIONS}
               />
@@ -342,7 +381,7 @@ export function OrderFilters({
               {/* Payment Method */}
               <FilterSelect
                 label="Metode Pembayaran"
-                value={filters.paymentMethodId || ""}
+                value={localFilters.paymentMethodId || ""}
                 onChange={(v) => updateFilter("paymentMethodId", v)}
                 options={paymentMethodOptions}
               />
@@ -350,13 +389,13 @@ export function OrderFilters({
               {/* Sort & Order */}
               <FilterSelect
                 label="Urut Berdasarkan"
-                value={filters.sort || ""}
+                value={localFilters.sort || ""}
                 onChange={(v) => updateFilter("sort", v)}
                 options={SORT_OPTIONS}
               />
               <FilterSelect
                 label="Urutan"
-                value={filters.order || "desc"}
+                value={localFilters.order || "desc"}
                 onChange={(v) => updateFilter("order", v as "asc" | "desc")}
                 options={ORDER_OPTIONS}
               />
@@ -373,55 +412,55 @@ export function OrderFilters({
                 {filters.search && (
                   <FilterTag
                     label={`Pencarian: "${filters.search}"`}
-                    onRemove={() => updateFilter("search", "")}
+                    onRemove={() => handleRemoveTag("search")}
                   />
                 )}
                 {filters.startDate && (
                   <FilterTag
                     label={`Dari: ${filters.startDate}`}
-                    onRemove={() => updateFilter("startDate", "")}
+                    onRemove={() => handleRemoveTag("startDate")}
                   />
                 )}
                 {filters.endDate && (
                   <FilterTag
                     label={`Sampai: ${filters.endDate}`}
-                    onRemove={() => updateFilter("endDate", "")}
+                    onRemove={() => handleRemoveTag("endDate")}
                   />
                 )}
                 {filters.orderMonth && (
                   <FilterTag
                     label={`Bulan: ${MONTH_OPTIONS.find((m) => m.value === String(filters.orderMonth))?.label}`}
-                    onRemove={() => updateFilter("orderMonth", undefined)}
+                    onRemove={() => handleRemoveTag("orderMonth")}
                   />
                 )}
                 {filters.orderYear && (
                   <FilterTag
                     label={`Tahun: ${filters.orderYear}`}
-                    onRemove={() => updateFilter("orderYear", undefined)}
+                    onRemove={() => handleRemoveTag("orderYear")}
                   />
                 )}
                 {filters.salesChannelId && (
                   <FilterTag
                     label={`Channel: ${salesChannels.find((s) => s.id === filters.salesChannelId)?.name || filters.salesChannelId}`}
-                    onRemove={() => updateFilter("salesChannelId", "")}
+                    onRemove={() => handleRemoveTag("salesChannelId")}
                   />
                 )}
                 {filters.paymentStatus && (
                   <FilterTag
                     label={`Status: ${PAYMENT_STATUS_OPTIONS.find((p) => p.value === filters.paymentStatus)?.label}`}
-                    onRemove={() => updateFilter("paymentStatus", "")}
+                    onRemove={() => handleRemoveTag("paymentStatus")}
                   />
                 )}
                 {filters.customerCategory && (
                   <FilterTag
                     label={`Kategori: ${filters.customerCategory}`}
-                    onRemove={() => updateFilter("customerCategory", "")}
+                    onRemove={() => handleRemoveTag("customerCategory")}
                   />
                 )}
                 {filters.paymentMethodId && (
                   <FilterTag
                     label={`Pembayaran: ${paymentMethods.find((p) => p.id === filters.paymentMethodId)?.name || filters.paymentMethodId}`}
-                    onRemove={() => updateFilter("paymentMethodId", "")}
+                    onRemove={() => handleRemoveTag("paymentMethodId")}
                   />
                 )}
               </div>

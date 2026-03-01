@@ -205,6 +205,7 @@ export interface ApiOrderDetail {
         insurance?: number;
         packaging?: number;
         shippingCost?: { cost: number; type: string; shippingService: string };
+        shippingDiscountPerKg?: number;
         productDiscount?: { produkVariantId: string; discountType: string; discountAmount: number }[];
         installments?: { amount: number; paymentDate: string; paymentMethodId: string };
     };
@@ -268,6 +269,8 @@ export interface OrderCreatePayload {
                     cost: number;
                     type: "reguler" | "manual" | "free";
                 };
+
+                shippingDiscountPerKg?: number;
 
                 discount?: {
                     value: number;

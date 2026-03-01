@@ -35,6 +35,10 @@ type ShippingSectionProps = Pick<
     | "setShippingDiscount"
     | "totalWeight"
     | "subtotal"
+    | "grossSubtotal"
+    | "totalProductDiscount"
+    | "grossShippingCost"
+    | "totalShippingDiscount"
     | "effectiveShippingCost"
     | "grandTotal"
     | "receiverId"
@@ -73,6 +77,10 @@ export function ShippingSection({
     setShippingDiscount,
     totalWeight,
     subtotal,
+    grossSubtotal,
+    totalProductDiscount,
+    grossShippingCost,
+    totalShippingDiscount,
     effectiveShippingCost,
     grandTotal,
     receiverId,
@@ -124,13 +132,25 @@ export function ShippingSection({
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Diskon Order</label>
                                 <div className="flex gap-2">
-                                    <input
-                                        type="number"
-                                        value={orderDiscount}
-                                        onChange={(e) => setOrderDiscount(Number(e.target.value))}
-                                        className="flex-1 h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                                        min={0}
-                                    />
+                                    {orderDiscountType === "nominal" ? (
+                                        <input
+                                            type="text"
+                                            value={orderDiscount > 0 ? "Rp " + orderDiscount.toLocaleString("id-ID") : ""}
+                                            onChange={(e) => {
+                                                const val = e.target.value.replace(/[^0-9]/g, "");
+                                                setOrderDiscount(val ? Number(val) : 0);
+                                            }}
+                                            className="flex-1 h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                                        />
+                                    ) : (
+                                        <input
+                                            type="number"
+                                            value={orderDiscount}
+                                            onChange={(e) => setOrderDiscount(Number(e.target.value))}
+                                            className="flex-1 h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                                            min={0}
+                                        />
+                                    )}
                                     <select
                                         value={orderDiscountType}
                                         onChange={(e) => setOrderDiscountType(e.target.value as "percent" | "nominal")}
@@ -146,11 +166,13 @@ export function ShippingSection({
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Asuransi</label>
                                 <input
-                                    type="number"
-                                    value={insurance}
-                                    onChange={(e) => setInsurance(Number(e.target.value))}
+                                    type="text"
+                                    value={insurance > 0 ? "Rp " + insurance.toLocaleString("id-ID") : ""}
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/[^0-9]/g, "");
+                                        setInsurance(val ? Number(val) : 0);
+                                    }}
                                     className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                                    min={0}
                                 />
                             </div>
                         )}
@@ -158,11 +180,13 @@ export function ShippingSection({
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Diskon Ongkir (per 1kg)</label>
                                 <input
-                                    type="number"
-                                    value={shippingDiscount}
-                                    onChange={(e) => setShippingDiscount(Number(e.target.value))}
+                                    type="text"
+                                    value={shippingDiscount > 0 ? "Rp " + shippingDiscount.toLocaleString("id-ID") : ""}
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/[^0-9]/g, "");
+                                        setShippingDiscount(val ? Number(val) : 0);
+                                    }}
                                     className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                                    min={0}
                                 />
                             </div>
                         )}
@@ -330,12 +354,14 @@ export function ShippingSection({
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Tarif Ongkir</label>
                                 <input
-                                    type="number"
-                                    value={manualShippingCost}
-                                    onChange={(e) => setManualShippingCost(Number(e.target.value))}
+                                    type="text"
+                                    value={manualShippingCost > 0 ? "Rp " + manualShippingCost.toLocaleString("id-ID") : ""}
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/[^0-9]/g, "");
+                                        setManualShippingCost(val ? Number(val) : 0);
+                                    }}
                                     className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
                                     placeholder="0"
-                                    min={0}
                                 />
                             </div>
                         </div>
@@ -395,11 +421,15 @@ export function ShippingSection({
 
                 {/* Summary */}
                 <OrderSummary
+                    grossSubtotal={grossSubtotal}
+                    totalProductDiscount={totalProductDiscount}
                     subtotal={subtotal}
                     orderDiscount={orderDiscount}
                     orderDiscountType={orderDiscountType}
                     insurance={insurance}
                     shippingMode={shippingMode}
+                    grossShippingCost={grossShippingCost}
+                    totalShippingDiscount={totalShippingDiscount}
                     effectiveShippingCost={effectiveShippingCost}
                     grandTotal={grandTotal}
                 />

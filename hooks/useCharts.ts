@@ -10,34 +10,62 @@ export const monthOrder = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
 ];
 
-
 import { mapApiOrdersToOrders } from "@/lib/mappers";
 
-export function useOrderChartData(orderYear?: number) {
-  const year = orderYear ?? new Date().getFullYear();
-  const { data: monthlyReport, isLoading, isError, refetch } = useOrders({ orderYear: year });
+type LocalChartItem = { name: string; total: number; sortKey: string };
+
+function getGroupingContext(date: Date, params?: import("@/types/api").ReportQueryParams) {
+  const isDayView = !!(params?.month || params?.week || params?.startDate || params?.endDate);
+  
+  if (isDayView) {
+    const name = date.toLocaleDateString("id-ID", { day: "numeric", month: "short", timeZone: "UTC" });
+    const sortKey = date.toISOString().split('T')[0];
+    return { name, sortKey };
+  } else {
+    const name = date.toLocaleDateString("id-ID", { month: "long", timeZone: "UTC" });
+    const sortKey = date.toISOString().substring(0, 7);
+    return { name, sortKey };
+  }
+}
+
+// OLD CODE (Dihapus/dikomentari sesuai permintaan):
+// export function useOrderChartData(orderYear?: number) {
+//   const year = orderYear ?? new Date().getFullYear();
+//   const { data: monthlyReport, isLoading, isError, refetch } = useOrders({ orderYear: year });
+
+export function useOrderChartData(params?: import("@/types/api").ReportQueryParams) {
+  // `useOrders` expects `OrderQueryParams` where `orderYear` is a number
+  const queryParams = { 
+    ...params, 
+    orderYear: params?.year ? parseInt(params.year) : new Date().getFullYear(),
+    month: params?.month,
+    startDate: params?.startDate,
+    endDate: params?.endDate
+  };
+  
+  const { data: monthlyReport, isLoading, isError, refetch } = useOrders(queryParams);
 
   // Map API orders to frontend Order type to get consistent total calculations
   const rawOrders = Array.isArray(monthlyReport) ? monthlyReport : [];
   const orders = mapApiOrdersToOrders(rawOrders);
   
   const chartData: ChartDataItem[] = orders
-    .reduce<ChartItem[]>((acc, item) => {
+    .reduce<LocalChartItem[]>((acc, item) => {
       const date = new Date(item.date);
-      const month = date.toLocaleDateString("id-ID", { month: "long", timeZone: "UTC" });
+      const { name, sortKey } = getGroupingContext(date, params);
       const price = item.total ?? 0;
 
-      const existing = acc.find(d => d.month === month);
+      const existing = acc.find(d => d.sortKey === sortKey);
       if (existing) {
         existing.total += price;
       } else {
-        acc.push({ month, total: price });
+        acc.push({ name, total: price, sortKey });
       }
 
       return acc;
     }, [])
-    .sort((a, b) => monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month))
-    .map(item => ({ name: item.month, value: item.total }));
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
+    .map(item => ({ name: item.name, value: item.total }));
 
   return {
     chartData,
@@ -47,44 +75,52 @@ export function useOrderChartData(orderYear?: number) {
   };
 }
 
-export function useCustomerChartData(customerYear?: number) {
-  const year = customerYear ?? new Date().getFullYear();
+// OLD CODE:
+// export function useCustomerChartData(customerYear?: number) {
+//   const year = customerYear ?? new Date().getFullYear();
+//
+//   const {
+//     data: customersResponse,
+//     isLoading,
+//     isError,
+//     refetch,
+//   } = useCustomers({ year });
+
+export function useCustomerChartData(params?: import("@/types/api").ReportQueryParams) {
+  const queryParams = { 
+    ...params, 
+    year: params?.year ? parseInt(params.year) : new Date().getFullYear(),
+    month: params?.month ? parseInt(params.month) : undefined,
+  };
 
   const {
     data: customersResponse,
     isLoading,
     isError,
     refetch,
-  } = useCustomers({ year });
+  } = useCustomers(queryParams);
 
   // ✅ ambil array customer dengan aman
   const customers = Array.isArray(customersResponse) ? customersResponse : [];
 
   const chartData: ChartDataItem[] = customers
-    .reduce<ChartItem[]>((acc, customer) => {
+    .reduce<LocalChartItem[]>((acc, customer) => {
       const date = new Date(customer.createdAt);
+      const { name, sortKey } = getGroupingContext(date, params);
 
-      const month = date.toLocaleDateString("id-ID", {
-        month: "long",
-        timeZone: "UTC",
-      });
-
-      const existing = acc.find(d => d.month === month);
+      const existing = acc.find(d => d.sortKey === sortKey);
 
       if (existing) {
         existing.total += 1; // ⬅️ hitung jumlah customer
       } else {
-        acc.push({ month, total: 1 });
+        acc.push({ name, total: 1, sortKey });
       }
 
       return acc;
     }, [])
-    .sort(
-      (a, b) =>
-        monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month)
-    )
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
     .map(item => ({
-      name: item.month,
+      name: item.name,
       value: item.total,
     }));
 
@@ -96,44 +132,52 @@ export function useCustomerChartData(customerYear?: number) {
   };
 }
 
-export function useProductChartData(productYear?: number) {
-  const year = productYear ?? new Date().getFullYear();
+// OLD CODE:
+// export function useProductChartData(productYear?: number) {
+//   const year = productYear ?? new Date().getFullYear();
+//
+//   const {
+//     data: productResponse,
+//     isLoading,
+//     isError,
+//     refetch,
+//   } = useProducts({ year: year });
+
+export function useProductChartData(params?: import("@/types/api").ReportQueryParams) {
+  const queryParams = { 
+    ...params, 
+    year: params?.year ? parseInt(params.year) : new Date().getFullYear(),
+    month: params?.month,
+  };
 
   const {
     data: productResponse,
     isLoading,
     isError,
     refetch,
-  } = useProducts({ year: year });
+  } = useProducts(queryParams);
 
   // ✅ ambil array product dengan aman
   const products = Array.isArray(productResponse) ? productResponse : [];
 
   const chartData: ChartDataItem[] = products
-    .reduce<ChartItem[]>((acc, product) => {
+    .reduce<LocalChartItem[]>((acc, product) => {
       const date = new Date(product.product.createdAt);
+      const { name, sortKey } = getGroupingContext(date, params);
 
-      const month = date.toLocaleDateString("id-ID", {
-        month: "long",
-        timeZone: "UTC",
-      });
-
-      const existing = acc.find(d => d.month === month);
+      const existing = acc.find(d => d.sortKey === sortKey);
 
       if (existing) {
-        existing.total += 1; // ⬅️ hitung jumlah customer
+        existing.total += 1; // ⬅️ hitung jumlah product
       } else {
-        acc.push({ month, total: 1 });
+        acc.push({ name, total: 1, sortKey });
       }
 
       return acc;
     }, [])
-    .sort(
-      (a, b) =>
-        monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month)
-    )
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
     .map(item => ({
-      name: item.month,
+      name: item.name,
       value: item.total,
     }));
 
@@ -145,47 +189,54 @@ export function useProductChartData(productYear?: number) {
   };
 }
 
-export function useExpensesChartData(expensesYear?: number) {
-  const year = expensesYear ?? new Date().getFullYear();
+// OLD CODE:
+// export function useExpensesChartData(expensesYear?: number) {
+//   const year = expensesYear ?? new Date().getFullYear();
+//
+//   const {
+//     data: expensesResponse,
+//     isLoading,
+//     isError,
+//     refetch,
+//   } = useExpenses({ year });
+
+export function useExpensesChartData(params?: import("@/types/api").ReportQueryParams) {
+  const queryParams = { 
+    ...params, 
+    year: params?.year ? parseInt(params.year) : new Date().getFullYear(),
+    month: params?.month ? parseInt(params.month) : undefined,
+  };
 
   const {
     data: expensesResponse,
     isLoading,
     isError,
     refetch,
-  } = useExpenses({ year });
+  } = useExpenses(queryParams);
 
   // ambil array expenses dengan aman
   const expensesData = expensesResponse?.data;
   const expenses = Array.isArray(expensesData) ? expensesData : [];
 
   const chartData: ChartDataItem[] = expenses
-    .reduce<ChartItem[]>((acc, item) => {
+    .reduce<LocalChartItem[]>((acc, item) => {
       const date = new Date(item.expenseDate);
-
-      const month = date.toLocaleDateString("id-ID", {
-        month: "long",
-        timeZone: "UTC",
-      });
-
+      const { name, sortKey } = getGroupingContext(date, params);
       const price = item.totalPrice ?? item.itemPrice ?? 0;
 
-      const existing = acc.find(d => d.month === month);
+      const existing = acc.find(d => d.sortKey === sortKey);
 
       if (existing) {
         existing.total += price;
       } else {
-        acc.push({ month, total: price });
+        acc.push({ name, total: price, sortKey });
       }
 
       return acc;
     }, [])
-    .sort(
-      (a, b) =>
-        monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month)
-    )
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
     .map(item => ({
-      name: item.month,
+      name: item.name,
       value: item.total,
     }));
 

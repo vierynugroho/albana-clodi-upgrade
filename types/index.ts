@@ -20,6 +20,9 @@ export interface Order {
   weight: number;
   insurance: number;
   discount: number;
+  productDiscount?: number;
+  orderDiscount?: number;
+  shippingDiscount?: number;
   subtotal: number;
   total: number;
   paymentStatus: "lunas" | "cicilan" | "belum_dibayar" | "dibatalkan";
