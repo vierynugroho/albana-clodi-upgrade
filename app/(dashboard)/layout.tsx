@@ -2,7 +2,6 @@
 
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
-import { Toaster } from "@/components/ui/toaster";
 import { useState, useCallback, memo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth";
@@ -63,7 +62,6 @@ export default function DashboardLayout({
         </main>
         <Footer />
       </div>
-      <Toaster />
     </div>
   );
 }

@@ -3,8 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/QueryProvider";
+import { Toaster } from "@/components/ui/toaster";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   preload: false,
 });
@@ -31,6 +32,7 @@ export default function RootLayout({
           <QueryProvider>
             {children}
           </QueryProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
