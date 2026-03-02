@@ -1,5 +1,5 @@
 import { Customer } from "@/types";
-import { Briefcase, Crown, Loader2, UserCheck, Users } from "lucide-react";
+import { Briefcase, Crown, UserCheck, Users } from "lucide-react";
 import { memo, useMemo } from "react";
 import { StatCard } from "../ui";
 import { LoadingState } from "../shared/LoadingState";

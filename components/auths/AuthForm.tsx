@@ -1,6 +1,6 @@
 "use client";
 
-import { Fingerprint } from "lucide-react";
+
 import { Button } from "../ui/button";
 import { FormField } from "../field/FormField";
 import { useForm } from "react-hook-form";
@@ -67,14 +67,11 @@ const LoginForm = memo(function LoginForm() {
       const msg = axiosError?.response?.data?.message || axiosError?.message || "Login gagal";
       setError(msg);
     }
-  }, [router]);
+  }, [router, queryClient]);
 
   return (
     <div className="w-full max-w-md rounded-2xl border p-8 flex flex-col items-center space-y-6 bg-card shadow-lg">
-      {/* <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center"> */}
-        {/* <Fingerprint className="h-8 w-8 text-white" /> */}
-        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" style={{ width: "90px", height: "90px", objectFit: "contain" }} priority />
-      {/* </div> */}
+      <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" style={{ width: "90px", height: "90px", objectFit: "contain" }} priority />
       <div className="text-center">
         <h1 className="text-2xl font-bold">Selamat Datang</h1>
         <p className="text-sm text-muted-foreground mt-1">Masuk ke akun Anda</p>
@@ -138,17 +135,11 @@ const RegisterForm = memo(function RegisterForm() {
     defaultValues: { name: "", email: "", password: "", role: "staff" },
   });
 
-  const onSubmit = useCallback((data: RegisterFormValues) => {
-    // @debug — commented for production
-    // console.log("Register:", data);
-  }, []);
+  const onSubmit = useCallback(() => { }, []);
 
   return (
     <div className="w-full max-w-md rounded-2xl border p-8 flex flex-col items-center space-y-6 bg-card shadow-lg">
-      {/* <div className="h-16 w-16 rounded-2xl gradient-primary flex items-center justify-center"> */}
-        {/* <Fingerprint className="h-8 w-8 text-white" /> */}
-        <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" style={{ width: "90px", height: "90px", objectFit: "contain" }} priority />
-      {/* </div> */}
+      <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} width={90} height={90} alt="logo" style={{ width: "90px", height: "90px", objectFit: "contain" }} priority />
       <div className="text-center">
         <h1 className="text-2xl font-bold">Buat Akun Baru</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -200,7 +191,7 @@ const RegisterForm = memo(function RegisterForm() {
             </span>
           )}
         </div>
-        
+
         <p className="text-sm text-muted-foreground text-center">
           Sudah punya akun?{" "}
           <Link

@@ -28,8 +28,6 @@ const CustomerLabelCard = ({
   </Card>
 );
 
-/* ================= SEARCHABLE SELECT COMPONENT ================= */
-
 interface SelectOption {
   value: string;
   label: string;
@@ -85,7 +83,6 @@ const SearchableSelect = ({
 
       {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-background border border-input rounded-xl shadow-lg max-h-60 overflow-hidden">
-          {/* Search Input */}
           <div className="p-2 border-b">
             <div className="relative">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -100,7 +97,6 @@ const SearchableSelect = ({
             </div>
           </div>
 
-          {/* Options List */}
           <div className="max-h-48 overflow-y-auto">
             {filteredOptions.length === 0 ? (
               <div className="p-3 text-sm text-muted-foreground text-center">
@@ -129,7 +125,6 @@ const SearchableSelect = ({
         </div>
       )}
 
-      {/* Click outside to close */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40"
@@ -143,18 +138,11 @@ const SearchableSelect = ({
   );
 };
 
-/* ================= FORM PROPS ================= */
-
 interface CustomerFormProps {
-  /** Data awal untuk mode edit */
   initialData?: CustomerFormValues & { id?: string };
-  /** Apakah dalam mode edit */
   isEditMode?: boolean;
-  /** Callback setelah submit berhasil */
   onSuccess?: () => void;
 }
-
-/* ================= FORM ================= */
 
 const CustomerForm = ({
   initialData,
@@ -164,18 +152,14 @@ const CustomerForm = ({
   const router = useRouter();
   const { toast } = useToast();
 
-  // Region state for cascading dropdowns
   const [selectedProvinceId, setSelectedProvinceId] = useState<string>("");
   const [selectedCityId, setSelectedCityId] = useState<string>("");
   const [selectedDistrictId, setSelectedDistrictId] = useState<string>("");
-
-  // Region hooks
   const { data: provinces = [], isLoading: loadingProvinces } = useProvinces();
   const { data: cities = [], isLoading: loadingCities } = useCities(selectedProvinceId);
   const { data: districts = [], isLoading: loadingDistricts } = useDistricts(selectedCityId);
   const { data: villages = [], isLoading: loadingVillages } = useVillages(selectedDistrictId);
 
-  // Mutation hooks
   const createCustomer = useCreateCustomer();
   const updateCustomer = useUpdateCustomer();
 
@@ -209,20 +193,17 @@ const CustomerForm = ({
     },
   });
 
-  // Watch for kecamatanId to get destinationId
   const watchedKecamatanId = watch("kecamatanId");
 
-  // Set initial region state for edit mode
   useEffect(() => {
     if (initialData) {
       reset(initialData);
     }
   }, [initialData, reset]);
 
-  // Resolve province name → ID when provinces load (edit mode)
   useEffect(() => {
     if (!isEditMode || !initialData?.provinsi || provinces.length === 0) return;
-    if (selectedProvinceId) return; // already resolved
+    if (selectedProvinceId) return;
     const match = provinces.find(
       (p) => p.name.toLowerCase() === initialData.provinsi.toLowerCase()
     );
@@ -232,7 +213,6 @@ const CustomerForm = ({
     }
   }, [isEditMode, initialData?.provinsi, provinces, selectedProvinceId, setValue]);
 
-  // Resolve city name → ID when cities load (edit mode)
   useEffect(() => {
     if (!isEditMode || !initialData?.kota || cities.length === 0) return;
     if (selectedCityId) return;
@@ -245,7 +225,6 @@ const CustomerForm = ({
     }
   }, [isEditMode, initialData?.kota, cities, selectedCityId, setValue]);
 
-  // Resolve district name → ID when districts load (edit mode)
   useEffect(() => {
     if (!isEditMode || !initialData?.kecamatan || districts.length === 0) return;
     if (selectedDistrictId) return;
@@ -258,7 +237,6 @@ const CustomerForm = ({
     }
   }, [isEditMode, initialData?.kecamatan, districts, selectedDistrictId, setValue]);
 
-  // Resolve village name → ID when villages load (edit mode)
   useEffect(() => {
     if (!isEditMode || !initialData?.desa || villages.length === 0) return;
     const currentDesaId = watch("desaId");
@@ -271,16 +249,13 @@ const CustomerForm = ({
     }
   }, [isEditMode, initialData?.desa, villages, watch, setValue]);
 
-  // Update destinationId when kecamatanId changes
   useEffect(() => {
     if (watchedKecamatanId) {
       setValue("destinationId", parseInt(watchedKecamatanId, 10));
     }
   }, [watchedKecamatanId, setValue]);
 
-  // Transform form data to API payload
   const transformToPayload = (data: CustomerFormValues): CustomerCreatePayload => {
-    // Map kategori to API format
     const categoryMap: Record<string, CustomerCreatePayload["category"]> = {
       customer: "CUSTOMER",
       reseller: "RESELLER",
@@ -310,7 +285,6 @@ const CustomerForm = ({
       const payload = transformToPayload(data);
 
       if (isEditMode && initialData?.id) {
-        // MODE EDIT: Update data
         await updateCustomer.mutateAsync({ id: initialData.id, payload });
         toast({
           title: "Berhasil",
@@ -318,7 +292,6 @@ const CustomerForm = ({
           variant: "success",
         });
       } else {
-        // MODE ADD: Create baru
         await createCustomer.mutateAsync(payload);
         toast({
           title: "Berhasil",
@@ -338,7 +311,6 @@ const CustomerForm = ({
     }
   };
 
-  // Handle province change - reset child selections
   const handleProvinceChange = (id: string, name: string) => {
     setSelectedProvinceId(id);
     setSelectedCityId("");
@@ -354,7 +326,6 @@ const CustomerForm = ({
     setValue("kodePos", "");
   };
 
-  // Handle city change - reset child selections
   const handleCityChange = (id: string, name: string) => {
     setSelectedCityId(id);
     setSelectedDistrictId("");
@@ -367,7 +338,6 @@ const CustomerForm = ({
     setValue("kodePos", "");
   };
 
-  // Handle district change - reset village
   const handleDistrictChange = (id: string, name: string) => {
     setSelectedDistrictId(id);
     setValue("kecamatanId", id);
@@ -377,18 +347,15 @@ const CustomerForm = ({
     setValue("kodePos", "");
   };
 
-  // Handle village change - auto-fill postal code
   const handleVillageChange = (id: string, name: string) => {
     setValue("desaId", id);
     setValue("desa", name);
-    // Find the selected village to get postal code
     const selectedVillage = villages.find((v) => v.id === id);
     if (selectedVillage) {
       setValue("kodePos", selectedVillage.postalCode.toString());
     }
   };
 
-  // Convert data to options
   const provinceOptions = provinces.map((p) => ({ value: p.id, label: p.name }));
   const cityOptions = cities.map((c) => ({ value: c.id, label: c.name }));
   const districtOptions = districts.map((d) => ({ value: d.id, label: d.name }));

@@ -15,9 +15,7 @@ import {
 import type { ProductQueryParams } from "@/types/api";
 import type { ApiCategory } from "@/types/api";
 
-/* ===============================
-   Filter Option Types
-================================ */
+
 interface FilterOption {
   value: string;
   label: string;
@@ -42,7 +40,6 @@ const ORDER_OPTIONS: FilterOption[] = [
   { value: "asc", label: "Terlama" },
 ];
 
-// Generate month options
 const MONTH_OPTIONS: FilterOption[] = [
   { value: "", label: "Semua Bulan" },
   { value: "1", label: "Januari" },
@@ -59,7 +56,6 @@ const MONTH_OPTIONS: FilterOption[] = [
   { value: "12", label: "Desember" },
 ];
 
-// Generate year options
 const currentYear = new Date().getFullYear();
 const YEAR_OPTIONS: FilterOption[] = [
   { value: "", label: "Semua Tahun" },
@@ -68,9 +64,7 @@ const YEAR_OPTIONS: FilterOption[] = [
   { value: String(currentYear - 2), label: String(currentYear - 2) },
 ];
 
-/* ===============================
-   Filter Select Component
-================================ */
+
 interface FilterSelectProps {
   label: string;
   value: string;
@@ -115,9 +109,6 @@ function FilterSelect({
   );
 }
 
-/* ===============================
-   Filter Date Input Component
-================================ */
 interface FilterDateInputProps {
   label: string;
   value: string;
@@ -155,9 +146,6 @@ function FilterDateInput({
   );
 }
 
-/* ===============================
-   Main ProductFilters Component
-================================ */
 interface ProductFiltersProps {
   filters: ProductQueryParams;
   onFiltersChange: (filters: ProductQueryParams) => void;
@@ -173,10 +161,8 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [localFilters, setLocalFilters] = useState<ProductQueryParams>(filters);
-  // Tracks the date the user picked (for display), week number is derived from it
   const [weekDate, setWeekDate] = useState("");
 
-  // Helper: compute ISO week number from a date string (YYYY-MM-DD)
   function getISOWeek(dateStr: string): string {
     const d = new Date(dateStr);
     const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -187,7 +173,7 @@ export function ProductFilters({
     return String(week);
   }
 
-  // Helper: format date to Indonesian readable string
+
   function formatDateID(dateStr: string): string {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -216,7 +202,7 @@ export function ProductFilters({
         return newFilters;
       });
     },
-    []
+    [setLocalFilters]
   );
 
   // Apply filters (triggers fetch)
@@ -245,7 +231,7 @@ export function ProductFilters({
     setLocalFilters({});
     setWeekDate("");
     onFiltersChange({});
-  }, [onFiltersChange]);
+  }, [onFiltersChange, setLocalFilters, setWeekDate]);
 
   // Count active filters from actual PARENT state
   const activeFilterCount = Object.keys(filters).filter(
