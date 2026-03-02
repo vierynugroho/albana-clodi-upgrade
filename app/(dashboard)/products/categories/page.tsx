@@ -98,6 +98,7 @@ export default function CategoriesPage() {
             setDeleteId(null);
         }
     };
+    
 
     if (isLoading) {
         return (
