@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Package, Loader2, RefreshCw, Download, Folder, Barcode } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useInfiniteProducts, useDeleteProduct } from "@/hooks/useProducts";
+import { useInfiniteProducts, useDeleteProduct, useExportProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiProductsToProducts } from "@/lib/mappers";
@@ -40,40 +40,34 @@ export default function ProductPage() {
   const deleteMutation = useDeleteProduct();
   const { toast } = useToast();
 
-  // --- Old handleExport (inline download, tanpa filter) ---
-  // const [isExporting, setIsExporting] = useState(false);
-  // const handleExport = async () => {
-  //   setIsExporting(true);
-  //   try {
-  //     const blob = await exportProducts("excel", {});
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = `products-${new Date().toISOString().split("T")[0]}.xlsx`;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //     a.remove();
-  //     toast({ title: "Berhasil", description: "Data produk berhasil diexport", variant: "success" });
-  //   } catch (error) {
-  //     toast({ title: "Gagal mengexport", description: error instanceof Error ? error.message : "Terjadi kesalahan", variant: "destructive" });
-  //   } finally {
-  //     setIsExporting(false);
-  //   }
-  // };
-  // --- End old handleExport ---
+  const exportMutation = useExportProducts();
 
   const handleExport = () => {
-    // Build query params from active filters
-    const params = new URLSearchParams();
-    params.set("type", "products");
-    if (filters.startDate) params.set("startDate", filters.startDate);
-    if (filters.endDate) params.set("endDate", filters.endDate);
-    if (filters.month) params.set("month", filters.month);
-    if (filters.year) params.set("year", String(filters.year));
-    if (filters.week) params.set("week", filters.week);
-    // Open export in new tab
-    window.open(`/export?${params.toString()}`, "_blank");
+    // Build ExportFilterParams — all 5 params supported by /products/export/excel
+    const exportParams = {
+      ...(filters.startDate && { startDate: filters.startDate }),
+      ...(filters.endDate && { endDate: filters.endDate }),
+      ...(filters.month && { month: filters.month }),
+      ...(filters.year && { year: String(filters.year) }),
+      ...(filters.week && { week: filters.week }),
+    };
+
+    exportMutation.mutate(exportParams, {
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Data produk berhasil diexport",
+          variant: "success",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Gagal mengexport",
+          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   // Flatten all pages into a single array of products
@@ -161,9 +155,13 @@ export default function ProductPage() {
             <Barcode className="mr-2 h-4 w-4" />
             Cetak Barcode
           </Button>
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="mr-2 h-4 w-4" />
-            Export
+          <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
+            {exportMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {exportMutation.isPending ? "Mengexport..." : "Export"}
           </Button>
           <Button onClick={() => router.push("/products/add")} variant="gradient">
             <Plus className="mr-2 h-4 w-4" />
