@@ -1,7 +1,7 @@
 // hooks/useCustomers.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as customerService from "@/lib/services/customer.service";
-import type { CustomerQueryParams } from "@/types/api";
+import type { CustomerQueryParams, ExportFilterParams } from "@/types/api";
 
 export const customerKeys = {
     all: ["customers"] as const,
@@ -73,9 +73,18 @@ export function useImportCustomers() {
     });
 }
 
+// --- Old useExportCustomers (tanpa query params) ---
+// export function useExportCustomers() {
+//     return useMutation({
+//         mutationFn: () => customerService.exportCustomers(),
+//         ...
+//     });
+// }
+// --- End old useExportCustomers ---
+
 export function useExportCustomers() {
     return useMutation({
-        mutationFn: () => customerService.exportCustomers(),
+        mutationFn: (params?: ExportFilterParams) => customerService.exportCustomers(params),
         onSuccess: (blob) => {
             // Create download link
             const url = window.URL.createObjectURL(blob);

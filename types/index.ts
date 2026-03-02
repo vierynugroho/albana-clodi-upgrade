@@ -22,6 +22,8 @@ export interface Order {
   discount: number;
   productDiscount?: number;
   orderDiscount?: number;
+  orderDiscountType?: "percent" | "nominal";
+  orderDiscountValue?: number;
   shippingDiscount?: number;
   subtotal: number;
   total: number;

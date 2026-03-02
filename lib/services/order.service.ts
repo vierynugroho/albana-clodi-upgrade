@@ -8,6 +8,7 @@ import type {
     PaginatedResponse,
     CursorPaginatedResponse,
     CursorPaginationMeta,
+    ExportFilterParams,
 } from "@/types/api";
 
 export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]> {
@@ -114,7 +115,17 @@ export async function cancelOrder(id: string): Promise<ApiOrder | null> {
     return res.data?.responseObject || null;
 }
 
-export async function exportOrders(format: "excel" = "excel"): Promise<Blob> {
-    const res = await api.get(`/orders/export/${format}`, { responseType: "blob" });
+// --- Old exportOrders (tanpa query params) ---
+// export async function exportOrders(format: "excel" = "excel"): Promise<Blob> {
+//     const res = await api.get(`/orders/export/${format}`, { responseType: "blob" });
+//     return res.data;
+// }
+// --- End old exportOrders ---
+
+export async function exportOrders(format: "excel" = "excel", params?: ExportFilterParams): Promise<Blob> {
+    const res = await api.get(`/orders/export/${format}`, {
+        responseType: "blob",
+        params: params || {},
+    });
     return res.data;
 }

@@ -1,7 +1,7 @@
 // hooks/useExpenses.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as expenseService from "@/lib/services/expense.service";
-import type { ExpenseQueryParams, ExpenseCreatePayload } from "@/types/api";
+import type { ExpenseQueryParams, ExpenseCreatePayload, ExportFilterParams } from "@/types/api";
 
 export const expenseKeys = {
     all: ["expenses"] as const,
@@ -153,9 +153,18 @@ export function useDeleteExpense() {
     });
 }
 
+// --- Old useExportExpenses (tanpa query params) ---
+// export function useExportExpenses() {
+//     return useMutation({
+//         mutationFn: () => expenseService.exportExpenses(),
+//         ...
+//     });
+// }
+// --- End old useExportExpenses ---
+
 export function useExportExpenses() {
     return useMutation({
-        mutationFn: () => expenseService.exportExpenses(),
+        mutationFn: (params?: ExportFilterParams) => expenseService.exportExpenses(params),
         onSuccess: (blob) => {
             // Create download link
             const url = window.URL.createObjectURL(blob);

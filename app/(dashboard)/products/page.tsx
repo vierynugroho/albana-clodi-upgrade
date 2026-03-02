@@ -1,21 +1,32 @@
 "use client";
 
 import { ProductTable } from "@/components/product/ProductTable";
+import { ProductFilters } from "@/components/product/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Plus, Package, Loader2, RefreshCw, Download, Folder, Barcode } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useInfiniteProducts, useDeleteProduct } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiProductsToProducts } from "@/lib/mappers";
-import { exportProducts } from "@/lib/services/product.service";
+// --- Old import (replaced by export page approach) ---
+// import { exportProducts } from "@/lib/services/product.service";
+// --- End old import ---
 import type { Product } from "@/types";
+import type { ProductQueryParams } from "@/types/api";
 import { ProductStats } from "@/components/product/ProdukStats";
 
 export default function ProductPage() {
   const router = useRouter();
 
-  // Use infinite query for products
+  // Filter state
+  const [filters, setFilters] = useState<ProductQueryParams>({});
+
+  // Fetch categories for filter options
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+
+  // Use infinite query for products — pass filters
   const {
     data,
     fetchNextPage,
@@ -24,43 +35,48 @@ export default function ProductPage() {
     isLoading,
     isError,
     refetch
-  } = useInfiniteProducts();
+  } = useInfiniteProducts(filters);
 
   const deleteMutation = useDeleteProduct();
   const { toast } = useToast();
-  const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      const blob = await exportProducts("excel");
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `products-${new Date().toISOString().split("T")[0]}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
-      toast({
-        title: "Berhasil",
-        description: "Data produk berhasil diexport",
-        variant: "success",
-      });
-    } catch (error) {
-      toast({
-        title: "Gagal mengexport",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
+  // --- Old handleExport (inline download, tanpa filter) ---
+  // const [isExporting, setIsExporting] = useState(false);
+  // const handleExport = async () => {
+  //   setIsExporting(true);
+  //   try {
+  //     const blob = await exportProducts("excel", {});
+  //     const url = window.URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = `products-${new Date().toISOString().split("T")[0]}.xlsx`;
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     window.URL.revokeObjectURL(url);
+  //     a.remove();
+  //     toast({ title: "Berhasil", description: "Data produk berhasil diexport", variant: "success" });
+  //   } catch (error) {
+  //     toast({ title: "Gagal mengexport", description: error instanceof Error ? error.message : "Terjadi kesalahan", variant: "destructive" });
+  //   } finally {
+  //     setIsExporting(false);
+  //   }
+  // };
+  // --- End old handleExport ---
+
+  const handleExport = () => {
+    // Build query params from active filters
+    const params = new URLSearchParams();
+    params.set("type", "products");
+    if (filters.startDate) params.set("startDate", filters.startDate);
+    if (filters.endDate) params.set("endDate", filters.endDate);
+    if (filters.month) params.set("month", filters.month);
+    if (filters.year) params.set("year", String(filters.year));
+    if (filters.week) params.set("week", filters.week);
+    // Open export in new tab
+    window.open(`/export?${params.toString()}`, "_blank");
   };
 
   // Flatten all pages into a single array of products
-  // Each page is ApiProductListItem[], we need to map each item to frontend Product type
-  // useInfiniteQuery data.pages is Array<ApiProductListItem[]>
   const products: Product[] = useMemo(() => {
     if (!data) return [];
     const allItems = data.pages.flatMap((page) => page);
@@ -145,12 +161,8 @@ export default function ProductPage() {
             <Barcode className="mr-2 h-4 w-4" />
             Cetak Barcode
           </Button>
-          <Button variant="outline" onClick={handleExport} disabled={isExporting}>
-            {isExporting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="mr-2 h-4 w-4" />
-            )}
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
           <Button onClick={() => router.push("/products/add")} variant="gradient">
@@ -159,6 +171,14 @@ export default function ProductPage() {
           </Button>
         </div>
       </div>
+
+      {/* Filters */}
+      <ProductFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        categories={categories}
+        isLoadingOptions={isLoadingCategories}
+      />
 
       {/* Stats */}
       <ProductStats products={products} />

@@ -7,6 +7,7 @@ import type {
     ExpenseQueryParams,
     ExpenseListResponse,
     ExpenseListResult,
+    ExportFilterParams,
 } from "@/types/api";
 
 
@@ -55,13 +56,31 @@ export async function deleteExpense(id: string): Promise<ApiExpense | null> {
     return res.data?.responseObject || null;
 }
 
-export async function exportExpenses(): Promise<Blob> {
+// --- Old exportExpenses (tanpa query params) ---
+// export async function exportExpenses(): Promise<Blob> {
+//     try {
+//         const res = await api.get("/expenses/export/excel", {
+//             responseType: "blob",
+//             headers: {
+//                 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+//             }
+//         });
+//         return res.data;
+//     } catch (error) {
+//         console.error("Export error:", error);
+//         throw new Error("Gagal mengekspor data. Pastikan Anda sudah login.");
+//     }
+// }
+// --- End old exportExpenses ---
+
+export async function exportExpenses(params?: ExportFilterParams): Promise<Blob> {
     try {
         const res = await api.get("/expenses/export/excel", {
             responseType: "blob",
             headers: {
                 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            }
+            },
+            params: params || {},
         });
         return res.data;
     } catch (error) {

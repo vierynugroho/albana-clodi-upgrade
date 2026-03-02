@@ -51,21 +51,22 @@ const Toolbar = memo(function Toolbar({
   const exportExpenses = useExportExpenses();
   const importExpenses = useImportExpenses();
 
-  const handleExport = async () => {
-    try {
-      await exportExpenses.mutateAsync();
-      toast({
-        title: "Berhasil!",
-        description: "Data pengeluaran berhasil diekspor",
-      });
-    } catch (error) {
-      console.error("Export error:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Gagal mengekspor data. Silakan coba lagi.",
-        variant: "destructive",
-      });
-    }
+  // --- Old handleExport (inline download) ---
+  // const handleExport = async () => {
+  //   try {
+  //     await exportExpenses.mutateAsync({});
+  //     toast({ title: "Berhasil!", description: "Data pengeluaran berhasil diekspor" });
+  //   } catch (error) {
+  //     console.error("Export error:", error);
+  //     toast({ title: "Error", description: error instanceof Error ? error.message : "Gagal mengekspor data.", variant: "destructive" });
+  //   }
+  // };
+  // --- End old handleExport ---
+
+  const handleExport = () => {
+    const params = new URLSearchParams();
+    params.set("type", "expenses");
+    window.open(`/export?${params.toString()}`, "_blank");
   };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {

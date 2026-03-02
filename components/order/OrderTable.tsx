@@ -186,20 +186,29 @@ const OrderCard = memo(function OrderCard({
               </li>
             )}
             
-            {(order.orderDiscount ?? 0) > 0 && (
+            {/* --- Old Diskon Order (tanpa type label) --- */}
+            {/* {(order.orderDiscount ?? 0) > 0 && (
               <li className="flex justify-between text-green-600">
                 <span>Diskon Order</span>
                 <span>-{formatCurrency(order.orderDiscount ?? 0)}</span>
               </li>
+            )} */}
+            {/* --- End old Diskon Order --- */}
+            {(order.orderDiscount ?? 0) > 0 && (
+              <li className="flex justify-between text-green-600">
+                <span>Diskon Order {order.orderDiscountType === "percent" ? `(${order.orderDiscountValue}%)` : ""}</span>
+                <span>-{formatCurrency(order.orderDiscount ?? 0)}</span>
+              </li>
             )}
 
-            {/* Fallback original generic discount if specific discounts are all zero but generic exists logically */}
-            {!(order.productDiscount || order.orderDiscount) && (order.discount ?? 0) > 0 && (
+            {/* --- Old generic Diskon fallback (redundan, dihapus) --- */}
+            {/* {!(order.productDiscount || order.orderDiscount) && (order.discount ?? 0) > 0 && (
               <li className="flex justify-between text-green-600">
                 <span>Diskon</span>
                 <span>-{formatCurrency(order.discount ?? 0)}</span>
               </li>
-            )}
+            )} */}
+            {/* --- End old generic Diskon fallback --- */}
 
             {(order.insurance ?? 0) > 0 && (
               <li className="flex justify-between">

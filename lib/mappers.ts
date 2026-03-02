@@ -175,7 +175,12 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
 
     let shippingDiscountVal = 0;
     if (orderDetail?.otherFees?.shippingDiscountPerKg) {
-        shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * Math.max(1, Math.ceil((orderDetail.otherFees.weight || 0) / 1000));
+        // --- Old calculation (salah, ceiling ke 1kg minimum) ---
+        // shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * Math.max(1, Math.ceil((orderDetail.otherFees.weight || 0) / 1000));
+        // --- End old ---
+        // Rumus sama dengan useOrderStateForm: shippingDiscount * weightInKg (tanpa ceiling)
+        const weightInKg = (orderDetail.otherFees.weight || 0) / 1000;
+        shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * weightInKg;
     }
 
     // 5. Reconstruct TRUE Subtotal (Gross Subtotal)
@@ -203,7 +208,9 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         insurance,
         discount,
         productDiscount: productDiscountTotal,
-        orderDiscount: orderDiscountVal, // Fallback if needed
+        orderDiscount: orderDiscountVal,
+        orderDiscountType: orderDetail?.otherFees?.discount?.type as "percent" | "nominal" | undefined,
+        orderDiscountValue: orderDetail?.otherFees?.discount?.value,
         shippingDiscount: shippingDiscountVal,
         subtotal: trueSubtotal,
         // 4. Perhitungan Total Pembayaran Akhir:

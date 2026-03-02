@@ -311,13 +311,13 @@ export function ProductTable({
 
   return (
     <div className="space-y-4">
-      <Toolbar
+      {/* <Toolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         filterCategory={filterCategory}
         onFilterChange={setFilterCategory}
         categories={categories}
-      />
+      /> */}
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">

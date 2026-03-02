@@ -523,7 +523,7 @@ export function ProductForm({
                 />
               </FormFieldWrapper>
 
-              {showDiscount && (
+              {/* {showDiscount && (
                 <FormFieldWrapper
                   label="Diskon"
                   className="flex-1 max-w-50"
@@ -538,7 +538,7 @@ export function ProductForm({
                     })}
                   />
                 </FormFieldWrapper>
-              )}
+              )} */}
             </div>
           </CardContent>
         </Card>
@@ -558,11 +558,11 @@ export function ProductForm({
                 checked={showVariantToggle}
                 onChange={setShowVariantToggle}
               />
-              <ToggleSwitch
+              {/* <ToggleSwitch
                 label="Diskon"
                 checked={showDiscount}
                 onChange={setShowDiscount}
-              />
+              /> */}
             </CardContent>
           </Card>
 

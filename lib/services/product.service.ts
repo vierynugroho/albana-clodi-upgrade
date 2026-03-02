@@ -11,6 +11,7 @@ import type {
     ProductVariantPayload,
     ProductWholesalerPayload,
     ProductCreatePayload,
+    ExportFilterParams,
 } from "@/types/api";
 export type { ProductCreatePayload } from "@/types/api";
 
@@ -308,20 +309,40 @@ export async function deleteProduct(id: string): Promise<ApiProduct | null> {
     return res.data?.responseObject || null;
 }
 
-//Export products to file format (simple version)
-export async function exportProducts(format: "excel" = "excel"): Promise<Blob> {
-    const res = await api.post(`/products/export/${format}`, null, { responseType: "blob" });
+// --- Old exportProducts (tanpa query params) ---
+// export async function exportProducts(format: "excel" = "excel"): Promise<Blob> {
+//     const res = await api.post(`/products/export/${format}`, null, { responseType: "blob" });
+//     return res.data;
+// }
+// --- End old exportProducts ---
+
+//Export products to file format (with optional date filter params)
+export async function exportProducts(format: "excel" = "excel", params?: ExportFilterParams): Promise<Blob> {
+    const res = await api.post(`/products/export/${format}`, null, {
+        responseType: "blob",
+        params: params || {},
+    });
     return res.data;
 }
 
+// --- Old downloadProductExcel (tanpa query params) ---
+// export async function downloadProductExcel(): Promise<{ success: boolean; message?: string }> {
+//     try {
+//         const res = await api.post("/products/export/excel", null, {
+//             headers: { Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+//             responseType: "blob",
+//         });
+// --- End old downloadProductExcel ---
+
 //Download products as Excel file, Creates a download link and triggers the download
-export async function downloadProductExcel(): Promise<{ success: boolean; message?: string }> {
+export async function downloadProductExcel(params?: ExportFilterParams): Promise<{ success: boolean; message?: string }> {
     try {
         const res = await api.post("/products/export/excel", null, {
             headers: {
                 Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             },
             responseType: "blob",
+            params: params || {},
         });
 
         const blob = new Blob([res.data], {

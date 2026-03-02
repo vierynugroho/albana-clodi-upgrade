@@ -160,32 +160,37 @@ export default function OrderPage() {
     }
   }, [isLoading, currentPage, hasNext, nextCursor, cursorHistory]);
 
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      const blob = await exportOrders("excel");
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `orders-${new Date().toISOString().split("T")[0]}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
-      toast({
-        title: "Berhasil",
-        description: "Data order berhasil diexport",
-        variant: "success",
-      });
-    } catch (error) {
-      toast({
-        title: "Gagal mengexport",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
+  // --- Old handleExport (inline download) ---
+  // const handleExport = async () => {
+  //   setIsExporting(true);
+  //   try {
+  //     const blob = await exportOrders("excel", {
+  //       startDate: filters.startDate,
+  //       endDate: filters.endDate,
+  //     });
+  //     const url = window.URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = `orders-${new Date().toISOString().split("T")[0]}.xlsx`;
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     window.URL.revokeObjectURL(url);
+  //     a.remove();
+  //     toast({ title: "Berhasil", description: "Data order berhasil diexport", variant: "success" });
+  //   } catch (error) {
+  //     toast({ title: "Gagal mengexport", description: error instanceof Error ? error.message : "Terjadi kesalahan", variant: "destructive" });
+  //   } finally {
+  //     setIsExporting(false);
+  //   }
+  // };
+  // --- End old handleExport ---
+
+  const handleExport = () => {
+    const params = new URLSearchParams();
+    params.set("type", "orders");
+    if (filters.startDate) params.set("startDate", filters.startDate);
+    if (filters.endDate) params.set("endDate", filters.endDate);
+    window.open(`/export?${params.toString()}`, "_blank");
   };
 
   const handleEdit = (order: Order) => {

@@ -46,21 +46,21 @@ export default function CustomersPage() {
     });
   };
 
-  const handleExport = async () => {
-    try {
-      await exportMutation.mutateAsync();
-      toast({
-        title: "Berhasil",
-        description: "Data customer berhasil diexport",
-        variant: "success",
-      });
-    } catch (error) {
-      toast({
-        title: "Gagal mengexport",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
-        variant: "destructive",
-      });
-    }
+  // --- Old handleExport (inline download) ---
+  // const handleExport = async () => {
+  //   try {
+  //     await exportMutation.mutateAsync({});
+  //     toast({ title: "Berhasil", description: "Data customer berhasil diexport", variant: "success" });
+  //   } catch (error) {
+  //     toast({ title: "Gagal mengexport", description: error instanceof Error ? error.message : "Terjadi kesalahan", variant: "destructive" });
+  //   }
+  // };
+  // --- End old handleExport ---
+
+  const handleExport = () => {
+    const params = new URLSearchParams();
+    params.set("type", "customers");
+    window.open(`/export?${params.toString()}`, "_blank");
   };
 
   const handleImportClick = () => {
