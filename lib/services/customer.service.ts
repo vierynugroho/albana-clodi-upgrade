@@ -54,12 +54,30 @@ export async function updateCustomer(id: string, payload: Partial<CustomerCreate
 }
 
 export async function deleteCustomer(id: string): Promise<ApiCustomer | null> {
-    const res = await api.delete<ApiResponse<ApiCustomer>>(`/customers/${id}`);
-    // Only throw error if API explicitly returns success: false
-    if (res.data?.success === false) {
-        throw new Error(res.data?.message || "Failed to delete customer");
+    try {
+        const res = await api.delete<ApiResponse<ApiCustomer>>(`/customers/${id}`);
+        const message = res.data?.message?.toLowerCase() || "";
+        const isActuallySuccess = message.includes("successfully") || message.includes("berhasil");
+
+        // Backend anomaly: success can be false even when delete succeeds
+        // Check message content as the reliable indicator
+        if (res.data?.success === false && !isActuallySuccess) {
+            throw new Error(res.data?.message || "Failed to delete customer");
+        }
+        return res.data?.responseObject || null;
+    } catch (error) {
+        // Handle case where API successfully deletes but returns non-2xx status
+        const axiosError = error as { response?: { data?: ApiResponse<ApiCustomer> } };
+        const responseData = axiosError?.response?.data;
+        const message = responseData?.message?.toLowerCase() || "";
+        const isActuallySuccess = message.includes("successfully") || message.includes("berhasil");
+
+        if (isActuallySuccess) {
+            return responseData?.responseObject || null;
+        }
+
+        throw error;
     }
-    return res.data?.responseObject || null;
 }
 
 // Import customers from Excel file
