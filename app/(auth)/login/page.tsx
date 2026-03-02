@@ -17,7 +17,6 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  // Tampilkan loading saat cek autentikasi
   if (isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">

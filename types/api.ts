@@ -120,8 +120,6 @@ export interface ApiProduct {
     productVariants?: ApiProductVariant[];
 }
 
-// Product list response structure (from /products endpoint)
-// This matches the actual API response structure
 export interface ApiProductListItem {
     product: {
         id: string;
@@ -250,7 +248,6 @@ export interface OrderCreatePayload {
     };
     orderDetail: {
         detail: {
-            /** REQUIRED by contract */
             originalFinalPrice: number;
 
             otherFees: {
@@ -299,7 +296,6 @@ export interface OrderCreatePayload {
             productQty: number;
         }[];
 
-        /** REQUIRED by contract */
         shippingServices: {
             shippingName: string;
             serviceName: string;
@@ -317,8 +313,6 @@ export interface OrderCreatePayload {
     };
 }
 
-
-// Query parameters
 export interface OrderQueryParams {
     page?: number;
     limit?: number;
@@ -340,7 +334,6 @@ export interface OrderQueryParams {
     search?: string;
     sort?: string;
     order?: "asc" | "desc";
-    // Field-specific search (from old app)
     customerName?: string;
     orderId?: string;
     code?: string;
@@ -376,10 +369,8 @@ export interface ProductQueryParams {
     month?: string;
     year?: number;
     week?: string;
-    // Note: productPrice is complex object, handle separately if needed
 }
 
-// Category types
 export interface ApiCategory {
     id: string;
     name: string;
@@ -399,7 +390,6 @@ export interface CategoryCreatePayload {
     name: string;
 }
 
-// Enhanced Product Price types
 export interface ApiProductPrice {
     id?: string;
     productVariantId?: string;
@@ -412,7 +402,6 @@ export interface ApiProductPrice {
     updatedAt?: string;
 }
 
-// Product Wholesaler types
 export interface ApiProductWholesaler {
     id?: string;
     lowerLimitItem: number;
@@ -421,7 +410,6 @@ export interface ApiProductWholesaler {
     wholesalerPrice: number;
 }
 
-// Product Discount types
 export interface ApiProductDiscount {
     id?: string;
     type: "PERCENT" | "NOMINAL";
@@ -430,7 +418,6 @@ export interface ApiProductDiscount {
     endDate?: string;
 }
 
-// Enhanced Product Variant with prices
 export interface ApiProductVariantDetail {
     id: string;
     productId: string;
@@ -446,7 +433,6 @@ export interface ApiProductVariantDetail {
     productWholesalers?: ApiProductWholesaler[];
 }
 
-// Detailed Product Response (for single product)
 export interface ApiProductDetail {
     id: string;
     categoryId: string | null;
@@ -462,7 +448,6 @@ export interface ApiProductDetail {
     productVariants: ApiProductVariantDetail[];
 }
 
-// Product Create/Update Payload types
 export interface ProductPricePayload {
     normal: number;
     buy: number;
