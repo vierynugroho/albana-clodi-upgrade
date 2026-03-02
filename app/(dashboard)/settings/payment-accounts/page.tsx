@@ -21,7 +21,6 @@ export default function PaymentAccountsPage() {
   const deleteMutation = useDeletePaymentMethod();
   const { toast } = useToast();
 
-  // Map API data to frontend type
   const bankAccounts: BankAccount[] = mapApiPaymentMethodsToBankAccounts(apiMethods);
 
   const handleDelete = (methodId: string) => {
@@ -45,7 +44,6 @@ export default function PaymentAccountsPage() {
     });
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -55,7 +53,6 @@ export default function PaymentAccountsPage() {
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -75,7 +72,6 @@ export default function PaymentAccountsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div>
         <h1 className="page-title flex items-center gap-2">
           <CreditCard className="h-7 w-7 text-info" />
@@ -86,7 +82,6 @@ export default function PaymentAccountsPage() {
         </p>
       </div>
 
-      {/* Payment Accounts */}
       <Card accent="info">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div>

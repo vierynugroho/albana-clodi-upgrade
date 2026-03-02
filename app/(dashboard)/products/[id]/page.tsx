@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import type { ApiProductDetail } from "@/types/api";
 
-/**
- * Maps ApiProductDetail to ProductForm initialData
- */
 function mapApiProductToFormValues(apiProduct: ApiProductDetail) {
   return {
     id: apiProduct.id,
@@ -78,7 +75,6 @@ export default function EditProductPage() {
     refetch,
   } = useProductDetail(id);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -88,7 +84,6 @@ export default function EditProductPage() {
     );
   }
 
-  // Error state
   if (isError || !productData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">

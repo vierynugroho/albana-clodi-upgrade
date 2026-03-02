@@ -22,7 +22,6 @@ export default function CustomersPage() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Map API customers to frontend Customer type
   const customers: Customer[] = mapApiCustomersToCustomers(apiCustomers);
 
   const handleDelete = (customerId: string) => {
@@ -46,17 +45,6 @@ export default function CustomersPage() {
     });
   };
 
-  // --- Old handleExport (inline download) ---
-  // const handleExport = async () => {
-  //   try {
-  //     await exportMutation.mutateAsync({});
-  //     toast({ title: "Berhasil", description: "Data customer berhasil diexport", variant: "success" });
-  //   } catch (error) {
-  //     toast({ title: "Gagal mengexport", description: error instanceof Error ? error.message : "Terjadi kesalahan", variant: "destructive" });
-  //   }
-  // };
-  // --- End old handleExport ---
-
   const handleExport = () => {
     const params = new URLSearchParams();
     params.set("type", "customers");
@@ -71,7 +59,6 @@ export default function CustomersPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.name.match(/\.(xlsx|xls)$/i)) {
       toast({
         title: "Error",
@@ -100,18 +87,15 @@ export default function CustomersPage() {
         variant: "destructive",
       });
     } finally {
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {/* Page Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="page-title flex items-center gap-2">
@@ -122,16 +106,13 @@ export default function CustomersPage() {
           </div>
         </div>
 
-        {/* Stats Loading */}
         <CustomerStats customers={[]} isLoading={true} />
 
-        {/* Table Loading */}
         <LoadingState  />
       </div>
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-100 gap-4">
@@ -151,7 +132,6 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="page-title flex items-center gap-2">
@@ -169,7 +149,6 @@ export default function CustomersPage() {
         </div>
 
         <div className="flex gap-2">
-          {/* Hidden file input for import */}
           <Input
             ref={fileInputRef}
             type="file"
@@ -211,10 +190,8 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      {/* Stats - Now integrated with real data */}
       <CustomerStats customers={customers} />
 
-      {/* Table */}
       <CustomerTable
         customers={customers}
         onEdit={(c) => router.push(`/customers/${c.id}`)}

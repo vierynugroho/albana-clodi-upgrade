@@ -40,7 +40,6 @@ export default function EditShippingOriginPage({ params }: PageProps) {
     );
   }
 
-  // Map API data to form values
   const initialData = {
     id: deliveryPlace.id,
     name: deliveryPlace.name,
@@ -48,7 +47,7 @@ export default function EditShippingOriginPage({ params }: PageProps) {
     phone: deliveryPlace.phoneNumber,
     address: deliveryPlace.address,
     description: deliveryPlace.description || "",
-    status: true, // API doesn't have status field
+    status: true,
   };
 
   return (

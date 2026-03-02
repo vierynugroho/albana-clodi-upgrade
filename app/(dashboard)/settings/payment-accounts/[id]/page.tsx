@@ -40,13 +40,12 @@ export default function EditPaymentAccountPage({ params }: PageProps) {
     );
   }
 
-  // Map API data to form values
   const initialData = {
     id: paymentMethod.id,
     bankName: paymentMethod.bankName,
     accountNumber: paymentMethod.accountNumber,
-    accountName: paymentMethod.name, // name is used as account holder name
-    status: true, // API doesn't have status field
+    accountName: paymentMethod.name,
+    status: true,
   };
 
   return (

@@ -28,7 +28,6 @@ interface SelectedBarcodeItem {
 export default function PrintBarcodePage() {
     const { toast } = useToast();
 
-    // Barcode settings
     const [settings, setSettings] = useState<BarcodeSettings>({
         labelHeight: "15",
         columns: "1",
@@ -36,21 +35,17 @@ export default function PrintBarcodePage() {
         showPrice: true,
     });
 
-    // Product search
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Product[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    // Selected products for barcode
     const [selectedItems, setSelectedItems] = useState<SelectedBarcodeItem[]>([]);
 
-    // Initial products load
     const { data: initialProducts = [] } = useProducts();
     const products = mapApiProductsToProducts(initialProducts);
 
-    // Click outside handler
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -61,7 +56,6 @@ export default function PrintBarcodePage() {
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
-    // Debounced search
     useEffect(() => {
         const timeoutId = setTimeout(async () => {
             if (searchQuery.trim()) {
@@ -82,7 +76,6 @@ export default function PrintBarcodePage() {
         return () => clearTimeout(timeoutId);
     }, [searchQuery]);
 
-    // Handle product selection
     const handleSelectProduct = useCallback((product: Product) => {
         const newItems: SelectedBarcodeItem[] = (product.variants || []).map((variant: ProductVariant) => ({
             productName: product.name,
@@ -108,7 +101,6 @@ export default function PrintBarcodePage() {
         });
     }, [toast]);
 
-    // Update quantity
     const updateQuantity = (index: number, qty: number) => {
         setSelectedItems((prev) => {
             const updated = [...prev];
@@ -117,12 +109,9 @@ export default function PrintBarcodePage() {
         });
     };
 
-    // Remove item
     const removeItem = (index: number) => {
         setSelectedItems((prev) => prev.filter((_, i) => i !== index));
     };
-
-    // Print barcodes
     const handlePrint = () => {
         if (selectedItems.length === 0) {
             toast({
@@ -222,13 +211,10 @@ export default function PrintBarcodePage() {
                 </div>
             </div>
 
-            {/* Main Content - Two Columns */}
             <div className="grid gap-6 lg:grid-cols-2">
-                {/* Left Column - Settings */}
                 <div className="rounded-xl border border-border bg-card p-6">
                     <h2 className="text-lg font-semibold mb-4">Pengaturan Label Barcode</h2>
 
-                    {/* Info Box */}
                     <div className="flex gap-3 bg-primary/10 rounded-xl p-4 mb-6">
                         <Info className="h-10 w-10 text-primary flex-shrink-0" />
                         <p className="text-sm text-muted-foreground">
@@ -237,7 +223,6 @@ export default function PrintBarcodePage() {
                         </p>
                     </div>
 
-                    {/* Label Size */}
                     <div className="space-y-4">
                         <div>
                             <label className="text-sm font-medium mb-2 block">Ukuran Label</label>
@@ -252,7 +237,6 @@ export default function PrintBarcodePage() {
                             </select>
                         </div>
 
-                        {/* Column Count */}
                         <div>
                             <label className="text-sm font-medium mb-2 block">Jumlah Kolom</label>
                             <select
@@ -267,7 +251,6 @@ export default function PrintBarcodePage() {
                             </select>
                         </div>
 
-                        {/* Data to Print */}
                         <div>
                             <label className="text-sm font-medium mb-2 block">Data Yang Dicetak</label>
                             <div className="flex gap-6 mt-2">
@@ -294,11 +277,9 @@ export default function PrintBarcodePage() {
                     </div>
                 </div>
 
-                {/* Right Column - Product Search */}
                 <div className="rounded-xl border border-border bg-card p-6">
                     <h2 className="text-lg font-semibold mb-4">Pilih Produk</h2>
 
-                    {/* Search Input */}
                     <div className="relative" ref={wrapperRef}>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -314,7 +295,6 @@ export default function PrintBarcodePage() {
                             />
                         </div>
 
-                        {/* Search Dropdown */}
                         {isDropdownOpen && (
                             <div className="absolute z-50 w-full mt-1 max-h-60 overflow-y-auto rounded-xl border border-border bg-background shadow-lg">
                                 {isSearching ? (
@@ -341,7 +321,6 @@ export default function PrintBarcodePage() {
                         )}
                     </div>
 
-                    {/* Selected Products */}
                     <div className="mt-6 space-y-3">
                         <h3 className="text-sm font-medium">Produk Terpilih ({selectedItems.length})</h3>
 
@@ -383,7 +362,6 @@ export default function PrintBarcodePage() {
                         )}
                     </div>
 
-                    {/* Print Button */}
                     <Button
                         onClick={handlePrint}
                         variant="gradient"

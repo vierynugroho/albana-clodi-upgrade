@@ -40,7 +40,6 @@ export default function DashboardLayout({
   const handleOpenSidebar = useCallback(() => setIsSidebarOpen(true), []);
   const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
 
-  // Tampilkan loading saat cek autentikasi
   if (isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/20">

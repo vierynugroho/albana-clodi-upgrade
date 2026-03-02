@@ -22,7 +22,6 @@ export default function SalesChannelPage() {
   const deleteMutation = useDeleteSalesChannel();
   const { toast } = useToast();
 
-  // Map API data to frontend type
   const channels: SalesChannel[] = mapApiSalesChannelsToSalesChannels(apiChannels);
 
   const handleEdit = (channel: SalesChannel) => {
@@ -54,7 +53,6 @@ export default function SalesChannelPage() {
     router.push(`/settings/sales-channels/${channel.id}`);
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -64,7 +62,6 @@ export default function SalesChannelPage() {
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -84,7 +81,6 @@ export default function SalesChannelPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="page-title flex items-center gap-2">
@@ -104,7 +100,6 @@ export default function SalesChannelPage() {
         </Link>
       </div>
 
-      {/* Channel Cards */}
       <div className="grid gap-4 sm:grid-cols-2">
         {channels.length === 0 ? (
           <Card className="sm:col-span-2 p-8">

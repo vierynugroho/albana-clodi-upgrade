@@ -23,7 +23,6 @@ export default function ShippingOriginPage() {
   const deleteMutation = useDeleteDeliveryPlace();
   const { toast } = useToast();
 
-  // Map API data to frontend type
   const warehouses: Warehouse[] = mapApiDeliveryPlacesToWarehouses(apiPlaces);
 
   const handleEdit = (warehouse: Warehouse) => {
@@ -55,7 +54,6 @@ export default function ShippingOriginPage() {
     router.push(`/settings/shipping-origins/${warehouse.id}`);
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-100 gap-4">
@@ -65,7 +63,6 @@ export default function ShippingOriginPage() {
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-100 gap-4">
@@ -85,7 +82,6 @@ export default function ShippingOriginPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="page-title flex items-center gap-2">
@@ -105,7 +101,6 @@ export default function ShippingOriginPage() {
         </Link>
       </div>
 
-      {/* Warehouse Cards */}
       <div className="space-y-4">
         {warehouses.length === 0 ? (
           <Card className="p-8">

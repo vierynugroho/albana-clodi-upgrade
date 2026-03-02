@@ -40,7 +40,6 @@ export default function EditSalesChannelPage({ params }: PageProps) {
     );
   }
 
-  // Map API data to form values
   const initialData = {
     id: channel.id,
     name: channel.name,

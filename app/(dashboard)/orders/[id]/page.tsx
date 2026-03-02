@@ -13,7 +13,6 @@ export default function OrderDetailPage() {
 
     const { data: orderData, isLoading, isError, refetch } = useOrder(id);
 
-    // Loading state
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -23,7 +22,6 @@ export default function OrderDetailPage() {
         );
     }
 
-    // Error state
     if (isError || !orderData) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -61,7 +59,6 @@ export default function OrderDetailPage() {
                 </div>
             </div>
 
-            {/* Note: Edit mode perlu refactoring untuk load existing data */}
             <OrderForm
                 mode="edit"
                 orderId={id}

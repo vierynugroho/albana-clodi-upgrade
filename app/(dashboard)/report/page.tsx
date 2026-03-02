@@ -23,7 +23,6 @@ export default function ReportPage() {
 
   const [appliedQueryParams, setAppliedQueryParams] = useState<ReportQueryParams>({});
 
-  // Build query params based on filter settings
   const draftQueryParams: ReportQueryParams = useMemo(() => {
     const today = new Date();
 
@@ -51,7 +50,6 @@ export default function ReportPage() {
         return {};
       }
       default: {
-        // "all" or month/year selected
         const params: ReportQueryParams = {};
         if (selectedMonth) params.month = selectedMonth;
         if (selectedYear) params.year = selectedYear;
@@ -64,7 +62,6 @@ export default function ReportPage() {
     setAppliedQueryParams(draftQueryParams);
   };
 
-  // Fetch report data
   const {
     data: ordersReport,
     isLoading: isLoadingOrders,
@@ -90,21 +87,16 @@ export default function ReportPage() {
 
   const isLoading = isLoadingOrders || isLoadingExpenses;
 
-  // Handle filter preset change
   const handleFilterPresetChange = (preset: string) => {
     setFilterPreset(preset);
-    // Reset custom dates when switching presets
     if (preset !== "custom") {
       setStartDate("");
       setEndDate("");
     }
-    // Reset month when not using month filter
     if (preset !== "month" && preset !== "all") {
       setSelectedMonth("");
     }
   };
-
-  // Error state
   if (isErrorOrders) {
     return (
       <div className="space-y-6">
@@ -133,7 +125,6 @@ export default function ReportPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div>
         <h1 className="page-title flex items-center gap-2">
           <FileText className="h-7 w-7 text-purple" />
@@ -142,7 +133,6 @@ export default function ReportPage() {
         <p className="page-description">Semua data laporan penjualan</p>
       </div>
 
-      {/* Summary Header - Superadmin only */}
       {isSuperAdmin && (
         <SummaryHeader
           totalPendapatan={ordersReport?.penjualan_bersih || 0}
@@ -152,7 +142,6 @@ export default function ReportPage() {
         />
       )}
 
-      {/* Filter Section */}
       <FilterSection
         filterPreset={filterPreset}
         onFilterPresetChange={handleFilterPresetChange}
@@ -168,7 +157,6 @@ export default function ReportPage() {
         onApplyFilter={handleApplyFilter}
       />
 
-      {/* Profit Summary - Superadmin only */}
       {isSuperAdmin && (
         <div>
           <h3 className="text-lg font-semibold mb-4">Ringkasan Keuangan</h3>
@@ -182,7 +170,6 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* Stats Grid - hide expenses for admin */}
       <StatsGrid
         expenses={expensesReport?.totalExpenses || ordersReport?.expenses_amount || 0}
         itemsSold={ordersReport?.total_item_terjual || 0}
@@ -192,7 +179,6 @@ export default function ReportPage() {
         hideExpenses={!isSuperAdmin}
       />
 
-      {/* Transaction Status */}
       <TransactionStatusCards
         pending={ordersReport?.total_transaction_pending || 0}
         installments={ordersReport?.total_transaction_installments || 0}
@@ -200,7 +186,6 @@ export default function ReportPage() {
         isLoading={isLoading}
       />
 
-      {/* Charts Keuangan - Superadmin only */}
       {isSuperAdmin && (
         <div className="grid gap-6 lg:grid-cols-2">
           <ChartPlaceholder
@@ -222,7 +207,6 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* Charts Non-Keuangan - Semua role */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPlaceholder
           title="Grafik Customer"

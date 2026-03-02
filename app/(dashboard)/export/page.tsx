@@ -38,7 +38,6 @@ function ExportPageContent() {
 
     hasStarted.current = true;
 
-    // Extract filter params from URL
     const params: ExportFilterParams = {};
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
@@ -73,7 +72,6 @@ function ExportPageContent() {
             throw new Error("Tipe export tidak valid");
         }
 
-        // Trigger download
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -153,7 +151,6 @@ function ExportPageContent() {
                 onClick={() => {
                   hasStarted.current = false;
                   setStatus("loading");
-                  // Re-trigger by forcing re-render
                   window.location.reload();
                 }}
               >

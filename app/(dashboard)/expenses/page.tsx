@@ -13,12 +13,9 @@ export default function ExpensePage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Fetch expenses from API
   const { data: expenseData, isLoading: isLoadingExpenses } = useExpenses();
   const { data: stats, isLoading: isLoadingStats } = useExpenseStats();
   const deleteExpense = useDeleteExpense();
-
-  // Map API expenses to frontend Expense type
   const expenses: Expense[] = (expenseData?.data || []).map((expense) => ({
     id: expense.id,
     itemName: expense.itemName,
@@ -63,7 +60,6 @@ export default function ExpensePage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="page-title flex items-center gap-2">
@@ -86,7 +82,6 @@ export default function ExpensePage() {
         </Button>
       </div>
 
-      {/* Stats */}
       <ExpenseStats
         totalExpenses={stats?.totalExpenses || 0}
         thisMonthTotal={stats?.thisMonthTotal || 0}
@@ -97,7 +92,6 @@ export default function ExpensePage() {
         isLoading={isLoadingStats}
       />
 
-      {/* Table */}
       <ExpenseTable
         expenses={expenses}
         onEdit={handleEdit}

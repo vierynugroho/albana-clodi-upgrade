@@ -26,31 +26,26 @@ export default function CategoriesPage() {
     const deleteMutation = useDeleteCategory();
     const { toast } = useToast();
 
-    // Modal states
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [editCategory, setEditCategory] = useState<ApiCategory | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
-    // Open modal for creating new category
     const handleAddClick = () => {
         setEditCategory(null);
         setIsFormOpen(true);
     };
 
-    // Open modal for editing category
     const handleEdit = (category: ApiCategory) => {
         setEditCategory(category);
         setIsFormOpen(true);
     };
 
-    // Open delete confirmation
     const handleDeleteClick = (id: string) => {
         setDeleteId(id);
         setIsDeleteOpen(true);
     };
 
-    // Submit category form (create or update)
     const handleFormSubmit = async (name: string) => {
         try {
             if (editCategory) {
@@ -82,7 +77,6 @@ export default function CategoriesPage() {
         }
     };
 
-    // Confirm delete
     const handleDeleteConfirm = async () => {
         if (!deleteId) return;
         try {
@@ -104,7 +98,6 @@ export default function CategoriesPage() {
         }
     };
 
-    // Loading state
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-100 gap-4">
@@ -114,7 +107,6 @@ export default function CategoriesPage() {
         );
     }
 
-    // Error state
     if (isError) {
         return (
             <div className="flex flex-col items-center justify-center min-h-100 gap-4">
@@ -134,7 +126,6 @@ export default function CategoriesPage() {
 
     return (
         <div className="space-y-6">
-            {/* Page Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="page-title flex items-center gap-2">
@@ -150,14 +141,12 @@ export default function CategoriesPage() {
                 </Button>
             </div>
 
-            {/* Table */}
             <CategoryTable
                 categories={categories}
                 onEdit={handleEdit}
                 onDelete={handleDeleteClick}
             />
 
-            {/* Form Modal */}
             <CategoryFormModal
                 isOpen={isFormOpen}
                 onClose={() => {
@@ -169,7 +158,6 @@ export default function CategoriesPage() {
                 isLoading={createMutation.isPending || updateMutation.isPending}
             />
 
-            {/* Delete Confirmation Dialog */}
             <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

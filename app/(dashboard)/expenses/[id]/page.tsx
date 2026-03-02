@@ -42,12 +42,11 @@ export default function EditExpensesPage() {
     );
   }
 
-  // Map API expense to form values
   const initialData = {
     id: expense.id,
     itemName: expense.itemName,
     itemPrice: expense.itemPrice,
-    expenseDate: expense.expenseDate.split("T")[0], // Convert ISO string to date input format
+    expenseDate: expense.expenseDate.split("T")[0],
     qty: expense.qty,
     personResponsible: expense.personResponsible || "",
     note: expense.note || "",

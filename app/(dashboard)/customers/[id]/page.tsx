@@ -9,13 +9,9 @@ import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import type { CustomerFormValues } from "@/schemas/zod.schemas";
 import type { ApiCustomer } from "@/types/api";
 
-/**
- * Maps ApiCustomer to CustomerFormValues for the edit form
- */
 function mapApiCustomerToFormValues(
   apiCustomer: ApiCustomer,
 ): CustomerFormValues & { id: string } {
-  // Map category from API to form format
   const categoryMap: Record<string, string> = {
     CUSTOMER: "customer",
     RESELLER: "reseller",
@@ -51,7 +47,6 @@ export default function EditCustomerPage() {
 
   const { data: customerData, isLoading, isError, refetch } = useCustomer(id);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -61,7 +56,6 @@ export default function EditCustomerPage() {
     );
   }
 
-  // Error state
   if (isError || !customerData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">

@@ -10,9 +10,6 @@ import { useInfiniteProducts, useDeleteProduct, useExportProducts } from "@/hook
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiProductsToProducts } from "@/lib/mappers";
-// --- Old import (replaced by export page approach) ---
-// import { exportProducts } from "@/lib/services/product.service";
-// --- End old import ---
 import type { Product } from "@/types";
 import type { ProductQueryParams } from "@/types/api";
 import { ProductStats } from "@/components/product/ProdukStats";
@@ -20,13 +17,10 @@ import { ProductStats } from "@/components/product/ProdukStats";
 export default function ProductPage() {
   const router = useRouter();
 
-  // Filter state
   const [filters, setFilters] = useState<ProductQueryParams>({});
 
-  // Fetch categories for filter options
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
 
-  // Use infinite query for products — pass filters
   const {
     data,
     fetchNextPage,
@@ -43,7 +37,6 @@ export default function ProductPage() {
   const exportMutation = useExportProducts();
 
   const handleExport = () => {
-    // Build ExportFilterParams — all 5 params supported by /products/export/excel
     const exportParams = {
       ...(filters.startDate && { startDate: filters.startDate }),
       ...(filters.endDate && { endDate: filters.endDate }),
@@ -70,7 +63,6 @@ export default function ProductPage() {
     });
   };
 
-  // Flatten all pages into a single array of products
   const products: Product[] = useMemo(() => {
     if (!data) return [];
     const allItems = data.pages.flatMap((page) => page);
@@ -106,7 +98,6 @@ export default function ProductPage() {
     router.push(`/products/${product.id}`);
   };
 
-  // Loading state (initial load only)
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -116,7 +107,6 @@ export default function ProductPage() {
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -136,7 +126,6 @@ export default function ProductPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="page-title flex items-center gap-2">
@@ -170,7 +159,6 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Filters */}
       <ProductFilters
         filters={filters}
         onFiltersChange={setFilters}
@@ -178,10 +166,8 @@ export default function ProductPage() {
         isLoadingOptions={isLoadingCategories}
       />
 
-      {/* Stats */}
       <ProductStats products={products} />
 
-      {/* Table */}
       <ProductTable
         products={products}
         onEdit={handleEdit}
@@ -189,7 +175,6 @@ export default function ProductPage() {
         onView={handleView}
       />
 
-      {/* Load More Button */}
       {hasNextPage && (
         <div className="flex justify-center pt-4 pb-8">
           <Button
