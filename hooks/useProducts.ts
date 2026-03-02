@@ -1,7 +1,7 @@
 // hooks/useProducts.ts
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import * as productService from "@/lib/services/product.service";
-import type { ProductQueryParams, ProductFullCreatePayload } from "@/types/api";
+import type { ProductQueryParams, ProductFullCreatePayload, ExportFilterParams } from "@/types/api";
 
 export const productKeys = {
     all: ["products"] as const,
@@ -124,7 +124,8 @@ export function useDeleteProduct() {
  */
 export function useExportProducts() {
     return useMutation({
-        mutationFn: () => productService.downloadProductExcel(),
+        mutationFn: (params?: ExportFilterParams) =>
+            productService.downloadProductExcel(params),
     });
 }
 

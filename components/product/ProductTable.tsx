@@ -30,7 +30,7 @@ interface ProductTableProps {
 const dropdownData = {
   title: "Actions",
   text: ["Import Product", "Export Product"],
-  url: ["/products/import/excel", "/products/export/excel"],
+  url: ["/products/import/excel", "/export?type=products"],
 };
 
 type ProductType = Product["type"];
@@ -136,7 +136,7 @@ const ProductRow = memo(function ProductRow({
   ];
   const gradientIndex = index % gradientColors.length;
 
-  const {data} = useCurrentUser()
+  const { data } = useCurrentUser()
   const role = data?.responseObject.role
 
   return (
@@ -195,15 +195,15 @@ const ProductRow = memo(function ProductRow({
           </IconButton>
 
           {
-            role?.toLocaleLowerCase() === "superadmin" ? 
-            <IconButton
-              color="destructive"
-              size="sm"
-              onClick={() => onDelete(product.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </IconButton>
-            : <></>
+            role?.toLocaleLowerCase() === "superadmin" ?
+              <IconButton
+                color="destructive"
+                size="sm"
+                onClick={() => onDelete(product.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </IconButton>
+              : <></>
           }
         </div>
       </td>
