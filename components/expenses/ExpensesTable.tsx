@@ -24,6 +24,7 @@ import type { Expense } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useExportExpenses, useImportExpenses } from "@/hooks/useExpenses";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import { LoadingState } from "@/components/shared/LoadingState";
 
 interface ExpenseTableProps {
@@ -100,7 +101,7 @@ const Toolbar = memo(function Toolbar({
       console.error("Import error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Gagal mengimpor data. Pastikan format file sesuai.",
+        description: getApiErrorMessage(error, "Gagal mengimpor data. Pastikan format file sesuai."),
         variant: "destructive",
       });
     }

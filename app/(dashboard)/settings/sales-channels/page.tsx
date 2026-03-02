@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useSalesChannels, useDeleteSalesChannel } from "@/hooks/useSalesChannels";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import { mapApiSalesChannelsToSalesChannels } from "@/lib/mappers";
 import { ChannelCard } from "@/components/setting/sales-channels/ChannelCard";
 
@@ -42,7 +43,7 @@ export default function SalesChannelPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus sales channel",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },

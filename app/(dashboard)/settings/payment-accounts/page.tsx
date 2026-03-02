@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { usePaymentMethods, useDeletePaymentMethod } from "@/hooks/usePaymentMethods";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import { mapApiPaymentMethodsToBankAccounts } from "@/lib/mappers";
 import { BankAccountCard } from "@/components/setting/payment-accounts/PaymentAccountCard";
 
@@ -37,7 +38,7 @@ export default function PaymentAccountsPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus metode pembayaran",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },

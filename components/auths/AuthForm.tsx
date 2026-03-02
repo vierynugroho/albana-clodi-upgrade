@@ -45,7 +45,6 @@ const LoginForm = memo(function LoginForm() {
     setError(null);
     try {
       const res = await api.post("/auth/login", data);
-      // struktur response berbeda-beda; coba beberapa kemungkinan
       const resData = res.data || {};
       const token =
         resData?.token ||

@@ -364,7 +364,6 @@ const CustomerForm = ({
   return (
     <Card className="space-y-6 border-0">
       <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-0">
-        {/* FORM */}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="border p-4 rounded-xl space-y-4"
@@ -372,7 +371,6 @@ const CustomerForm = ({
           <h3 className="font-bold text-base">Informasi Customer</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* Kategori - Dropdown Select */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">Kategori *</label>
               <select
@@ -400,7 +398,6 @@ const CustomerForm = ({
               error={errors.namaLengkap?.message}
             />
 
-            {/* Provinsi - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">Provinsi <span className="text-destructive">*</span></label>
               <Controller
@@ -422,7 +419,6 @@ const CustomerForm = ({
               )}
             </div>
 
-            {/* Kota - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">Kota / Kabupaten <span className="text-destructive">*</span></label>
               <Controller
@@ -445,7 +441,6 @@ const CustomerForm = ({
               )}
             </div>
 
-            {/* Kecamatan - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">Kecamatan <span className="text-destructive">*</span></label>
               <Controller
@@ -466,7 +461,6 @@ const CustomerForm = ({
               {errors.kecamatanId && (
                 <span className="text-xs text-red-500">{errors.kecamatanId.message}</span>
               )}
-              {/* Destination ID Info */}
               {watchedKecamatanId && (
                 <div className="text-xs text-green-600 flex items-center gap-1 mt-1">
                   <span>✓</span>
@@ -475,7 +469,6 @@ const CustomerForm = ({
               )}
             </div>
 
-            {/* Desa - Searchable Dropdown */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">Desa / Kelurahan</label>
               <Controller
@@ -522,7 +515,6 @@ const CustomerForm = ({
             error={errors.noTelepon?.message}
           />
 
-          {/* TEXTAREA */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">Alamat <span className="text-destructive">*</span></label>
 
@@ -550,7 +542,6 @@ const CustomerForm = ({
           </Button>
         </form>
 
-        {/* LABEL INFO */}
         <div className="border p-4 rounded-xl space-y-4">
           <h3 className="font-bold text-base">Tipe Customer</h3>
 

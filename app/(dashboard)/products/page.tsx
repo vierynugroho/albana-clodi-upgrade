@@ -10,6 +10,7 @@ import { useInfiniteProducts, useDeleteProduct, useExportProducts } from "@/hook
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiProductsToProducts } from "@/lib/mappers";
+import { getApiErrorMessage } from "@/lib/utils";
 import type { Product } from "@/types";
 import type { ProductQueryParams } from "@/types/api";
 import { ProductStats } from "@/components/product/ProdukStats";
@@ -56,7 +57,7 @@ export default function ProductPage() {
       onError: (error) => {
         toast({
           title: "Gagal mengexport",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },
@@ -87,7 +88,7 @@ export default function ProductPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus produk",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },

@@ -12,6 +12,7 @@ import { useSalesChannels } from "@/hooks/useSalesChannels";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import { mapApiOrdersToOrders } from "@/lib/mappers";
 import type { Order } from "@/types";
 import type { OrderQueryParams } from "@/types/api";
@@ -152,7 +153,7 @@ export default function OrderPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus order",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },
@@ -173,7 +174,7 @@ export default function OrderPage() {
       onError: (error) => {
         toast({
           title: "Gagal membatalkan order",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },

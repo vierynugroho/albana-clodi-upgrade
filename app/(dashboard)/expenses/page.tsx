@@ -7,6 +7,7 @@ import { Plus, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useExpenses, useExpenseStats, useDeleteExpense } from "@/hooks/useExpenses";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import { ExpenseStats } from "@/components/expenses/ExpensesStats";
 
 export default function ExpensePage() {
@@ -48,7 +49,7 @@ export default function ExpensePage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Gagal menghapus data",
+        description: getApiErrorMessage(error, "Gagal menghapus data"),
         variant: "destructive",
       });
     }

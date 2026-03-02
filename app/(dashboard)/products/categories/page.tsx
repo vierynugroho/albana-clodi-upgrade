@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Folder, Loader2, RefreshCw } from "lucide-react";
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import type { ApiCategory } from "@/types/api";
 import { CategoryTable } from "@/components/product/category/CategoryTable";
 import { CategoryFormModal } from "@/components/product/category/CategoryFormModal";
@@ -71,7 +72,7 @@ export default function CategoriesPage() {
         } catch (error) {
             toast({
                 title: "Gagal",
-                description: error instanceof Error ? error.message : "Terjadi kesalahan",
+                description: getApiErrorMessage(error),
                 variant: "destructive",
             });
         }
@@ -89,7 +90,7 @@ export default function CategoriesPage() {
         } catch (error) {
             toast({
                 title: "Gagal menghapus",
-                description: error instanceof Error ? error.message : "Terjadi kesalahan",
+                description: getApiErrorMessage(error),
                 variant: "destructive",
             });
         } finally {

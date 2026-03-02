@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreateSalesChannel, useUpdateSalesChannel } from "@/hooks/useSalesChannels";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 
 /* ================= FORM PROPS ================= */
 
@@ -91,7 +92,7 @@ const SalesChannelsForm = ({
     } catch (error) {
       toast({
         title: "Gagal",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+        description: getApiErrorMessage(error),
         variant: "destructive",
       });
     }

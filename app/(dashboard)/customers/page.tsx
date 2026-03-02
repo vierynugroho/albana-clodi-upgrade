@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useCustomers, useDeleteCustomer, useImportCustomers, useExportCustomers } from "@/hooks/useCustomers";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiCustomersToCustomers } from "@/lib/mappers";
+import { getApiErrorMessage } from "@/lib/utils";
 import type { Customer } from "@/types";
 import { CustomerStats } from "@/components/customer/CustomerStats";
 import { useRef } from "react";
@@ -38,7 +39,7 @@ export default function CustomersPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus customer",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },
@@ -108,7 +109,7 @@ export default function CustomersPage() {
 
         <CustomerStats customers={[]} isLoading={true} />
 
-        <LoadingState  />
+        <LoadingState />
       </div>
     );
   }

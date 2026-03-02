@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreatePaymentMethod, useUpdatePaymentMethod } from "@/hooks/usePaymentMethods";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 
 /* ================= FORM PROPS ================= */
 
@@ -93,7 +94,7 @@ const PaymentAccountForm = ({
     } catch (error) {
       toast({
         title: "Gagal",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+        description: getApiErrorMessage(error),
         variant: "destructive",
       });
     }

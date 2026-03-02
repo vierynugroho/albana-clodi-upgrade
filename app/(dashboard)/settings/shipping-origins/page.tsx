@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useDeliveryPlaces, useDeleteDeliveryPlace } from "@/hooks/useDeliveryPlaces";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 import { mapApiDeliveryPlacesToWarehouses } from "@/lib/mappers";
 import { WarehouseCard } from "@/components/setting/shipping-origins/WarehouseCard";
 
@@ -43,7 +44,7 @@ export default function ShippingOriginPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus lokasi pengiriman",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },

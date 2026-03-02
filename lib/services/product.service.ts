@@ -268,18 +268,18 @@ export async function createProductFull(payload: ProductFullCreatePayload): Prom
 
 
 export async function updateProduct(
-  id: string,
-  payload: ProductCreatePayload
+    id: string,
+    payload: ProductCreatePayload
 ) {
-  const formData = convertProductToFormData(payload);
+    const formData = convertProductToFormData(payload);
 
-  const res = await api.put(`/products/${id}`, formData);
+    const res = await api.put(`/products/${id}`, formData);
 
-  if (!res.data?.success) {
-    throw new Error(res.data?.message || "Failed to update product");
-  }
+    if (!res.data?.success) {
+        throw new Error(res.data?.message || "Failed to update product");
+    }
 
-  return res.data.responseObject;
+    return res.data.responseObject;
 }
 
 
@@ -300,13 +300,32 @@ export async function updateProductFull(id: string, payload: ProductFullCreatePa
     return res.data.responseObject;
 }
 
-//Delete a product by ID
 export async function deleteProduct(id: string): Promise<ApiProduct | null> {
-    const res = await api.delete<ApiResponse<ApiProduct>>(`/products/${id}`);
-    if (res.data?.success === false) {
-        throw new Error(res.data?.message || "Failed to delete product");
+    try {
+        const res = await api.delete<ApiResponse<ApiProduct>>(`/products/${id}`);
+        const message = res.data?.message?.toLowerCase() || "";
+        const isActuallySuccess = message.includes("successfully") || message.includes("berhasil");
+
+        if (res.data?.success === false && !isActuallySuccess) {
+            throw new Error(res.data?.message || "Failed to delete product");
+        }
+        return res.data?.responseObject || null;
+    } catch (error) {
+        const axiosError = error as { response?: { data?: ApiResponse<ApiProduct> } };
+        const responseData = axiosError?.response?.data;
+        const message = responseData?.message?.toLowerCase() || "";
+        const isActuallySuccess = message.includes("successfully") || message.includes("berhasil");
+
+        if (isActuallySuccess) {
+            return responseData?.responseObject || null;
+        }
+
+        // Re-throw with the actual API message if available
+        if (responseData?.message) {
+            throw new Error(responseData.message);
+        }
+        throw error;
     }
-    return res.data?.responseObject || null;
 }
 
 // --- Old exportProducts (tanpa query params) ---

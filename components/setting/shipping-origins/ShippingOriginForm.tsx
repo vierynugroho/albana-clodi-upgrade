@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreateDeliveryPlace, useUpdateDeliveryPlace } from "@/hooks/useDeliveryPlaces";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/utils";
 
 /* ================= FORM PROPS ================= */
 
@@ -99,7 +100,7 @@ const ShippingOriginForm = ({
     } catch (error) {
       toast({
         title: "Gagal",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+        description: getApiErrorMessage(error),
         variant: "destructive",
       });
     }
