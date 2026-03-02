@@ -93,6 +93,7 @@ const Toolbar = memo(function Toolbar({
       toast({
         title: "Berhasil!",
         description: result.message || "Data pengeluaran berhasil diimpor",
+        variant: "success",
       });
       // React Query will auto-refresh data after successful mutation
     } catch (error) {
@@ -489,9 +490,9 @@ export function ExpenseTable({
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center">
-                    <LoadingState 
-                      className="py-12 h-auto" 
-                      iconClassName="h-8 w-8 text-orange mb-4" 
+                    <LoadingState
+                      className="py-12 h-auto"
+                      iconClassName="h-8 w-8 text-orange mb-4"
                       message="Memuat data pengeluaran..."
                       textClassName="text-sm"
                     />

@@ -46,6 +46,7 @@ export default function ExpensePage() {
       toast({
         title: "Berhasil!",
         description: "Data pengeluaran berhasil dihapus",
+        variant: "success",
       });
     } catch (error) {
       toast({

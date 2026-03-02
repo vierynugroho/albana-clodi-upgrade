@@ -122,6 +122,7 @@ const ExpensesForm = ({
         toast({
           title: "Berhasil!",
           description: "Data pengeluaran berhasil diperbarui",
+          variant: "success",
         });
       } else {
         // MODE ADD: Create baru
@@ -130,6 +131,7 @@ const ExpensesForm = ({
         toast({
           title: "Berhasil!",
           description: "Data pengeluaran berhasil ditambahkan",
+          variant: "success",
         });
       }
 
