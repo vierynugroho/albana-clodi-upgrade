@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { OrderTable } from "@/components/order/OrderTable";
 import { OrderFilters } from "@/components/order/OrderFilters";
+import { OrderExportDialog } from "@/components/order/OrderExportDialog";
 import { Plus, ShoppingCart, RefreshCw, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
@@ -25,6 +26,7 @@ export default function OrderPage() {
   const { toast } = useToast();
 
   const [filters, setFilters] = useState<OrderQueryParams>({});
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -127,12 +129,8 @@ export default function OrderPage() {
     }
   }, [isLoading, currentPage, hasNext, nextCursor]);
 
-  const handleExport = () => {
-    const params = new URLSearchParams();
-    params.set("type", "orders");
-    if (filters.startDate) params.set("startDate", filters.startDate);
-    if (filters.endDate) params.set("endDate", filters.endDate);
-    window.open(`/export?${params.toString()}`, "_blank");
+  const handleExportClick = () => {
+    setIsExportDialogOpen(true);
   };
 
   const handleEdit = (order: Order) => {
@@ -223,7 +221,7 @@ export default function OrderPage() {
           <p className="page-description">Kelola semua order pelanggan Anda</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={handleExport}>
+          <Button variant="outline" onClick={handleExportClick}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -285,6 +283,11 @@ export default function OrderPage() {
           hasPrev: currentPage > 1,
           onPageChange: handlePageChange,
         }}
+      />
+
+      <OrderExportDialog
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
       />
     </div>
   );

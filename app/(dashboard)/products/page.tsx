@@ -2,6 +2,7 @@
 
 import { ProductTable } from "@/components/product/ProductTable";
 import { ProductFilters } from "@/components/product/ProductFilters";
+import { ProductExportDialog } from "@/components/product/ProductExportDialog";
 import { Button } from "@/components/ui/button";
 import { Plus, Package, Loader2, RefreshCw, Download, Folder, Barcode } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ export default function ProductPage() {
   const router = useRouter();
 
   const [filters, setFilters] = useState<ProductQueryParams>({});
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
 
@@ -37,14 +39,7 @@ export default function ProductPage() {
 
   const exportMutation = useExportProducts();
 
-  const handleExport = () => {
-    const exportParams = {
-      ...(filters.startDate && { startDate: filters.startDate }),
-      ...(filters.endDate && { endDate: filters.endDate }),
-      ...(filters.month && { month: filters.month }),
-      ...(filters.year && { year: String(filters.year) }),
-      ...(filters.week && { week: filters.week }),
-    };
+  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
 
     exportMutation.mutate(exportParams, {
       onSuccess: () => {
@@ -145,13 +140,9 @@ export default function ProductPage() {
             <Barcode className="mr-2 h-4 w-4" />
             Cetak Barcode
           </Button>
-          <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
-            {exportMutation.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="mr-2 h-4 w-4" />
-            )}
-            {exportMutation.isPending ? "Mengexport..." : "Export"}
+          <Button variant="outline" onClick={() => setIsExportDialogOpen(true)}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
           </Button>
           <Button onClick={() => router.push("/products/add")} variant="gradient">
             <Plus className="mr-2 h-4 w-4" />
@@ -195,6 +186,13 @@ export default function ProductPage() {
           </Button>
         </div>
       )}
+
+      <ProductExportDialog
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        onExport={handleExport}
+        isExporting={exportMutation.isPending}
+      />
     </div>
   );
 }

@@ -51,31 +51,7 @@ const ORDER_OPTIONS: FilterOption[] = [
   { value: "asc", label: "Terlama" },
 ];
 
-// Generate month options
-const MONTH_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Bulan" },
-  { value: "1", label: "Januari" },
-  { value: "2", label: "Februari" },
-  { value: "3", label: "Maret" },
-  { value: "4", label: "April" },
-  { value: "5", label: "Mei" },
-  { value: "6", label: "Juni" },
-  { value: "7", label: "Juli" },
-  { value: "8", label: "Agustus" },
-  { value: "9", label: "September" },
-  { value: "10", label: "Oktober" },
-  { value: "11", label: "November" },
-  { value: "12", label: "Desember" },
-];
 
-// Generate year options (current year and 2 years back)
-const currentYear = new Date().getFullYear();
-const YEAR_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Tahun" },
-  { value: String(currentYear), label: String(currentYear) },
-  { value: String(currentYear - 1), label: String(currentYear - 1) },
-  { value: String(currentYear - 2), label: String(currentYear - 2) },
-];
 
 /* ===============================
    Filter Select Component
@@ -168,7 +144,7 @@ export function OrderFilters({
 }: OrderFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [localFilters, setLocalFilters] = useState<OrderQueryParams>(filters);
-  
+
   // Sync localFilters if external filters prop changes entirely (e.g., from reset on parent)
   // Optional, but good practice when parent state might wipe out children state.
   // useEffect(() => { setLocalFilters(filters); }, [filters]);
@@ -200,12 +176,12 @@ export function OrderFilters({
         if (value === "" || value === undefined) {
           delete newFilters[key];
         } else {
-          newFilters[key] = value as any;
+          (newFilters as Record<string, unknown>)[key] = value;
         }
         return newFilters;
       });
     },
-    []
+    [setLocalFilters]
   );
 
   // Apply filters (triggers fetch)
@@ -222,17 +198,17 @@ export function OrderFilters({
 
   // Remove tag applies instantly for immediate UX or require submit? Let's make it instant.
   const handleRemoveTag = (key: keyof OrderQueryParams) => {
-      const newFilters = { ...filters };
-      delete newFilters[key];
-      setLocalFilters(newFilters); // sync local
-      onFiltersChange(newFilters); // sync parent instantly
+    const newFilters = { ...filters };
+    delete newFilters[key];
+    setLocalFilters(newFilters); // sync local
+    onFiltersChange(newFilters); // sync parent instantly
   };
 
   // Reset all filters
   const resetFilters = useCallback(() => {
     setLocalFilters({});
     onFiltersChange({});
-  }, [onFiltersChange]);
+  }, [onFiltersChange, setLocalFilters]);
 
   // Count active filters from actual PARENT state so the badge reflects what's actively loaded
   const activeFilterCount = Object.keys(filters).filter(
@@ -328,23 +304,7 @@ export function OrderFilters({
                 onChange={(v) => updateFilter("endDate", v)}
               />
 
-              {/* Month & Year */}
-              <FilterSelect
-                label="Bulan"
-                value={localFilters.orderMonth?.toString() || ""}
-                onChange={(v) =>
-                  updateFilter("orderMonth", v ? Number(v) : undefined)
-                }
-                options={MONTH_OPTIONS}
-              />
-              <FilterSelect
-                label="Tahun"
-                value={localFilters.orderYear?.toString() || ""}
-                onChange={(v) =>
-                  updateFilter("orderYear", v ? Number(v) : undefined)
-                }
-                options={YEAR_OPTIONS}
-              />
+
 
               {/* Sales Channel */}
               <FilterSelect
@@ -427,18 +387,7 @@ export function OrderFilters({
                     onRemove={() => handleRemoveTag("endDate")}
                   />
                 )}
-                {filters.orderMonth && (
-                  <FilterTag
-                    label={`Bulan: ${MONTH_OPTIONS.find((m) => m.value === String(filters.orderMonth))?.label}`}
-                    onRemove={() => handleRemoveTag("orderMonth")}
-                  />
-                )}
-                {filters.orderYear && (
-                  <FilterTag
-                    label={`Tahun: ${filters.orderYear}`}
-                    onRemove={() => handleRemoveTag("orderYear")}
-                  />
-                )}
+
                 {filters.salesChannelId && (
                   <FilterTag
                     label={`Channel: ${salesChannels.find((s) => s.id === filters.salesChannelId)?.name || filters.salesChannelId}`}
