@@ -3,13 +3,26 @@
 import { ProductTable } from "@/components/product/ProductTable";
 import { ProductFilters } from "@/components/product/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Plus, Package, Loader2, RefreshCw, Download, Folder, Barcode } from "lucide-react";
+import {
+  Plus,
+  Package,
+  Loader2,
+  RefreshCw,
+  Download,
+  Folder,
+  Barcode,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useInfiniteProducts, useDeleteProduct, useExportProducts } from "@/hooks/useProducts";
+import {
+  useInfiniteProducts,
+  useDeleteProduct,
+  useExportProducts,
+} from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiProductsToProducts } from "@/lib/mappers";
+import { getApiErrorMessage } from "@/lib/utils";
 // --- Old import (replaced by export page approach) ---
 // import { exportProducts } from "@/lib/services/product.service";
 // --- End old import ---
@@ -24,7 +37,8 @@ export default function ProductPage() {
   const [filters, setFilters] = useState<ProductQueryParams>({});
 
   // Fetch categories for filter options
-  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    useCategories();
 
   // Use infinite query for products — pass filters
   const {
@@ -34,7 +48,7 @@ export default function ProductPage() {
     isFetchingNextPage,
     isLoading,
     isError,
-    refetch
+    refetch,
   } = useInfiniteProducts(filters);
 
   const deleteMutation = useDeleteProduct();
@@ -63,7 +77,8 @@ export default function ProductPage() {
       onError: (error) => {
         toast({
           title: "Gagal mengexport",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description:
+            error instanceof Error ? error.message : "Terjadi kesalahan",
           variant: "destructive",
         });
       },
@@ -95,7 +110,7 @@ export default function ProductPage() {
       onError: (error) => {
         toast({
           title: "Gagal menghapus produk",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },
@@ -147,15 +162,25 @@ export default function ProductPage() {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" onClick={() => router.push("/products/categories")}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/products/categories")}
+          >
             <Folder className="mr-2 h-4 w-4" />
             Kategori
           </Button>
-          <Button variant="outline" onClick={() => router.push("/products/print-barcode")}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/products/print-barcode")}
+          >
             <Barcode className="mr-2 h-4 w-4" />
             Cetak Barcode
           </Button>
-          <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={exportMutation.isPending}
+          >
             {exportMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -163,7 +188,10 @@ export default function ProductPage() {
             )}
             {exportMutation.isPending ? "Mengexport..." : "Export"}
           </Button>
-          <Button onClick={() => router.push("/products/add")} variant="gradient">
+          <Button
+            onClick={() => router.push("/products/add")}
+            variant="gradient"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Tambah Product
           </Button>
