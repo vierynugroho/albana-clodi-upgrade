@@ -218,7 +218,7 @@ export function OrderFilters({
   return (
     <Card className="p-4">
       {/* Header with toggle */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           {/* Search Input */}
           <div className="relative">
@@ -227,7 +227,7 @@ export function OrderFilters({
               value={localFilters.search || ""}
               onChange={(e) => updateFilter("search", e.target.value)}
               onKeyDown={handleSearchKeyDown}
-              className="w-64"
+              className="w-full sm:w-64"
               leftIcon={<Search className="h-4 w-4" />}
             />
           </div>

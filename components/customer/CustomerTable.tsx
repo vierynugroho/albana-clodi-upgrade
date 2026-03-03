@@ -193,6 +193,71 @@ const CustomerRow = memo(function CustomerRow({
   );
 });
 
+// Mobile card view for customers
+const CustomerMobileCard = memo(function CustomerMobileCard({
+  customer,
+  index,
+  onView,
+  onEdit,
+  onDelete,
+}: CustomerRowProps) {
+  const config = categoryConfig[customer.category];
+
+  return (
+    <div
+      className="p-4 border-b last:border-b-0 animate-fade-in"
+      style={{ animationDelay: `${index * 30}ms` }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center ${config.variant === "info"
+            ? "bg-info/10"
+            : config.variant === "purple"
+              ? "bg-purple/10"
+              : config.variant === "success"
+                ? "bg-success/10"
+                : config.variant === "warning"
+                  ? "bg-warning/10"
+                  : "bg-muted"
+            }`}
+        >
+          <Users className={`h-5 w-5 ${config.color}`} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">{customer.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{customer.email}</p>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <IconButton color="info" size="sm" onClick={() => onView(customer)}>
+                <Eye className="h-4 w-4" />
+              </IconButton>
+              <IconButton color="warning" size="sm" onClick={() => onEdit(customer)}>
+                <Edit className="h-4 w-4" />
+              </IconButton>
+              <IconButton color="destructive" size="sm" onClick={() => onDelete(customer.id)}>
+                <Trash2 className="h-4 w-4" />
+              </IconButton>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <Badge variant={config.variant} dot>{config.label}</Badge>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Phone className="h-3 w-3 text-success" />
+              <span>{customer.phone}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+            <MapPin className="h-3 w-3 text-pink shrink-0" />
+            <span className="truncate">{customer.city}, {customer.province}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -230,7 +295,6 @@ const Pagination = memo(function Pagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-
         {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(
           (page) => (
             <Button
@@ -244,7 +308,6 @@ const Pagination = memo(function Pagination({
             </Button>
           )
         )}
-
         <Button
           variant="outline"
           size="icon"
@@ -299,25 +362,44 @@ export function CustomerTable({
       />
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card Layout */}
+        <div className="md:hidden">
+          {paginatedCustomers.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="py-12">
+                <div className="h-16 w-16 rounded-2xl bg-pink/10 flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-pink" />
+                </div>
+                <p className="text-base font-semibold">Tidak ada customer</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {searchQuery ? "Coba ubah kata kunci pencarian" : "Belum ada customer yang tersedia"}
+                </p>
+              </div>
+            </div>
+          ) : (
+            paginatedCustomers.map((customer, index) => (
+              <CustomerMobileCard
+                key={customer.id}
+                customer={customer}
+                index={index}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Customer
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Kategori
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Kontak
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Lokasi
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">
-                  Aksi
-                </th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customer</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kategori</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kontak</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Lokasi</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -328,13 +410,9 @@ export function CustomerTable({
                       <div className="h-16 w-16 rounded-2xl bg-pink/10 flex items-center justify-center mx-auto mb-4">
                         <Users className="h-8 w-8 text-pink" />
                       </div>
-                      <p className="text-base font-semibold">
-                        Tidak ada customer
-                      </p>
+                      <p className="text-base font-semibold">Tidak ada customer</p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {searchQuery
-                          ? "Coba ubah kata kunci pencarian"
-                          : "Belum ada customer yang tersedia"}
+                        {searchQuery ? "Coba ubah kata kunci pencarian" : "Belum ada customer yang tersedia"}
                       </p>
                     </div>
                   </td>

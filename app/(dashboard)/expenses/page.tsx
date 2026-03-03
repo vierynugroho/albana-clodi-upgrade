@@ -77,7 +77,7 @@ export default function ExpensePage() {
           </p>
         </div>
 
-        <Button onClick={() => router.push("/expenses/add")} variant="gradient">
+        <Button onClick={() => router.push("/expenses/add")} variant="gradient" className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Tambah Data
         </Button>

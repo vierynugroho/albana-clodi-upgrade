@@ -149,7 +149,7 @@ export default function CustomersPage() {
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Input
             ref={fileInputRef}
             type="file"
@@ -159,6 +159,7 @@ export default function CustomersPage() {
           />
           <Button
             variant="outline"
+            size="sm"
             onClick={handleImportClick}
             disabled={importMutation.isPending}
           >
@@ -171,6 +172,7 @@ export default function CustomersPage() {
           </Button>
           <Button
             variant="outline"
+            size="sm"
             onClick={handleExport}
             disabled={exportMutation.isPending}
           >
@@ -184,6 +186,7 @@ export default function CustomersPage() {
           <Button
             onClick={() => router.push("/customers/add")}
             variant="gradient"
+            className="w-full sm:w-auto"
           >
             <Plus className="mr-2 h-4 w-4" />
             Tambah Customer
