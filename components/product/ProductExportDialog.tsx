@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useState } from "react";
 import {
@@ -58,6 +58,17 @@ export function ProductExportDialog({
     const [endDate, setEndDate] = useState("");
     const [month, setMonth] = useState("");
     const [year, setYear] = useState("");
+    const [weekDate, setWeekDate] = useState("");
+
+    function getISOWeek(dateStr: string): string {
+        const d = new Date(dateStr);
+        const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        const day = date.getUTCDay() || 7;
+        date.setUTCDate(date.getUTCDate() + 4 - day);
+        const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+        const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+        return String(week);
+    }
 
     const handleExport = () => {
         onExport({
@@ -65,6 +76,7 @@ export function ProductExportDialog({
             endDate: endDate || undefined,
             month: month || undefined,
             year: year || undefined,
+            week: weekDate ? getISOWeek(weekDate) : undefined,
         });
         onOpenChange(false);
     };
@@ -74,6 +86,7 @@ export function ProductExportDialog({
         setEndDate("");
         setMonth("");
         setYear("");
+        setWeekDate("");
     };
 
     return (
@@ -145,6 +158,24 @@ export function ProductExportDialog({
                                 ))}
                             </select>
                         </div>
+                    </div>
+
+                    {/* Week filter */}
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-foreground">
+                            Filter Minggu
+                        </label>
+                        <input
+                            type="date"
+                            value={weekDate}
+                            onChange={(e) => setWeekDate(e.target.value)}
+                            className="w-full h-10 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                        {weekDate && (
+                            <p className="text-xs text-muted-foreground">
+                                Minggu ke-{getISOWeek(weekDate)}
+                            </p>
+                        )}
                     </div>
                 </div>
 

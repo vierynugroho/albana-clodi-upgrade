@@ -19,7 +19,7 @@ export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]
     };
     const res = await api.get<PaginatedResponse<ApiOrder>>("/orders", { params: queryParams });
     const ro = res.data?.responseObject;
-    
+
     // Normalize: backend may return { data, meta } object or flat array
     if (ro && typeof ro === "object" && !Array.isArray(ro) && Array.isArray((ro as any).data)) {
         return (ro as any).data;
@@ -75,10 +75,10 @@ export async function getOrder(id: string): Promise<ApiOrder | null> {
 }
 
 export async function getOrderById(
-  id: string
+    id: string
 ): Promise<ApiOrder | null> {
-  const res = await api.get<ApiResponse<ApiOrder>>(`/orders/${id}`);
-  return res.data?.responseObject || null;
+    const res = await api.get<ApiResponse<ApiOrder>>(`/orders/${id}`);
+    return res.data?.responseObject || null;
 }
 
 export async function createOrder(payload: OrderCreatePayload): Promise<ApiOrder> {
@@ -128,4 +128,58 @@ export async function exportOrders(format: "excel" = "excel", params?: ExportFil
         params: params || {},
     });
     return res.data;
+}
+
+export async function downloadOrderExcel(params?: ExportFilterParams): Promise<{ success: boolean; message?: string }> {
+    try {
+        const res = await api.get("/orders/export/excel", {
+            headers: {
+                Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            },
+            responseType: "blob",
+            params: params || {},
+        });
+
+        const blob = new Blob([res.data], {
+            type: res.headers["content-type"],
+        });
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+
+        const contentDisposition = res.headers["content-disposition"];
+        const fileName =
+            contentDisposition?.split("filename=")[1]?.replace(/"/g, "") ||
+            "Orders.xlsx";
+
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        return { success: true };
+    } catch (error) {
+        let message = "Terjadi kesalahan saat mengexport order";
+
+        const axiosError = error as { response?: { data?: Blob | unknown } };
+        const responseData = axiosError?.response?.data;
+
+        if (responseData instanceof Blob) {
+            try {
+                const text = await responseData.text();
+                const json = JSON.parse(text);
+                if (json?.message) {
+                    message = json.message;
+                }
+            } catch {
+
+            }
+        } else if (error instanceof Error) {
+            message = error.message;
+        }
+
+        throw new Error(message);
+    }
 }

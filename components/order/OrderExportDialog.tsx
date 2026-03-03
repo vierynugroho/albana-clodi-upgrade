@@ -10,7 +10,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 
 interface FilterOption {
     value: string;
@@ -44,26 +44,40 @@ const YEAR_OPTIONS: FilterOption[] = [
 interface OrderExportDialogProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
+    onExport: (params: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => void;
+    isExporting: boolean;
 }
 
 export function OrderExportDialog({
     isOpen,
     onOpenChange,
+    onExport,
+    isExporting,
 }: OrderExportDialogProps) {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [month, setMonth] = useState("");
     const [year, setYear] = useState("");
+    const [weekDate, setWeekDate] = useState("");
+
+    function getISOWeek(dateStr: string): string {
+        const d = new Date(dateStr);
+        const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        const day = date.getUTCDay() || 7;
+        date.setUTCDate(date.getUTCDate() + 4 - day);
+        const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+        const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+        return String(week);
+    }
 
     const handleExport = () => {
-        const params = new URLSearchParams();
-        params.set("type", "orders");
-        if (startDate) params.set("startDate", startDate);
-        if (endDate) params.set("endDate", endDate);
-        if (month) params.set("month", month);
-        if (year) params.set("year", year);
-
-        window.open(`/export?${params.toString()}`, "_blank");
+        onExport({
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
+            month: month || undefined,
+            year: year || undefined,
+            week: weekDate ? getISOWeek(weekDate) : undefined,
+        });
         onOpenChange(false);
     };
 
@@ -72,6 +86,7 @@ export function OrderExportDialog({
         setEndDate("");
         setMonth("");
         setYear("");
+        setWeekDate("");
     };
 
     return (
@@ -80,7 +95,7 @@ export function OrderExportDialog({
                 <DialogHeader>
                     <DialogTitle>Export Data Order</DialogTitle>
                     <DialogDescription>
-                        Pilih kriteria untuk menentukan data order yang akan diexport.
+                        Pilih kriteria untuk menentukan data order yang akan diexport. Jika dikosongkan, semua order akan diexport.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -144,6 +159,24 @@ export function OrderExportDialog({
                             </select>
                         </div>
                     </div>
+
+                    {/* Week filter */}
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-foreground">
+                            Filter Minggu
+                        </label>
+                        <input
+                            type="date"
+                            value={weekDate}
+                            onChange={(e) => setWeekDate(e.target.value)}
+                            className="w-full h-10 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                        {weekDate && (
+                            <p className="text-xs text-muted-foreground">
+                                Minggu ke-{getISOWeek(weekDate)}
+                            </p>
+                        )}
+                    </div>
                 </div>
 
                 <DialogFooter className="flex sm:justify-between items-center w-full">
@@ -158,9 +191,13 @@ export function OrderExportDialog({
                         >
                             Batal
                         </Button>
-                        <Button type="button" onClick={handleExport}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Export
+                        <Button type="button" onClick={handleExport} disabled={isExporting}>
+                            {isExporting ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Download className="mr-2 h-4 w-4" />
+                            )}
+                            {isExporting ? "Mengexport..." : "Export"}
                         </Button>
                     </div>
                 </DialogFooter>

@@ -7,7 +7,7 @@ import { OrderExportDialog } from "@/components/order/OrderExportDialog";
 import { Plus, ShoppingCart, RefreshCw, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useDeleteOrder, useCancelOrder } from "@/hooks/useOrders";
+import { useDeleteOrder, useCancelOrder, useExportOrders } from "@/hooks/useOrders";
 import { useOrdersPaginated } from "@/hooks/useOrders";
 import { useSalesChannels } from "@/hooks/useSalesChannels";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
@@ -96,6 +96,7 @@ export default function OrderPage() {
 
   const deleteMutation = useDeleteOrder();
   const cancelMutation = useCancelOrder();
+  const exportMutation = useExportOrders();
 
   const orders: Order[] = mapApiOrdersToOrders(apiOrders);
   const totalPages = totalItems > 0
@@ -131,6 +132,25 @@ export default function OrderPage() {
 
   const handleExportClick = () => {
     setIsExportDialogOpen(true);
+  };
+
+  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
+    exportMutation.mutate(exportParams, {
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Data order berhasil diexport",
+          variant: "success",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Gagal mengexport",
+          description: getApiErrorMessage(error),
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const handleEdit = (order: Order) => {
@@ -288,6 +308,8 @@ export default function OrderPage() {
       <OrderExportDialog
         isOpen={isExportDialogOpen}
         onOpenChange={setIsExportDialogOpen}
+        onExport={handleExport}
+        isExporting={exportMutation.isPending}
       />
     </div>
   );
