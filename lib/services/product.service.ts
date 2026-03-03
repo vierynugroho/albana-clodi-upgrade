@@ -210,7 +210,7 @@ export async function getProduct(id: string): Promise<ApiProduct | null> {
 }
 
 
-//Get detailed product info including variants with prices, Maps productPrices array to single object for each variant
+
 export async function getProductDetail(id: string): Promise<ApiProductDetail | null> {
     const res = await api.get<ApiResponse<ApiProductDetail>>(`/products/${id}`);
 
@@ -218,11 +218,10 @@ export async function getProductDetail(id: string): Promise<ApiProductDetail | n
 
     const product = res.data.responseObject;
 
-    // Transform productPrices from array to single object (if needed)
+
     if (product.productVariants) {
         product.productVariants = product.productVariants.map((variant) => ({
             ...variant,
-            // If productPrices is an array, take the first item
             productPrices: Array.isArray(variant.productPrices)
                 ? variant.productPrices[0]
                 : variant.productPrices,
@@ -232,15 +231,10 @@ export async function getProductDetail(id: string): Promise<ApiProductDetail | n
     return product;
 }
 
-/**
- * Create a new product using FormData (for proper API structure)
- * Sends data as multipart/form-data with nested field names
- * Note: Do NOT set Content-Type manually - browser will add boundary automatically
- */
+
 export async function createProduct(payload: ProductCreatePayload): Promise<ApiProduct> {
     const formData = convertProductToFormData(payload);
 
-    // Don't set Content-Type header - let browser add multipart boundary
     const res = await api.post<ApiResponse<ApiProduct>>("/products", formData);
 
     if (!res.data?.success) {
@@ -249,15 +243,10 @@ export async function createProduct(payload: ProductCreatePayload): Promise<ApiP
     return res.data.responseObject;
 }
 
-/**
- * Create a new product with full payload including variants and images
- * Uses FormData for multipart/form-data upload
- * Note: Do NOT set Content-Type manually - browser will add boundary automatically
- */
 export async function createProductFull(payload: ProductFullCreatePayload): Promise<ApiProduct> {
     const formData = convertToFormData(payload);
 
-    // Don't set Content-Type header - let browser add multipart boundary
+
     const res = await api.post<ApiResponse<ApiProduct>>("/products", formData);
 
     if (!res.data?.success) {
@@ -283,11 +272,6 @@ export async function updateProduct(
 }
 
 
-/**
- * Update an existing product with full payload including variants and images
- * Uses FormData for multipart/form-data upload
- * Note: Do NOT set Content-Type manually - browser will add boundary automatically
- */
 export async function updateProductFull(id: string, payload: ProductFullCreatePayload): Promise<ApiProduct> {
     const formData = convertToFormData(payload);
 
@@ -328,12 +312,7 @@ export async function deleteProduct(id: string): Promise<ApiProduct | null> {
     }
 }
 
-// --- Old exportProducts (tanpa query params) ---
-// export async function exportProducts(format: "excel" = "excel"): Promise<Blob> {
-//     const res = await api.post(`/products/export/${format}`, null, { responseType: "blob" });
-//     return res.data;
-// }
-// --- End old exportProducts ---
+
 
 //Export products to file format (with optional date filter params)
 export async function exportProducts(format: "excel" = "excel", params?: ExportFilterParams): Promise<Blob> {
@@ -344,14 +323,7 @@ export async function exportProducts(format: "excel" = "excel", params?: ExportF
     return res.data;
 }
 
-// --- Old downloadProductExcel (tanpa query params) ---
-// export async function downloadProductExcel(): Promise<{ success: boolean; message?: string }> {
-//     try {
-//         const res = await api.post("/products/export/excel", null, {
-//             headers: { Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-//             responseType: "blob",
-//         });
-// --- End old downloadProductExcel ---
+
 
 //Download products as Excel file, Creates a download link and triggers the download
 export async function downloadProductExcel(params?: ExportFilterParams): Promise<{ success: boolean; message?: string }> {
@@ -388,13 +360,24 @@ export async function downloadProductExcel(params?: ExportFilterParams): Promise
     } catch (error) {
         let message = "Terjadi kesalahan saat mengexport produk";
 
-        if (error instanceof Error) {
+
+        const axiosError = error as { response?: { data?: Blob | unknown } };
+        const responseData = axiosError?.response?.data;
+
+        if (responseData instanceof Blob) {
+            try {
+                const text = await responseData.text();
+                const json = JSON.parse(text);
+                if (json?.message) {
+                    message = json.message;
+                }
+            } catch {
+
+            }
+        } else if (error instanceof Error) {
             message = error.message;
         }
 
-        return {
-            success: false,
-            message,
-        };
+        throw new Error(message);
     }
 }

@@ -25,7 +25,10 @@ ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 const toastVariants = {
     default: "border bg-background text-foreground",
     destructive: "destructive group border-destructive bg-destructive text-destructive-foreground",
-    success: "border-green-500 bg-green-500 text-white dark:bg-green-900/20 dark:text-white",
+    //issue mode gelap hardcode /20
+    //success: "border-green-500 bg-green-500 text-white dark:bg-green-900/20 dark:text-white",
+    //yang benar dibawah ini pakai semua mode
+    success: "group border-success bg-success text-success-foreground",
 };
 
 interface ToastProps extends React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> {
