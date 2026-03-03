@@ -1,7 +1,7 @@
 // hooks/useOrders.ts
 import { useQuery, useMutation, useQueryClient, useQueries } from "@tanstack/react-query";
 import * as orderService from "@/lib/services/order.service";
-import type { OrderQueryParams, OrderCreatePayload, ApiOrder } from "@/types/api";
+import type { OrderQueryParams, OrderCreatePayload, ApiOrder, ExportFilterParams } from "@/types/api";
 import { Order } from "@/types";
 import { mapApiOrderToOrder } from "@/lib/mappers";
 
@@ -37,24 +37,24 @@ export function useOrder(id: string) {
 
 // khusus untuk print ambil uuid dalam tipe array
 export function useOrdersByIds(orderIds: string[]) {
-  const queries = useQueries({
-    queries: orderIds.map((id) => ({
-      queryKey: ["order", id],
-      queryFn: () => orderService.getOrderById(id),
-      enabled: !!id,
-    })),
-  });
+    const queries = useQueries({
+        queries: orderIds.map((id) => ({
+            queryKey: ["order", id],
+            queryFn: () => orderService.getOrderById(id),
+            enabled: !!id,
+        })),
+    });
 
-  const orders: Order[] = queries
-    .map((q) => q.data)
-    .filter((data): data is ApiOrder => data != null)
-    .map(mapApiOrderToOrder);
+    const orders: Order[] = queries
+        .map((q) => q.data)
+        .filter((data): data is ApiOrder => data != null)
+        .map(mapApiOrderToOrder);
 
-  return {
-    orders,
-    isLoading: queries.some((q) => q.isLoading),
-    isError: queries.some((q) => q.isError),
-  };
+    return {
+        orders,
+        isLoading: queries.some((q) => q.isLoading),
+        isError: queries.some((q) => q.isError),
+    };
 }
 
 
@@ -102,5 +102,15 @@ export function useCancelOrder() {
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.detail(id) });
         },
+    });
+}
+
+/**
+ * Hook to export orders to Excel
+ */
+export function useExportOrders() {
+    return useMutation({
+        mutationFn: (params?: ExportFilterParams) =>
+            orderService.downloadOrderExcel(params),
     });
 }

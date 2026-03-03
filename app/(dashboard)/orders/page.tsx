@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { OrderTable } from "@/components/order/OrderTable";
 import { OrderFilters } from "@/components/order/OrderFilters";
+import { OrderExportDialog } from "@/components/order/OrderExportDialog";
 import { Plus, ShoppingCart, RefreshCw, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useDeleteOrder, useCancelOrder } from "@/hooks/useOrders";
+import { useDeleteOrder, useCancelOrder, useExportOrders } from "@/hooks/useOrders";
 import { useOrdersPaginated } from "@/hooks/useOrders";
 import { useSalesChannels } from "@/hooks/useSalesChannels";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
@@ -25,6 +26,7 @@ export default function OrderPage() {
   const { toast } = useToast();
 
   const [filters, setFilters] = useState<OrderQueryParams>({});
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -94,6 +96,7 @@ export default function OrderPage() {
 
   const deleteMutation = useDeleteOrder();
   const cancelMutation = useCancelOrder();
+  const exportMutation = useExportOrders();
 
   const orders: Order[] = mapApiOrdersToOrders(apiOrders);
   const totalPages = totalItems > 0
@@ -127,12 +130,27 @@ export default function OrderPage() {
     }
   }, [isLoading, currentPage, hasNext, nextCursor]);
 
-  const handleExport = () => {
-    const params = new URLSearchParams();
-    params.set("type", "orders");
-    if (filters.startDate) params.set("startDate", filters.startDate);
-    if (filters.endDate) params.set("endDate", filters.endDate);
-    window.open(`/export?${params.toString()}`, "_blank");
+  const handleExportClick = () => {
+    setIsExportDialogOpen(true);
+  };
+
+  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
+    exportMutation.mutate(exportParams, {
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Data order berhasil diexport",
+          variant: "success",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Gagal mengexport",
+          description: getApiErrorMessage(error),
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const handleEdit = (order: Order) => {
@@ -223,7 +241,7 @@ export default function OrderPage() {
           <p className="page-description">Kelola semua order pelanggan Anda</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={handleExport}>
+          <Button variant="outline" onClick={handleExportClick}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -285,6 +303,13 @@ export default function OrderPage() {
           hasPrev: currentPage > 1,
           onPageChange: handlePageChange,
         }}
+      />
+
+      <OrderExportDialog
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        onExport={handleExport}
+        isExporting={exportMutation.isPending}
       />
     </div>
   );
