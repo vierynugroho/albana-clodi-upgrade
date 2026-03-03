@@ -30,9 +30,14 @@ export function PaymentSection({
                         <label className="text-sm font-medium">Status Pembayaran</label>
                         <select
                             value={paymentStatus}
-                            onChange={(e) =>
-                                setPaymentStatus(e.target.value as typeof paymentStatus)
-                            }
+                            onChange={(e) => {
+                                const newStatus = e.target.value as typeof paymentStatus;
+                                setPaymentStatus(newStatus);
+                                // Reset installment amount when switching away from "cicilan"
+                                if (newStatus !== "cicilan") {
+                                    setInstallmentAmount(0);
+                                }
+                            }}
                             className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm"
                         >
                             <option value="belum_dibayar">Belum Dibayar</option>
