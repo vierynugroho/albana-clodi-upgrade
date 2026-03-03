@@ -124,9 +124,14 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                     }
 
                     // Set installment data from otherFees
+                    // Only override paymentStatus to "cicilan" if the backend status is PENDING
+                    // If status is already SETTLEMENT or CANCEL, keep that status
                     if (otherFees.installments) {
                         setInstallmentAmount(otherFees.installments.amount || 0);
-                        setPaymentStatus("cicilan");
+                        const backendStatus = orderDetail.paymentStatus;
+                        if (backendStatus !== "SETTLEMENT" && backendStatus !== "CANCEL") {
+                            setPaymentStatus("cicilan");
+                        }
                     }
 
                     // Set shipping cost from otherFees

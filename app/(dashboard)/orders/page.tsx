@@ -13,6 +13,7 @@ import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiOrdersToOrders } from "@/lib/mappers";
+import { getApiErrorMessage } from "@/lib/utils";
 import { exportOrders } from "@/lib/services/order.service";
 import type { Order } from "@/types";
 import type { OrderQueryParams } from "@/types/api";
@@ -209,9 +210,14 @@ export default function OrderPage() {
         });
       },
       onError: (error) => {
+        const rawMessage = getApiErrorMessage(error);
+        // Tampilkan pesan ramah untuk error foreign key installments
+        const description = rawMessage.toLowerCase().includes("installment")
+          ? "Order ini memiliki data cicilan sehingga tidak dapat dihapus. Hubungi administrator untuk menghapus data cicilan terlebih dahulu."
+          : rawMessage;
         toast({
           title: "Gagal menghapus order",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description,
           variant: "destructive",
         });
       },
@@ -232,7 +238,7 @@ export default function OrderPage() {
       onError: (error) => {
         toast({
           title: "Gagal membatalkan order",
-          description: error instanceof Error ? error.message : "Terjadi kesalahan",
+          description: getApiErrorMessage(error),
           variant: "destructive",
         });
       },
