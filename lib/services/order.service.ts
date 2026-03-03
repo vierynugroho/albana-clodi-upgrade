@@ -21,8 +21,9 @@ export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]
     const ro = res.data?.responseObject;
 
     // Normalize: backend may return { data, meta } object or flat array
-    if (ro && typeof ro === "object" && !Array.isArray(ro) && Array.isArray((ro as any).data)) {
-        return (ro as any).data;
+    const roObj = ro as unknown as Record<string, unknown> | undefined;
+    if (roObj && typeof roObj === "object" && !Array.isArray(roObj) && Array.isArray(roObj.data)) {
+        return roObj.data as ApiOrder[];
     }
 
     return Array.isArray(ro) ? ro : [];
@@ -114,13 +115,6 @@ export async function cancelOrder(id: string): Promise<ApiOrder | null> {
     }
     return res.data?.responseObject || null;
 }
-
-// --- Old exportOrders (tanpa query params) ---
-// export async function exportOrders(format: "excel" = "excel"): Promise<Blob> {
-//     const res = await api.get(`/orders/export/${format}`, { responseType: "blob" });
-//     return res.data;
-// }
-// --- End old exportOrders ---
 
 export async function exportOrders(format: "excel" = "excel", params?: ExportFilterParams): Promise<Blob> {
     const res = await api.get(`/orders/export/${format}`, {

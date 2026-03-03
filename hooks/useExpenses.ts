@@ -153,29 +153,9 @@ export function useDeleteExpense() {
     });
 }
 
-// --- Old useExportExpenses (tanpa query params) ---
-// export function useExportExpenses() {
-//     return useMutation({
-//         mutationFn: () => expenseService.exportExpenses(),
-//         ...
-//     });
-// }
-// --- End old useExportExpenses ---
-
 export function useExportExpenses() {
     return useMutation({
-        mutationFn: (params?: ExportFilterParams) => expenseService.exportExpenses(params),
-        onSuccess: (blob) => {
-            // Create download link
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `expenses_${new Date().toISOString().split("T")[0]}.xlsx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        },
+        mutationFn: (params?: ExportFilterParams) => expenseService.downloadExpenseExcel(params),
     });
 }
 
