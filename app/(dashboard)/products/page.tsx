@@ -132,19 +132,19 @@ export default function ProductPage() {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" onClick={() => router.push("/products/categories")}>
+          <Button variant="outline" size="sm" onClick={() => router.push("/products/categories")}>
             <Folder className="mr-2 h-4 w-4" />
             Kategori
           </Button>
-          <Button variant="outline" onClick={() => router.push("/products/print-barcode")}>
+          <Button variant="outline" size="sm" onClick={() => router.push("/products/print-barcode")}>
             <Barcode className="mr-2 h-4 w-4" />
             Cetak Barcode
           </Button>
-          <Button variant="outline" onClick={() => setIsExportDialogOpen(true)}>
+          <Button variant="outline" size="sm" onClick={() => setIsExportDialogOpen(true)}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button onClick={() => router.push("/products/add")} variant="gradient">
+          <Button onClick={() => router.push("/products/add")} variant="gradient" className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah Product
           </Button>

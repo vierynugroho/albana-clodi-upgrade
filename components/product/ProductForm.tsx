@@ -245,7 +245,7 @@ export function ProductForm({
 
       // Translate specific backend errors to be more informative
       if (
-        message.toLowerCase().includes("insufficient stock") || 
+        message.toLowerCase().includes("insufficient stock") ||
         message.toLowerCase().includes("tidak cukup") ||
         message.toLowerCase().includes("kurang")
       ) {
@@ -258,7 +258,7 @@ export function ProductForm({
         variant: "destructive",
       });
     }
-  }; 
+  };
 
   const onFormError = (formErrors: FieldErrors<ProductFormValues>) => {
     // Get current form values for debugging
@@ -352,7 +352,7 @@ export function ProductForm({
   return (
     <form onSubmit={handleSubmit(onSubmit, onFormError)} className="space-y-6">
       {/* Header with Back Button and Breadcrumb */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Button
             type="button"
@@ -506,7 +506,7 @@ export function ProductForm({
             </FormFieldWrapper>
 
             {/* Weight and Discount */}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <FormFieldWrapper
                 label="Berat (gram)"
                 required
@@ -574,7 +574,7 @@ export function ProductForm({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <ToggleSwitch 
+              <ToggleSwitch
                 label="Publish"
                 checked={isPublish}
                 onChange={setIsPublish}

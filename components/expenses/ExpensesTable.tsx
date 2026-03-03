@@ -269,6 +269,62 @@ const ExpenseRow = memo(function ExpenseRow({
   );
 });
 
+// Mobile card view for expenses
+const ExpenseMobileCard = memo(function ExpenseMobileCard({
+  expense,
+  index,
+  onView,
+  onEdit,
+  onDelete,
+}: ExpenseRowProps) {
+  return (
+    <div
+      className="p-4 border-b last:border-b-0 animate-fade-in"
+      style={{ animationDelay: `${index * 30}ms` }}
+    >
+      <div className="flex items-start gap-3">
+        <div className="h-10 w-10 shrink-0 rounded-xl bg-orange/10 flex items-center justify-center">
+          <Receipt className="h-5 w-5 text-orange" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">{expense.itemName}</p>
+              <p className="text-xs text-muted-foreground">Qty: {expense.qty || 1}</p>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <IconButton color="info" size="sm" onClick={() => onView(expense)}>
+                <Eye className="h-4 w-4" />
+              </IconButton>
+              <IconButton color="warning" size="sm" onClick={() => onEdit(expense)}>
+                <Edit className="h-4 w-4" />
+              </IconButton>
+              <IconButton color="destructive" size="sm" onClick={() => onDelete(expense.id)}>
+                <Trash2 className="h-4 w-4" />
+              </IconButton>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <div>
+              <p className="text-xs text-muted-foreground">@{formatCurrency(expense.itemPrice)}</p>
+              <p className="text-sm font-bold gradient-text-warm">{formatCurrency(expense.totalPrice)}</p>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3 text-info" />
+              <span>{formatDate(expense.expenseDate)}</span>
+            </div>
+          </div>
+          {expense.personResponsible && (
+            <div className="mt-1.5">
+              <Badge variant="purple" dot>{expense.personResponsible}</Badge>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -286,14 +342,10 @@ const Pagination = memo(function Pagination({
   totalItems,
   onPageChange,
 }: PaginationProps) {
-  // Generate page numbers with ellipsis
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-
     if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       if (currentPage <= 3) {
         pages.push(1, 2, 3, 4, "...", totalPages);
@@ -303,7 +355,6 @@ const Pagination = memo(function Pagination({
         pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
-
     return pages;
   };
 
@@ -327,7 +378,6 @@ const Pagination = memo(function Pagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-
         {getPageNumbers().map((page, idx) => (
           typeof page === "number" ? (
             <Button
@@ -343,7 +393,6 @@ const Pagination = memo(function Pagination({
             <span key={idx} className="px-2 text-muted-foreground">...</span>
           )
         ))}
-
         <Button
           variant="outline"
           size="icon"
@@ -372,7 +421,6 @@ function filterByPeriod(expenses: Expense[], period: string): Expense[] {
     switch (period) {
       case "today":
         return expenseDateOnly.getTime() === today.getTime();
-
       case "week": {
         const weekStart = new Date(today);
         weekStart.setDate(today.getDate() - today.getDay());
@@ -380,16 +428,10 @@ function filterByPeriod(expenses: Expense[], period: string): Expense[] {
         weekEnd.setDate(weekStart.getDate() + 6);
         return expenseDateOnly >= weekStart && expenseDateOnly <= weekEnd;
       }
-
       case "month":
-        return (
-          expenseDate.getMonth() === now.getMonth() &&
-          expenseDate.getFullYear() === now.getFullYear()
-        );
-
+        return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear();
       case "year":
         return expenseDate.getFullYear() === now.getFullYear();
-
       default:
         return true;
     }
@@ -408,15 +450,12 @@ export function ExpenseTable({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Filter by period first
   const periodFilteredExpenses = useMemo(() => {
     return filterByPeriod(expenses, filterPeriod);
   }, [expenses, filterPeriod]);
 
-  // Then filter by search
   const filteredExpenses = useMemo(() => {
     if (!searchQuery) return periodFilteredExpenses;
-
     const query = searchQuery.toLowerCase();
     return periodFilteredExpenses.filter((expense) => {
       return (
@@ -437,7 +476,6 @@ export function ExpenseTable({
     setCurrentPage(page);
   }, []);
 
-  // Reset to page 1 when filter changes
   const handleFilterChange = useCallback((value: string) => {
     setFilterPeriod(value);
     setCurrentPage(1);
@@ -457,7 +495,6 @@ export function ExpenseTable({
         onFilterChange={handleFilterChange}
       />
 
-      {/* Filter info */}
       {filterPeriod !== "all" && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <FileSpreadsheet className="h-4 w-4" />
@@ -474,28 +511,54 @@ export function ExpenseTable({
       )}
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card Layout */}
+        <div className="md:hidden">
+          {isLoading ? (
+            <div className="p-8">
+              <LoadingState
+                className="py-12 h-auto"
+                iconClassName="h-8 w-8 text-orange mb-4"
+                message="Memuat data pengeluaran..."
+                textClassName="text-sm"
+              />
+            </div>
+          ) : paginatedExpenses.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="py-12">
+                <div className="h-16 w-16 rounded-2xl bg-orange/10 flex items-center justify-center mx-auto mb-4">
+                  <Wallet className="h-8 w-8 text-orange" />
+                </div>
+                <p className="text-base font-semibold">Tidak ada pengeluaran</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {searchQuery ? "Coba ubah kata kunci pencarian" : filterPeriod !== "all" ? "Tidak ada data untuk periode ini" : "Belum ada data pengeluaran"}
+                </p>
+              </div>
+            </div>
+          ) : (
+            paginatedExpenses.map((expense, index) => (
+              <ExpenseMobileCard
+                key={expense.id}
+                expense={expense}
+                index={index}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Item
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Tanggal
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Biaya
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Responsible
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Catatan
-                </th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">
-                  Aksi
-                </th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Item</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tanggal</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Biaya</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Responsible</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Catatan</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -517,15 +580,9 @@ export function ExpenseTable({
                       <div className="h-16 w-16 rounded-2xl bg-orange/10 flex items-center justify-center mx-auto mb-4">
                         <Wallet className="h-8 w-8 text-orange" />
                       </div>
-                      <p className="text-base font-semibold">
-                        Tidak ada pengeluaran
-                      </p>
+                      <p className="text-base font-semibold">Tidak ada pengeluaran</p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {searchQuery
-                          ? "Coba ubah kata kunci pencarian"
-                          : filterPeriod !== "all"
-                            ? "Tidak ada data untuk periode ini"
-                            : "Belum ada data pengeluaran"}
+                        {searchQuery ? "Coba ubah kata kunci pencarian" : filterPeriod !== "all" ? "Tidak ada data untuk periode ini" : "Belum ada data pengeluaran"}
                       </p>
                     </div>
                   </td>

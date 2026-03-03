@@ -160,6 +160,77 @@ const ProductRow = memo(function ProductRow({
   );
 });
 
+// Mobile card view for products
+const ProductMobileCard = memo(function ProductMobileCard({
+  product,
+  index,
+  onView,
+  onEdit,
+  onDelete,
+}: ProductRowProps) {
+  const typeConf = typeConfig[product.type];
+  const stockConf = getStockConfig(product.stock);
+  const gradientColors = [
+    "from-primary/20 to-purple/20",
+    "from-success/20 to-teal/20",
+    "from-info/20 to-cyan/20",
+    "from-warning/20 to-orange/20",
+    "from-pink/20 to-purple/20",
+  ];
+  const gradientIndex = index % gradientColors.length;
+
+  const { data } = useCurrentUser();
+  const role = data?.responseObject.role;
+
+  return (
+    <div
+      className="p-4 border-b last:border-b-0 animate-fade-in"
+      style={{ animationDelay: `${index * 30}ms` }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className={`h-12 w-12 shrink-0 rounded-xl bg-linear-to-br ${gradientColors[gradientIndex]} flex items-center justify-center`}
+        >
+          <Package className="h-6 w-6 text-foreground/60" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">{product.name}</p>
+              <p className="text-xs text-muted-foreground">{product.variants.length} variant</p>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <IconButton color="info" size="sm" onClick={() => onView(product)}>
+                <Eye className="h-4 w-4" />
+              </IconButton>
+              <IconButton color="warning" size="sm" onClick={() => onEdit(product)}>
+                <Edit className="h-4 w-4" />
+              </IconButton>
+              {role?.toLocaleLowerCase() === "superadmin" && (
+                <IconButton color="destructive" size="sm" onClick={() => onDelete(product.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </IconButton>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <code className="text-xs bg-muted px-2 py-0.5 rounded-md font-mono">{product.sku}</code>
+            <span className="text-xs text-muted-foreground">{product.category}</span>
+            <Badge variant={typeConf.variant} dot>{typeConf.label}</Badge>
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <div>
+              <p className="text-sm font-bold gradient-text">{formatCurrency(product.prices.normal)}</p>
+              <p className="text-[11px] text-muted-foreground">Agent: {formatCurrency(product.prices.agent)}</p>
+            </div>
+            <Badge variant={stockConf.variant}>{stockConf.label}</Badge>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -246,10 +317,35 @@ export function ProductTable({
 
   return (
     <div className="space-y-4">
-
-
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card Layout */}
+        <div className="md:hidden">
+          {paginatedProducts.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="py-12">
+                <div className="h-16 w-16 rounded-2xl bg-success/10 flex items-center justify-center mx-auto mb-4">
+                  <Package className="h-8 w-8 text-success" />
+                </div>
+                <p className="text-base font-semibold">Tidak ada produk</p>
+                <p className="text-sm text-muted-foreground mt-1">Belum ada produk yang tersedia</p>
+              </div>
+            </div>
+          ) : (
+            paginatedProducts.map((product, index) => (
+              <ProductMobileCard
+                key={index}
+                product={product}
+                index={index}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50 border-b">
               <tr>
@@ -287,12 +383,8 @@ export function ProductTable({
                       <div className="h-16 w-16 rounded-2xl bg-success/10 flex items-center justify-center mx-auto mb-4">
                         <Package className="h-8 w-8 text-success" />
                       </div>
-                      <p className="text-base font-semibold">
-                        Tidak ada produk
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Belum ada produk yang tersedia
-                      </p>
+                      <p className="text-base font-semibold">Tidak ada produk</p>
+                      <p className="text-sm text-muted-foreground mt-1">Belum ada produk yang tersedia</p>
                     </div>
                   </td>
                 </tr>
