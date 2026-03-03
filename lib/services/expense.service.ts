@@ -56,23 +56,6 @@ export async function deleteExpense(id: string): Promise<ApiExpense | null> {
     return res.data?.responseObject || null;
 }
 
-// --- Old exportExpenses (tanpa query params) ---
-// export async function exportExpenses(): Promise<Blob> {
-//     try {
-//         const res = await api.get("/expenses/export/excel", {
-//             responseType: "blob",
-//             headers: {
-//                 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-//             }
-//         });
-//         return res.data;
-//     } catch (error) {
-//         console.error("Export error:", error);
-//         throw new Error("Gagal mengekspor data. Pastikan Anda sudah login.");
-//     }
-// }
-// --- End old exportExpenses ---
-
 export async function exportExpenses(params?: ExportFilterParams): Promise<Blob> {
     try {
         const res = await api.get("/expenses/export/excel", {
@@ -86,6 +69,60 @@ export async function exportExpenses(params?: ExportFilterParams): Promise<Blob>
     } catch (error) {
         console.error("Export error:", error);
         throw new Error("Gagal mengekspor data. Pastikan Anda sudah login.");
+    }
+}
+
+export async function downloadExpenseExcel(params?: ExportFilterParams): Promise<{ success: boolean; message?: string }> {
+    try {
+        const res = await api.get("/expenses/export/excel", {
+            headers: {
+                Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            },
+            responseType: "blob",
+            params: params || {},
+        });
+
+        const blob = new Blob([res.data], {
+            type: res.headers["content-type"],
+        });
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+
+        const contentDisposition = res.headers["content-disposition"];
+        const fileName =
+            contentDisposition?.split("filename=")[1]?.replace(/"/g, "") ||
+            "Expenses.xlsx";
+
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        return { success: true };
+    } catch (error) {
+        let message = "Terjadi kesalahan saat mengexport pengeluaran";
+
+        const axiosError = error as { response?: { data?: Blob | unknown } };
+        const responseData = axiosError?.response?.data;
+
+        if (responseData instanceof Blob) {
+            try {
+                const text = await responseData.text();
+                const json = JSON.parse(text);
+                if (json?.message) {
+                    message = json.message;
+                }
+            } catch {
+
+            }
+        } else if (error instanceof Error) {
+            message = error.message;
+        }
+
+        throw new Error(message);
     }
 }
 

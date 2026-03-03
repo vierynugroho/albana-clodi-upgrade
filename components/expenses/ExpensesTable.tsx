@@ -26,6 +26,7 @@ import { useExportExpenses, useImportExpenses } from "@/hooks/useExpenses";
 import { useToast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/lib/utils";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ExpenseExportDialog } from "@/components/expenses/ExpenseExportDialog";
 
 interface ExpenseTableProps {
   expenses: Expense[];
@@ -52,22 +53,25 @@ const Toolbar = memo(function Toolbar({
   const exportExpenses = useExportExpenses();
   const importExpenses = useImportExpenses();
 
-  // --- Old handleExport (inline download) ---
-  // const handleExport = async () => {
-  //   try {
-  //     await exportExpenses.mutateAsync({});
-  //     toast({ title: "Berhasil!", description: "Data pengeluaran berhasil diekspor" });
-  //   } catch (error) {
-  //     console.error("Export error:", error);
-  //     toast({ title: "Error", description: error instanceof Error ? error.message : "Gagal mengekspor data.", variant: "destructive" });
-  //   }
-  // };
-  // --- End old handleExport ---
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
-  const handleExport = () => {
-    const params = new URLSearchParams();
-    params.set("type", "expenses");
-    window.open(`/export?${params.toString()}`, "_blank");
+  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
+    exportExpenses.mutate(exportParams, {
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Data pengeluaran berhasil diexport",
+          variant: "success",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Gagal mengexport",
+          description: getApiErrorMessage(error),
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +163,7 @@ const Toolbar = memo(function Toolbar({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleExport}
+          onClick={() => setIsExportDialogOpen(true)}
           disabled={exportExpenses.isPending}
         >
           {exportExpenses.isPending ? (
@@ -170,6 +174,13 @@ const Toolbar = memo(function Toolbar({
           Export
         </Button>
       </div>
+
+      <ExpenseExportDialog
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        onExport={handleExport}
+        isExporting={exportExpenses.isPending}
+      />
     </div>
   );
 });

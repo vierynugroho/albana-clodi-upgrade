@@ -3,10 +3,8 @@
 import { useState, memo, useCallback } from "react";
 import { Button, IconButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
-  Search,
   Edit,
   Trash2,
   Eye,
@@ -16,8 +14,6 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types";
-import DropdownButton from "../ui/DropdownButton";
-import { useCategories } from "@/hooks/useCategories";
 import { useCurrentUser } from "@/hooks/useAuth";
 
 interface ProductTableProps {
@@ -27,11 +23,7 @@ interface ProductTableProps {
   onView: (product: Product) => void;
 }
 
-const dropdownData = {
-  title: "Actions",
-  text: ["Import Product", "Export Product"],
-  url: ["/products/import/excel", "/export?type=products"],
-};
+
 
 type ProductType = Product["type"];
 type BadgeVariant =
@@ -54,50 +46,7 @@ const typeConfig: Record<
   pre_order: { label: "Pre Order", variant: "warning" },
 };
 
-interface ToolbarProps {
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  filterCategory: string;
-  onFilterChange: (value: string) => void;
-  categories: { id: string; name: string }[];
-}
 
-const Toolbar = memo(function Toolbar({
-  searchQuery,
-  onSearchChange,
-  filterCategory,
-  onFilterChange,
-  categories,
-}: ToolbarProps) {
-  return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex flex-1 flex-wrap items-center gap-3">
-        <Input
-          placeholder="Cari produk atau SKU..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="max-w-xs"
-          leftIcon={<Search className="h-4 w-4" />}
-        />
-
-        <select
-          value={filterCategory}
-          onChange={(e) => onFilterChange(e.target.value)}
-          className="h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="all">Semua Kategori</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.name}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <DropdownButton data={dropdownData} />
-    </div>
-  );
-});
 
 const getStockConfig = (
   stock: number
@@ -283,27 +232,13 @@ export function ProductTable({
   onDelete,
   onView,
 }: ProductTableProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Fetch categories for filter dropdown
-  const { data: categories = [] } = useCategories();
-
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      filterCategory === "all" || product.category === filterCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+  const paginatedProducts = products.slice(startIndex, endIndex);
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
@@ -311,13 +246,7 @@ export function ProductTable({
 
   return (
     <div className="space-y-4">
-      {/* <Toolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        filterCategory={filterCategory}
-        onFilterChange={setFilterCategory}
-        categories={categories}
-      /> */}
+
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
@@ -362,9 +291,7 @@ export function ProductTable({
                         Tidak ada produk
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {searchQuery
-                          ? "Coba ubah kata kunci pencarian"
-                          : "Belum ada produk yang tersedia"}
+                        Belum ada produk yang tersedia
                       </p>
                     </div>
                   </td>
@@ -385,13 +312,13 @@ export function ProductTable({
           </table>
         </div>
 
-        {filteredProducts.length > 0 && (
+        {products.length > 0 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             startIndex={startIndex}
             endIndex={endIndex}
-            totalItems={filteredProducts.length}
+            totalItems={products.length}
             onPageChange={handlePageChange}
           />
         )}
