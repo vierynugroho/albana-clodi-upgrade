@@ -23,7 +23,15 @@ interface ProductTableProps {
   onView: (product: Product) => void;
 }
 
+<<<<<<< HEAD
 
+=======
+const dropdownData = {
+  title: "Actions",
+  text: ["Import Product", "Export Product"],
+  url: ["/products/import/excel", "/export?type=products"],
+};
+>>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
 
 type ProductType = Product["type"];
 type BadgeVariant =
