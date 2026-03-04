@@ -15,25 +15,15 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-<<<<<<< HEAD
-import { useInfiniteProducts, useDeleteProduct, useExportProducts } from "@/hooks/useProducts";
-=======
 import {
   useInfiniteProducts,
   useDeleteProduct,
   useExportProducts,
 } from "@/hooks/useProducts";
->>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiProductsToProducts } from "@/lib/mappers";
 import { getApiErrorMessage } from "@/lib/utils";
-<<<<<<< HEAD
-=======
-// --- Old import (replaced by export page approach) ---
-// import { exportProducts } from "@/lib/services/product.service";
-// --- End old import ---
->>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
 import type { Product } from "@/types";
 import type { ProductQueryParams } from "@/types/api";
 import { ProductStats } from "@/components/product/ProdukStats";
@@ -44,13 +34,8 @@ export default function ProductPage() {
   const [filters, setFilters] = useState<ProductQueryParams>({});
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
-<<<<<<< HEAD
-  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
-=======
-  // Fetch categories for filter options
   const { data: categories = [], isLoading: isLoadingCategories } =
     useCategories();
->>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
 
   const {
     data,
@@ -67,20 +52,13 @@ export default function ProductPage() {
 
   const exportMutation = useExportProducts();
 
-<<<<<<< HEAD
-  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
-=======
-  const handleExport = () => {
-    // Build ExportFilterParams — all 5 params supported by /products/export/excel
-    const exportParams = {
-      ...(filters.startDate && { startDate: filters.startDate }),
-      ...(filters.endDate && { endDate: filters.endDate }),
-      ...(filters.month && { month: filters.month }),
-      ...(filters.year && { year: String(filters.year) }),
-      ...(filters.week && { week: filters.week }),
-    };
->>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
-
+  const handleExport = (exportParams: {
+    startDate?: string;
+    endDate?: string;
+    month?: string;
+    year?: string;
+    week?: string;
+  }) => {
     exportMutation.mutate(exportParams, {
       onSuccess: () => {
         toast({
@@ -92,12 +70,7 @@ export default function ProductPage() {
       onError: (error) => {
         toast({
           title: "Gagal mengexport",
-<<<<<<< HEAD
           description: getApiErrorMessage(error),
-=======
-          description:
-            error instanceof Error ? error.message : "Terjadi kesalahan",
->>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
           variant: "destructive",
         });
       },
@@ -177,23 +150,9 @@ export default function ProductPage() {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-<<<<<<< HEAD
-          <Button variant="outline" size="sm" onClick={() => router.push("/products/categories")}>
-            <Folder className="mr-2 h-4 w-4" />
-            Kategori
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => router.push("/products/print-barcode")}>
-            <Barcode className="mr-2 h-4 w-4" />
-            Cetak Barcode
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsExportDialogOpen(true)}>
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button onClick={() => router.push("/products/add")} variant="gradient" className="w-full sm:w-auto">
-=======
           <Button
             variant="outline"
+            size="sm"
             onClick={() => router.push("/products/categories")}
           >
             <Folder className="mr-2 h-4 w-4" />
@@ -201,6 +160,7 @@ export default function ProductPage() {
           </Button>
           <Button
             variant="outline"
+            size="sm"
             onClick={() => router.push("/products/print-barcode")}
           >
             <Barcode className="mr-2 h-4 w-4" />
@@ -208,21 +168,17 @@ export default function ProductPage() {
           </Button>
           <Button
             variant="outline"
-            onClick={handleExport}
-            disabled={exportMutation.isPending}
+            size="sm"
+            onClick={() => setIsExportDialogOpen(true)}
           >
-            {exportMutation.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="mr-2 h-4 w-4" />
-            )}
-            {exportMutation.isPending ? "Mengexport..." : "Export"}
+            <Download className="mr-2 h-4 w-4" />
+            Export
           </Button>
           <Button
             onClick={() => router.push("/products/add")}
             variant="gradient"
+            className="w-full sm:w-auto"
           >
->>>>>>> 5b79c54890619bc2dd178a10cc58cc1634a452af
             <Plus className="mr-2 h-4 w-4" />
             Tambah Product
           </Button>
