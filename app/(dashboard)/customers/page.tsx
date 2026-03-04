@@ -47,9 +47,22 @@ export default function CustomersPage() {
   };
 
   const handleExport = () => {
-    const params = new URLSearchParams();
-    params.set("type", "customers");
-    window.open(`/export?${params.toString()}`, "_blank");
+    exportMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Data customer berhasil diexport",
+          variant: "success",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Gagal mengexport",
+          description: getApiErrorMessage(error),
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const handleImportClick = () => {
