@@ -70,7 +70,6 @@ interface FilterSelectProps {
   onChange: (value: string) => void;
   options: FilterOption[];
   className?: string;
-  exportOnly?: boolean;
 }
 
 function FilterSelect({
@@ -79,20 +78,12 @@ function FilterSelect({
   onChange,
   options,
   className = "",
-  exportOnly = false,
 }: FilterSelectProps) {
   return (
     <div className={`space-y-1.5 ${className}`}>
-      <div className="flex items-center gap-2">
-        <label className="text-xs font-medium text-muted-foreground">
-          {label}
-        </label>
-        {exportOnly && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-medium leading-none">
-            Hanya untuk Export
-          </span>
-        )}
-      </div>
+      <label className="text-xs font-medium text-muted-foreground">
+        {label}
+      </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -116,7 +107,6 @@ interface FilterDateInputProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
-  exportOnly?: boolean;
 }
 
 function FilterDateInput({
@@ -124,20 +114,12 @@ function FilterDateInput({
   value,
   onChange,
   className = "",
-  exportOnly = false,
 }: FilterDateInputProps) {
   return (
     <div className={`space-y-1.5 ${className}`}>
-      <div className="flex items-center gap-2">
-        <label className="text-xs font-medium text-muted-foreground">
-          {label}
-        </label>
-        {exportOnly && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-medium leading-none">
-            Hanya untuk Export
-          </span>
-        )}
-      </div>
+      <label className="text-xs font-medium text-muted-foreground">
+        {label}
+      </label>
       <input
         type="date"
         value={value}
@@ -346,13 +328,11 @@ export function ProductFilters({
               {/* Date Range */}
               <FilterDateInput
                 label="Tanggal Mulai"
-                exportOnly
                 value={localFilters.startDate || ""}
                 onChange={(v) => updateFilter("startDate", v)}
               />
               <FilterDateInput
                 label="Tanggal Akhir"
-                exportOnly
                 value={localFilters.endDate || ""}
                 onChange={(v) => updateFilter("endDate", v)}
               />
@@ -360,14 +340,12 @@ export function ProductFilters({
               {/* Month & Year */}
               <FilterSelect
                 label="Bulan"
-                exportOnly
                 value={localFilters.month || ""}
                 onChange={(v) => updateFilter("month", v)}
                 options={MONTH_OPTIONS}
               />
               <FilterSelect
                 label="Tahun"
-                exportOnly
                 value={localFilters.year?.toString() || ""}
                 onChange={(v) =>
                   updateFilter("year", v ? Number(v) : undefined)
@@ -377,12 +355,9 @@ export function ProductFilters({
 
               {/* Week — user picks a date, week number computed automatically */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-muted-foreground">Filter Minggu</label>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-medium leading-none">
-                    Hanya untuk Export
-                  </span>
-                </div>
+                <label className="text-xs font-medium text-muted-foreground">
+                  Filter Minggu
+                </label>
                 <input
                   type="date"
                   value={weekDate}
@@ -397,11 +372,26 @@ export function ProductFilters({
                   }}
                   className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 />
-                {weekDate && (
-                  <p className="text-xs text-muted-foreground">
-                    Minggu ke-{getISOWeek(weekDate)}
-                  </p>
-                )}
+                {weekDate && (() => {
+                  const d = new Date(weekDate);
+                  const day = d.getDay() || 7; // Mon=1 … Sun=7
+                  const monday = new Date(d);
+                  monday.setDate(d.getDate() - day + 1);
+                  const sunday = new Date(monday);
+                  sunday.setDate(monday.getDate() + 6);
+                  const fmt = (dt: Date) =>
+                    dt.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+                  return (
+                    <div className="text-xs text-muted-foreground space-y-0.5">
+                      <p className="font-medium">
+                        Minggu ke-{getISOWeek(weekDate)}
+                      </p>
+                      <p>
+                        {fmt(monday)} — {fmt(sunday)}
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Sort & Order */}

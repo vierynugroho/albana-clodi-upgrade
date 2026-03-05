@@ -41,7 +41,7 @@ export function OrderSummary({
             )}
             {orderDiscount > 0 && (
                 <div className="flex justify-between text-sm text-green-600">
-                    <span>Diskon Order ({orderDiscountType === "percent" ? `${orderDiscount}%` : ""})</span>
+                    <span>Diskon Order ({orderDiscountType === "percent" ? `${orderDiscount}%` : `Rp ${orderDiscount.toLocaleString("id-ID")}`})</span>
                     <span>- Rp {calculateOrderDiscount(orderDiscount, subtotal, orderDiscountType).toLocaleString("id-ID")}</span>
                 </div>
             )}

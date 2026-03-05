@@ -546,13 +546,28 @@ const CustomerForm = ({
           <h3 className="font-bold text-base">Tipe Customer</h3>
 
           <CustomerLabelCard
-            title="Dropshipper"
-            description="Customer dengan harga normal, tetapi alamat pengiriman menggunakan data customer dropship."
+            title="Customer"
+            description="Pelanggan biasa yang mendapatkan harga normal."
           />
 
           <CustomerLabelCard
             title="Reseller"
-            description="Customer yang mendapatkan harga khusus dengan alamat pengiriman sendiri."
+            description="Customer yang mendapatkan potongan harga khusus untuk penjualan kembali."
+          />
+
+          <CustomerLabelCard
+            title="Agen"
+            description="Perantara yang biasanya memiliki kuota atau target penjualan tertentu."
+          />
+
+          <CustomerLabelCard
+            title="Member"
+            description="Customer yang telah mendaftar sebagai anggota dan mungkin mendapatkan promo atau akses khusus."
+          />
+
+          <CustomerLabelCard
+            title="Dropshiper"
+            description="Customer dengan harga normal, tetapi alamat pengiriman memakai data customer dropship."
           />
         </div>
       </CardContent>

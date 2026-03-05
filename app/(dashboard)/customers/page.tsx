@@ -10,8 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { mapApiCustomersToCustomers } from "@/lib/mappers";
 import { getApiErrorMessage } from "@/lib/utils";
 import type { Customer } from "@/types";
+import type { ExportFilterParams } from "@/types/api";
 import { CustomerStats } from "@/components/customer/CustomerStats";
-import { useRef } from "react";
+import { CustomerExportDialog } from "@/components/customer/CustomerExportDialog";
+import { useRef, useState } from "react";
 import { LoadingState } from "@/components/shared/LoadingState";
 
 export default function CustomersPage() {
@@ -22,6 +24,7 @@ export default function CustomersPage() {
   const exportMutation = useExportCustomers();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const customers: Customer[] = mapApiCustomersToCustomers(apiCustomers);
 
@@ -46,8 +49,8 @@ export default function CustomersPage() {
     });
   };
 
-  const handleExport = () => {
-    exportMutation.mutate(undefined, {
+  const handleExport = (params: ExportFilterParams) => {
+    exportMutation.mutate(params, {
       onSuccess: () => {
         toast({
           title: "Berhasil",
@@ -186,7 +189,7 @@ export default function CustomersPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExport}
+            onClick={() => setIsExportDialogOpen(true)}
             disabled={exportMutation.isPending}
           >
             {exportMutation.isPending ? (
@@ -214,6 +217,13 @@ export default function CustomersPage() {
         onEdit={(c) => router.push(`/customers/${c.id}`)}
         onView={(c) => router.push(`/customers/${c.id}`)}
         onDelete={handleDelete}
+      />
+
+      <CustomerExportDialog
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        onExport={handleExport}
+        isExporting={exportMutation.isPending}
       />
     </div>
   );
