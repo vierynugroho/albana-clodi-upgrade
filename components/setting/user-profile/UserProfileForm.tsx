@@ -9,7 +9,7 @@ import {
 } from "@/schemas/zod.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FormField } from "@/components/field/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { Loader2, User, Lock, Eye, EyeOff } from "lucide-react";
 import { useUpdateProfile } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";

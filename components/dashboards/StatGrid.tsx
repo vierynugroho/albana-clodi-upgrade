@@ -5,6 +5,8 @@ import { ReportQueryParams } from "@/types/api";
 import { useReportOrders } from "@/hooks/useReports";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { BanknoteArrowDown, BanknoteX, DollarSign, PackageCheckIcon, Wallet, WalletCards } from "lucide-react";
+import { LoadingState } from "../shared/LoadingState";
+import { formatDateISO } from "@/lib/utils";
 
 interface Stat {
   title: string;
@@ -21,18 +23,16 @@ export const StatsGrid = memo(function StatsGrid({
   const isSuperAdmin = userData?.responseObject?.role?.toLowerCase() === "superadmin";
   const queryParams: ReportQueryParams = useMemo(() => {
     const today = new Date();
-    const formatDate = (d: Date) =>
-      d.toISOString().split("T")[0];
 
     if (filter === "Today") {
-      const todayStr = formatDate(today);
+      const todayStr = formatDateISO(today);
       return { startDate: todayStr, endDate: todayStr };
     }
 
     if (filter === "Yesterday") {
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
-      const yesterdayStr = formatDate(yesterday);
+      const yesterdayStr = formatDateISO(yesterday);
       return { startDate: yesterdayStr, endDate: yesterdayStr };
     }
 
@@ -43,12 +43,7 @@ export const StatsGrid = memo(function StatsGrid({
 
   if (isLoading)
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-          <span className="text-gray-600">Loading...</span>
-        </div>
-      </div>
+      <LoadingState />
     );
 
   const stats: Stat[] = [

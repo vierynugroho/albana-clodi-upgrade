@@ -1,4 +1,3 @@
-// hooks/useSalesChannels.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as salesChannelService from "@/lib/services/sales-channel.service";
 

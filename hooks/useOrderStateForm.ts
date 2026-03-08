@@ -609,10 +609,6 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                 },
             };
 
-            // @debug — commented for production
-            // console.log("=== ORDER SUBMIT PAYLOAD (STRICT) ===");
-            // console.log(JSON.stringify(payload, null, 2));
-
             if (mode === "edit" && orderId) {
                 await updateOrder.mutateAsync({ id: orderId, payload });
                 toast({ title: "Berhasil", description: "Order berhasil diperbarui", variant: "success" });

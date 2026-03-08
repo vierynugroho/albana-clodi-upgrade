@@ -1,5 +1,4 @@
 // lib/mappers.ts
-// Functions to map API response types to frontend types
 
 import type {
     ApiOrder,
@@ -12,9 +11,7 @@ import type {
 } from "@/types/api";
 import type { Order, Customer, Product, ProductVariant, SalesChannel, Warehouse, BankAccount } from "@/types";
 
-/**
- * Maps payment status from API format to frontend format
- */
+//  * Maps payment status from API format to frontend format
 function mapPaymentStatus(
     status?: "PENDING" | "SETTLEMENT" | "CANCEL"
 ): Order["paymentStatus"] {
@@ -29,9 +26,7 @@ function mapPaymentStatus(
     }
 }
 
-/**
- * Maps customer category from API format to frontend format
- */
+//  * Maps customer category from API format to frontend format
 function mapCustomerCategory(
     category: ApiCustomer["category"]
 ): Customer["category"] {
@@ -45,9 +40,7 @@ function mapCustomerCategory(
     return mapping[category] || "customer";
 }
 
-/**
- * Maps product type from API format to frontend format
- */
+//  * Maps product type from API format to frontend format
 function mapProductType(
     type: ApiProduct["type"]
 ): Product["type"] {
@@ -59,9 +52,7 @@ function mapProductType(
     return mapping[type] || "barang_sendiri";
 }
 
-/**
- * Maps ApiCustomer to frontend Customer type
- */
+//  * Maps ApiCustomer to frontend Customer type
 export function mapApiCustomerToCustomer(apiCustomer: ApiCustomer): Customer {
     return {
         id: apiCustomer.id,
@@ -78,9 +69,7 @@ export function mapApiCustomerToCustomer(apiCustomer: ApiCustomer): Customer {
     };
 }
 
-/**
- * Maps ApiOrder to frontend Order type
- */
+//  * Maps ApiOrder to frontend Order type
 export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
     const orderDetail = apiOrder.OrderDetail;
     const shippingService = apiOrder.ShippingServices?.[0];
@@ -112,10 +101,8 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         weight: op.Product?.weight || 0,
         total: 0,
     })) || [];
-
-    // ==========================================
+    
     // RUMUS PERHITUNGAN SUBTOTAL, DISKON & TOTAL
-    // ==========================================
 
     // 1. Subtotal: Diambil dari originalFinalPrice (harga sebelum diskon).
     // Jika originalFinalPrice tidak tersedia, fallback ke finalPrice.
@@ -144,12 +131,7 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
         orderDetail.otherFees.productDiscount.forEach(pd => {
             const qty = products.find(p => p.variant === pd.produkVariantId)?.quantity || 1;
             if (pd.discountType === "percent") {
-                // If it's a percent, we calculate based on original subtotal for this product
-                // Since we don't strictly have the original price here, we estimate nominal as fallback or fetch it if needed.
-                // For simplicity, we assume nominal tracking is safer or it's pre-calculated if possible.
-                // As a fallback for API mapper, we'll try to just show the nominal amount if available.
-                // Assuming discountAmount is the actual deducted value when percent is used, or we just leave it 0 if it's strictly a % rate we can't apply here without price.
-                // Let's assume API `discountAmount` for nominal is the direct value.
+                // something
             } else {
                 productDiscountTotal += (pd.discountAmount * qty);
             }
@@ -175,17 +157,12 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
 
     let shippingDiscountVal = 0;
     if (orderDetail?.otherFees?.shippingDiscountPerKg) {
-        // --- Old calculation (salah, ceiling ke 1kg minimum) ---
-        // shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * Math.max(1, Math.ceil((orderDetail.otherFees.weight || 0) / 1000));
-        // --- End old ---
         // Rumus sama dengan useOrderStateForm: shippingDiscount * weightInKg (tanpa ceiling)
         const weightInKg = (orderDetail.otherFees.weight || 0) / 1000;
         shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * weightInKg;
     }
 
     // 5. Reconstruct TRUE Subtotal (Gross Subtotal)
-    // Backend's originalFinalPrice is flawed because it ignores tier prices.
-    // True Gross Subtotal = (Net Subtotal before Order Discount) + Product Discount.
     const trueSubtotal = netSubtotal + productDiscountTotal;
 
     return {
@@ -223,9 +200,7 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
     };
 }
 
-/**
- * Maps ApiProduct to frontend Product type
- */
+//  * Maps ApiProduct to frontend Product type
 export function mapApiProductToProduct(apiProduct: ApiProduct): Product {
     const variants: ProductVariant[] = apiProduct.productVariants?.map((v) => ({
         id: v.id,
@@ -257,10 +232,8 @@ export function mapApiProductToProduct(apiProduct: ApiProduct): Product {
     };
 }
 
-/**
- * Maps ApiProductListItem (from /products endpoint) to frontend Product type
- * This handles the nested structure: { product, variant, price }
- */
+//  * Maps ApiProductListItem (from /products endpoint) to frontend Product type
+//  * This handles the nested structure: { product, variant, price }
 export function mapApiProductListItemToProduct(item: ApiProductListItem): Product {
     const variants: ProductVariant[] = item.variant?.map((v) => ({
         id: v.id,
@@ -293,9 +266,7 @@ export function mapApiProductListItemToProduct(item: ApiProductListItem): Produc
     };
 }
 
-/**
- * Batch mappers for arrays (with defensive checks)
- */
+//  * Batch mappers for arrays (with defensive checks)
 export function mapApiOrdersToOrders(apiOrders: ApiOrder[] | undefined | null): Order[] {
     if (!Array.isArray(apiOrders)) return [];
     return apiOrders.map(mapApiOrderToOrder);
@@ -306,18 +277,14 @@ export function mapApiCustomersToCustomers(apiCustomers: ApiCustomer[] | undefin
     return apiCustomers.map(mapApiCustomerToCustomer);
 }
 
-/**
- * Maps ApiProductListItem[] (from /products endpoint) to Product[]
- * This handles the nested structure from the API
- */
+//  * Maps ApiProductListItem[] (from /products endpoint) to Product[]
+//  * This handles the nested structure from the API
 export function mapApiProductsToProducts(apiProducts: ApiProductListItem[] | undefined | null): Product[] {
     if (!Array.isArray(apiProducts)) return [];
     return apiProducts.map(mapApiProductListItemToProduct);
 }
 
-/**
- * Maps ApiSalesChannel to frontend SalesChannel type
- */
+//  * Maps ApiSalesChannel to frontend SalesChannel type
 export function mapApiSalesChannelToSalesChannel(apiChannel: ApiSalesChannel): SalesChannel {
     return {
         id: apiChannel.id,
@@ -332,9 +299,7 @@ export function mapApiSalesChannelsToSalesChannels(apiChannels: ApiSalesChannel[
     return apiChannels.map(mapApiSalesChannelToSalesChannel);
 }
 
-/**
- * Maps ApiDeliveryPlace to frontend Warehouse type
- */
+//  * Maps ApiDeliveryPlace to frontend Warehouse type
 export function mapApiDeliveryPlaceToWarehouse(apiPlace: ApiDeliveryPlace): Warehouse {
     return {
         id: apiPlace.id,
@@ -352,9 +317,7 @@ export function mapApiDeliveryPlacesToWarehouses(apiPlaces: ApiDeliveryPlace[] |
     return apiPlaces.map(mapApiDeliveryPlaceToWarehouse);
 }
 
-/**
- * Maps ApiPaymentMethod to frontend BankAccount type
- */
+//  * Maps ApiPaymentMethod to frontend BankAccount type
 export function mapApiPaymentMethodToBankAccount(apiMethod: ApiPaymentMethod): BankAccount {
     return {
         id: apiMethod.id,

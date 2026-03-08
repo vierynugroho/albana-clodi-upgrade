@@ -1,6 +1,7 @@
 import { Clock, Loader2, XCircle } from "lucide-react";
 import { memo } from "react";
 import { Card, CardContent } from "../ui";
+import { LoadingState } from "../shared/LoadingState";
 
 interface TransactionStatusCardsProps {
   pending: number;
@@ -40,11 +41,7 @@ export const TransactionStatusCards = memo(function TransactionStatusCards({
     return (
       <div className="grid gap-4 sm:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="h-24 animate-pulse">
-            <CardContent className="flex items-center justify-center h-full">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </CardContent>
-          </Card>
+          <LoadingState key={i}/>
         ))}
       </div>
     );

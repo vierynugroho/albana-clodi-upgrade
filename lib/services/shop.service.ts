@@ -1,23 +1,13 @@
-// lib/services/shop.service.ts
 import api from "@/lib/api";
 import type { ApiResponse, ApiShop } from "@/types/api";
 
 
-/**
- * Ambil shop pertama / default
- */
 export async function getDefaultShop(): Promise<ApiShop | null> {
   const res = await api.get<ApiResponse<ApiShop>>("/shop");
-  // Ambil item pertama dari responseObject
-  const shop = res.data.responseObject;
-  return shop;
+  return res.data.responseObject;
 }
 
-/**
- * Update single shop
- */
 export async function updateDefaultShop(formData: FormData): Promise<ApiShop> {
-  // Ambil ID shop pertama
   const shop = await getDefaultShop();
   if (!shop) throw new Error("Shop not found");
 

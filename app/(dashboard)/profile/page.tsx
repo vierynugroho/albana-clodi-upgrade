@@ -1,10 +1,11 @@
 "use client";
 
 import { useCurrentUser } from "@/hooks/useAuth";
-import UserProfileForm from "@/components/setting/UserProfileForm";
+import UserProfileForm from "@/components/setting/user-profile/UserProfileForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, User, Shield, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 export default function ProfilePage() {
   const { data, isLoading, error, refetch } = useCurrentUser();
@@ -12,10 +13,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-2">
-        <Loader2Icon className="h-6 w-6 animate-spin text-primary" />
-        <span className="text-xs text-muted-foreground">Memuat data…</span>
-      </div>
+      <LoadingState />
     );
   }
 

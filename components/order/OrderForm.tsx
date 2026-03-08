@@ -6,7 +6,7 @@ import { OrderProductsSection } from "./order-form/OrderProductsSection";
 import { ShippingSection } from "./order-form/ShippingSection";
 import { PaymentSection } from "./order-form/PaymentSection";
 import { OrderFormActions } from "./order-form/OrderFormActions";
-import type { OrderProductItem, OrderFormProps } from "../../types/index";
+import type { OrderFormProps } from "../../types/index";
 
 export function OrderForm({ mode = "create", orderId }: OrderFormProps) {
     const orderForm = useOrderForm({ mode, orderId });

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BankAccFormValues, bankAccountSchema } from "@/schemas/zod.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FormField } from "@/components/field/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreatePaymentMethod, useUpdatePaymentMethod } from "@/hooks/usePaymentMethods";

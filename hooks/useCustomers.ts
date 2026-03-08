@@ -73,15 +73,6 @@ export function useImportCustomers() {
     });
 }
 
-// --- Old useExportCustomers (tanpa query params) ---
-// export function useExportCustomers() {
-//     return useMutation({
-//         mutationFn: () => customerService.exportCustomers(),
-//         ...
-//     });
-// }
-// --- End old useExportCustomers ---
-
 export function useExportCustomers() {
     return useMutation({
         mutationFn: (params?: ExportFilterParams) => customerService.exportCustomers(params),

@@ -10,10 +10,9 @@ import { Button } from "../ui/button";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useCreateExpense, useUpdateExpense } from "@/hooks/useExpenses";
 import { useToast } from "@/hooks/use-toast";
-import { getApiErrorMessage } from "@/lib/utils";
+import { getApiErrorMessage, formatCurrency, parseRupiah, formatFull } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { formatCurrency, parseRupiah } from "@/lib/utils";
 
 type ExpensesFormValues = z.infer<typeof expensesSchema>;
 
@@ -251,7 +250,7 @@ const ExpensesForm = ({
               </label>
               <p className="text-2xl font-bold">
                 <span className="text-xs text-muted-foreground font-normal align-top mr-1">Rp</span>
-                {new Intl.NumberFormat("id-ID").format(
+                {formatFull(
                   parseRupiah(String(watch("itemPrice") || 0)) * Number(watch("qty") || 1)
                 )}
               </p>

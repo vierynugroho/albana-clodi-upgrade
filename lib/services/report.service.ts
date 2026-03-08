@@ -1,4 +1,3 @@
-// lib/services/report.service.ts
 import api from "@/lib/api";
 import type {
     ApiResponse,

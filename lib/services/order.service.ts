@@ -31,10 +31,8 @@ export async function fetchOrders(params?: OrderQueryParams): Promise<ApiOrder[]
 
 const ITEMS_PER_PAGE = 20;
 
-/**
- * Fetch orders with cursor-based pagination.
- * Returns { data, meta } with nextCursor for navigation.
- */
+//  * Fetch orders with cursor-based pagination.
+//  * Returns { data, meta } with nextCursor for navigation.
 export async function fetchOrdersPaginated(
     params?: OrderQueryParams
 ): Promise<{ data: ApiOrder[]; meta: CursorPaginationMeta }> {

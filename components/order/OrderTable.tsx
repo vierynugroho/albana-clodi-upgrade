@@ -18,9 +18,7 @@ import {
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Order } from "@/types";
 
-/* ===============================
-   Toolbar
-================================ */
+//   Toolbar
 interface TableToolbarProps {
   selectedCount: number;
   onPrintSelected: () => void;
@@ -47,9 +45,7 @@ const TableToolbar = memo(function TableToolbar({
   );
 });
 
-/* ===============================
-   Payment Status
-================================ */
+//   Payment Status
 type PaymentStatus = Order["paymentStatus"];
 type BadgeVariant = "success" | "warning" | "outline" | "destructive";
 
@@ -68,9 +64,7 @@ const getPaymentStatusConfig = (
   return configs[status];
 };
 
-/* ===============================
-   Order Card
-================================ */
+//   Order Card
 interface OrderCardProps {
   order: Order;
   isSelected: boolean;
@@ -186,29 +180,12 @@ const OrderCard = memo(function OrderCard({
               </li>
             )}
             
-            {/* --- Old Diskon Order (tanpa type label) --- */}
-            {/* {(order.orderDiscount ?? 0) > 0 && (
-              <li className="flex justify-between text-green-600">
-                <span>Diskon Order</span>
-                <span>-{formatCurrency(order.orderDiscount ?? 0)}</span>
-              </li>
-            )} */}
-            {/* --- End old Diskon Order --- */}
             {(order.orderDiscount ?? 0) > 0 && (
               <li className="flex justify-between text-green-600">
                 <span>Diskon Order {order.orderDiscountType === "percent" ? `(${order.orderDiscountValue}%)` : ""}</span>
                 <span>-{formatCurrency(order.orderDiscount ?? 0)}</span>
               </li>
             )}
-
-            {/* --- Old generic Diskon fallback (redundan, dihapus) --- */}
-            {/* {!(order.productDiscount || order.orderDiscount) && (order.discount ?? 0) > 0 && (
-              <li className="flex justify-between text-green-600">
-                <span>Diskon</span>
-                <span>-{formatCurrency(order.discount ?? 0)}</span>
-              </li>
-            )} */}
-            {/* --- End old generic Diskon fallback --- */}
 
             {(order.insurance ?? 0) > 0 && (
               <li className="flex justify-between">
@@ -285,17 +262,6 @@ const OrderCard = memo(function OrderCard({
             <Printer className="h-4 w-4" />
           </IconButton>
 
-          {/* {order.paymentStatus !== "dibatalkan" && onCancel && (
-            <IconButton
-              size="sm"
-              color="orange"
-              onClick={() => onCancel(order.id)}
-              title="Batalkan Order"
-            >
-              <XCircle className="h-4 w-4" />
-            </IconButton>
-          )} */}
-
           <IconButton
             size="sm"
             color="destructive"
@@ -311,10 +277,7 @@ const OrderCard = memo(function OrderCard({
 
 export default OrderCard;
 
-
-/* ===============================
-   Pagination
-================================ */
+//   Pagination
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -376,9 +339,7 @@ const Pagination = memo(function Pagination({
   );
 });
 
-/* ===============================
-   Main Component
-================================ */
+//Main Component
 interface OrderTableProps {
   orders: Order[];
   onEdit: (order: Order) => void;
@@ -409,17 +370,7 @@ export function OrderTable({
 }: OrderTableProps) {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
-  // === Old client-side pagination (commented out — replaced by server-side) ===
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const itemsPerPage = 10;
-  // const totalPages = Math.ceil(orders.length / itemsPerPage);
-  // const startIndex = (currentPage - 1) * itemsPerPage;
-  // const endIndex = startIndex + itemsPerPage;
-  // const paginatedOrders = orders.slice(startIndex, endIndex);
-  // ============================================================================
 
-  // Server-side pagination: display orders as-is (already paginated from API)
-  // Fallback to client-side if serverPagination not provided
   const [clientPage, setClientPage] = useState(1);
   const clientItemsPerPage = 10;
 

@@ -2,7 +2,7 @@
 
 
 import { Button } from "../ui/button";
-import { FormField } from "../field/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

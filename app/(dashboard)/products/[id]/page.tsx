@@ -6,6 +6,8 @@ import { useProductDetail } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import type { ApiProductDetail } from "@/types/api";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 function mapApiProductToFormValues(apiProduct: ApiProductDetail) {
   return {
@@ -77,37 +79,17 @@ export default function EditProductPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Memuat data produk...</p>
-      </div>
+      <LoadingState />
     );
   }
 
   if (isError || !productData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data produk
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => router.push("/products")}
-            variant="outline"
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </Button>
-          <Button onClick={() => refetch()} variant="outline" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Coba lagi
-          </Button>
-        </div>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data produk"
+        onRetry={() => refetch()}
+        onBack={() => router.push("/products")}
+      />
     );
   }
 

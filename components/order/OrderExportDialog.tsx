@@ -12,34 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Download } from "lucide-react";
 
-interface FilterOption {
-    value: string;
-    label: string;
-}
-
-const MONTH_OPTIONS: FilterOption[] = [
-    { value: "", label: "Semua Bulan" },
-    { value: "1", label: "Januari" },
-    { value: "2", label: "Februari" },
-    { value: "3", label: "Maret" },
-    { value: "4", label: "April" },
-    { value: "5", label: "Mei" },
-    { value: "6", label: "Juni" },
-    { value: "7", label: "Juli" },
-    { value: "8", label: "Agustus" },
-    { value: "9", label: "September" },
-    { value: "10", label: "Oktober" },
-    { value: "11", label: "November" },
-    { value: "12", label: "Desember" },
-];
-
-const currentYear = new Date().getFullYear();
-const YEAR_OPTIONS: FilterOption[] = [
-    { value: "", label: "Semua Tahun" },
-    { value: String(currentYear), label: String(currentYear) },
-    { value: String(currentYear - 1), label: String(currentYear - 1) },
-    { value: String(currentYear - 2), label: String(currentYear - 2) },
-];
+import { MONTH_OPTIONS, YEAR_OPTIONS } from "@/lib/constants";
+import { getISOWeek } from "@/lib/utils";
 
 interface OrderExportDialogProps {
     isOpen: boolean;
@@ -59,16 +33,6 @@ export function OrderExportDialog({
     const [month, setMonth] = useState("");
     const [year, setYear] = useState("");
     const [weekDate, setWeekDate] = useState("");
-
-    function getISOWeek(dateStr: string): string {
-        const d = new Date(dateStr);
-        const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-        const day = date.getUTCDay() || 7;
-        date.setUTCDate(date.getUTCDate() + 4 - day);
-        const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-        const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-        return String(week);
-    }
 
     const handleExport = () => {
         onExport({

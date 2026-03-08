@@ -1,4 +1,3 @@
-// hooks/useReports.ts
 import { useQuery } from "@tanstack/react-query";
 import * as reportService from "@/lib/services/report.service";
 import type { ReportQueryParams } from "@/types/api";

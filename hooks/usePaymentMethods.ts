@@ -1,4 +1,3 @@
-// hooks/usePaymentMethods.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as paymentMethodService from "@/lib/services/payment-method.service";
 

@@ -5,6 +5,8 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ShippingOriginForm from "@/components/setting/shipping-origins/ShippingOriginForm";
 import { useDeliveryPlace } from "@/hooks/useDeliveryPlaces";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -16,27 +18,16 @@ export default function EditShippingOriginPage({ params }: PageProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Memuat data asal pengiriman...</p>
-      </div>
+      <LoadingState />
     );
   }
 
   if (isError || !deliveryPlace) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data asal pengiriman
-          </p>
-        </div>
-        <Button onClick={() => refetch()} variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Coba lagi
-        </Button>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data asal pengiriman"
+        onRetry={() => refetch()}
+      />
     );
   }
 

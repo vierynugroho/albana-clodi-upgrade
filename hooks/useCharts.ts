@@ -28,10 +28,6 @@ function getGroupingContext(date: Date, params?: import("@/types/api").ReportQue
   }
 }
 
-// OLD CODE (Dihapus/dikomentari sesuai permintaan):
-// export function useOrderChartData(orderYear?: number) {
-//   const year = orderYear ?? new Date().getFullYear();
-//   const { data: monthlyReport, isLoading, isError, refetch } = useOrders({ orderYear: year });
 
 export function useOrderChartData(params?: import("@/types/api").ReportQueryParams) {
   // `useOrders` expects `OrderQueryParams` where `orderYear` is a number
@@ -75,16 +71,6 @@ export function useOrderChartData(params?: import("@/types/api").ReportQueryPara
   };
 }
 
-// OLD CODE:
-// export function useCustomerChartData(customerYear?: number) {
-//   const year = customerYear ?? new Date().getFullYear();
-//
-//   const {
-//     data: customersResponse,
-//     isLoading,
-//     isError,
-//     refetch,
-//   } = useCustomers({ year });
 
 export function useCustomerChartData(params?: import("@/types/api").ReportQueryParams) {
   const queryParams = { 
@@ -132,16 +118,6 @@ export function useCustomerChartData(params?: import("@/types/api").ReportQueryP
   };
 }
 
-// OLD CODE:
-// export function useProductChartData(productYear?: number) {
-//   const year = productYear ?? new Date().getFullYear();
-//
-//   const {
-//     data: productResponse,
-//     isLoading,
-//     isError,
-//     refetch,
-//   } = useProducts({ year: year });
 
 export function useProductChartData(params?: import("@/types/api").ReportQueryParams) {
   const queryParams = { 
@@ -189,16 +165,6 @@ export function useProductChartData(params?: import("@/types/api").ReportQueryPa
   };
 }
 
-// OLD CODE:
-// export function useExpensesChartData(expensesYear?: number) {
-//   const year = expensesYear ?? new Date().getFullYear();
-//
-//   const {
-//     data: expensesResponse,
-//     isLoading,
-//     isError,
-//     refetch,
-//   } = useExpenses({ year });
 
 export function useExpensesChartData(params?: import("@/types/api").ReportQueryParams) {
   const queryParams = { 

@@ -3,9 +3,10 @@
 import { useParams, useRouter } from "next/navigation";
 import ExpensesForm from "@/components/expenses/ExpensesForm";
 import { useExpense } from "@/hooks/useExpenses";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 export default function EditExpensesPage() {
   const params = useParams();
@@ -16,12 +17,7 @@ export default function EditExpensesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-orange mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">Memuat data pengeluaran...</p>
-        </div>
-      </div>
+      <LoadingState />
     );
   }
 

@@ -542,16 +542,7 @@ export interface ExpenseCreatePayload {
     note?: string;
 }
 
-// Export filter params — shared by all export functions
-export interface ExportFilterParams {
-    startDate?: string; // Format: YYYY-MM-DD
-    endDate?: string;   // Format: YYYY-MM-DD
-    month?: string;     // Month number 1-12
-    year?: string;      // Year in YYYY format
-    week?: string;      // Week number 1-52
-}
-
-// Report types
+// Export filter params & Report query params — unified (identical fields)
 export interface ReportQueryParams {
     startDate?: string; // Format: YYYY-MM-DD
     endDate?: string;   // Format: YYYY-MM-DD
@@ -559,6 +550,9 @@ export interface ReportQueryParams {
     year?: string;      // Year in YYYY format
     week?: string;      // Week number 1-52
 }
+
+/** @deprecated use ReportQueryParams instead */
+export type ExportFilterParams = ReportQueryParams;
 
 export interface ReportExpenses {
     filterInfo: string;

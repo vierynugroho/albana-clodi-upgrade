@@ -5,6 +5,8 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PaymentAccountForm from "@/components/setting/payment-accounts/PaymentAccountForm";
 import { usePaymentMethod } from "@/hooks/usePaymentMethods";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -16,27 +18,16 @@ export default function EditPaymentAccountPage({ params }: PageProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Memuat data akun bank...</p>
-      </div>
+      <LoadingState />
     );
   }
 
   if (isError || !paymentMethod) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data akun bank
-          </p>
-        </div>
-        <Button onClick={() => refetch()} variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Coba lagi
-        </Button>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data akun bank"
+        onRetry={() => refetch()}
+      />
     );
   }
 

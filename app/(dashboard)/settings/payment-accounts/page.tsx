@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/lib/utils";
 import { mapApiPaymentMethodsToBankAccounts } from "@/lib/mappers";
 import { BankAccountCard } from "@/components/setting/payment-accounts/PaymentAccountCard";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function PaymentAccountsPage() {
   const { data: apiMethods = [], isLoading, isError, refetch } = usePaymentMethods();
@@ -47,27 +49,16 @@ export default function PaymentAccountsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Memuat data rekening...</p>
-      </div>
+      <LoadingState />
     );
   }
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data rekening
-          </p>
-        </div>
-        <Button onClick={() => refetch()} variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Coba lagi
-        </Button>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data rekening"
+        onRetry={() => refetch()}
+      />
     );
   }
 

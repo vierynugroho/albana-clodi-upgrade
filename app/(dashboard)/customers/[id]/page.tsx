@@ -8,6 +8,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import type { CustomerFormValues } from "@/schemas/zod.schemas";
 import type { ApiCustomer } from "@/types/api";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 function mapApiCustomerToFormValues(
   apiCustomer: ApiCustomer,
@@ -58,28 +59,11 @@ export default function EditCustomerPage() {
 
   if (isError || !customerData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data customer
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => router.push("/customers")}
-            variant="outline"
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </Button>
-          <Button onClick={() => refetch()} variant="outline" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Coba lagi
-          </Button>
-        </div>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data customer"
+        onRetry={() => refetch()}
+        onBack={() => router.push("/customers")}
+      />
     );
   }
 

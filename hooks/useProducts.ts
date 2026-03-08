@@ -1,4 +1,3 @@
-// hooks/useProducts.ts
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import * as productService from "@/lib/services/product.service";
 import type { ProductQueryParams, ProductFullCreatePayload, ExportFilterParams } from "@/types/api";
@@ -11,9 +10,6 @@ export const productKeys = {
     detail: (id: string) => [...productKeys.details(), id] as const,
 };
 
-/**
- * Hook to fetch all products
- */
 export function useProducts(params?: ProductQueryParams) {
     return useQuery({
         queryKey: productKeys.list(params || {}),
@@ -21,9 +17,6 @@ export function useProducts(params?: ProductQueryParams) {
     });
 }
 
-/**
- * Hook to fetch a single product by ID (basic info)
- */
 export function useProduct(id: string) {
     return useQuery({
         queryKey: productKeys.detail(id),
@@ -32,9 +25,6 @@ export function useProduct(id: string) {
     });
 }
 
-/**
- * Hook to fetch detailed product info including variants with prices
- */
 export function useProductDetail(id: string) {
     return useQuery({
         queryKey: [...productKeys.detail(id), "full"],
@@ -43,9 +33,6 @@ export function useProductDetail(id: string) {
     });
 }
 
-/**
- * Hook to create a new product (simple payload)
- */
 export function useCreateProduct() {
     const queryClient = useQueryClient();
 
@@ -58,9 +45,6 @@ export function useCreateProduct() {
     });
 }
 
-/**
- * Hook to create a new product with full payload (including variants and images)
- */
 export function useCreateProductFull() {
     const queryClient = useQueryClient();
 
@@ -73,9 +57,6 @@ export function useCreateProductFull() {
     });
 }
 
-/**
- * Hook to update an existing product (uses FormData like createProduct)
- */
 export function useUpdateProduct() {
     const queryClient = useQueryClient();
 
@@ -89,9 +70,6 @@ export function useUpdateProduct() {
     });
 }
 
-/**
- * Hook to update an existing product with full payload (including variants and images)
- */
 export function useUpdateProductFull() {
     const queryClient = useQueryClient();
 
@@ -105,9 +83,6 @@ export function useUpdateProductFull() {
     });
 }
 
-/**
- * Hook to delete a product
- */
 export function useDeleteProduct() {
     const queryClient = useQueryClient();
 
@@ -119,9 +94,6 @@ export function useDeleteProduct() {
     });
 }
 
-/**
- * Hook to export products to Excel
- */
 export function useExportProducts() {
     return useMutation({
         mutationFn: (params?: ExportFilterParams) =>
@@ -129,21 +101,13 @@ export function useExportProducts() {
     });
 }
 
-/**
- * Hook to fetch products with infinite scrolling
- */
 export function useInfiniteProducts(params?: ProductQueryParams) {
     return useInfiniteQuery({
         queryKey: [...productKeys.lists(), "infinite", params],
         queryFn: ({ pageParam = 1 }) => productService.fetchProducts({ ...params, page: pageParam }),
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages) => {
-            // Check if lastPage has results. If less than limit (50), no more pages.
-            // Or use meta if available. ApiProductListItem[] doesn't have meta directly attached in return type.
-            // fetchProducts returns ApiProductListItem[], mapping response.data.
-            // We lose meta in fetchProducts simply returning array. 
-            // We need to check array length. If 0 or < limit, we stop.
-            // Default limit is 50.
+
             return lastPage.length === 0 ? undefined : allPages.length + 1;
         },
     });

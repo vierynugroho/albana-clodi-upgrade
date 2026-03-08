@@ -18,6 +18,7 @@ import { mapApiOrdersToOrders } from "@/lib/mappers";
 import type { Order } from "@/types";
 import type { OrderQueryParams } from "@/types/api";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -220,18 +221,10 @@ export default function OrderPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data orders
-          </p>
-        </div>
-        <Button onClick={() => refetch()} variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Coba lagi
-        </Button>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data orders"
+        onRetry={() => refetch()}
+      />
     );
   }
 

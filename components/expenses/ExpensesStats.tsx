@@ -3,6 +3,7 @@ import { Calendar, Loader2, PieChart, TrendingDown, Wallet } from "lucide-react"
 import { memo } from "react";
 import { StatCard } from "../ui";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { LoadingState } from "../shared/LoadingState";
 
 interface ExpenseStatsProps {
   totalExpenses: number;
@@ -35,12 +36,7 @@ export const ExpenseStats = memo(function ExpenseStats({
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="h-32 rounded-xl border bg-card animate-pulse flex items-center justify-center"
-          >
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
+          <LoadingState key={i} />
         ))}
       </div>
     );

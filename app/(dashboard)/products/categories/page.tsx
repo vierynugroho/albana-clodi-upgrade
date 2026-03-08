@@ -19,6 +19,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/confirm-dialog";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function CategoriesPage() {
     const { data: categories = [], isLoading, isError, refetch } = useCategories();
@@ -102,27 +104,16 @@ export default function CategoriesPage() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-muted-foreground">Memuat data kategori...</p>
-            </div>
+            <LoadingState />
         );
     }
 
     if (isError) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-                <div className="text-center">
-                    <p className="font-semibold text-destructive">Gagal memuat data</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Terjadi kesalahan saat memuat data kategori
-                    </p>
-                </div>
-                <Button onClick={() => refetch()} variant="outline" className="gap-2">
-                    <RefreshCw className="h-4 w-4" />
-                    Coba lagi
-                </Button>
-            </div>
+            <ErrorState
+                message="Terjadi kesalahan saat memuat data kategori"
+                onRetry={() => refetch()}
+            />
         );
     }
 

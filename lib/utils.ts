@@ -37,7 +37,44 @@ export function formatDateTime(date: string | Date): string {
   }).format(new Date(date));
 }
 
-export const generateSKU = (prefix = 'SKU') => `${prefix}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+// Format date as ISO string (YYYY-MM-DD)
+export function formatDateISO(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
+// Format date to Indonesian readable string (e.g. "1 Mar 2026")
+export function formatDateID(dateStr: string): string {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+// Compute ISO week number from a date string (YYYY-MM-DD)
+export function getISOWeek(dateStr: string): string {
+  const d = new Date(dateStr);
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return String(week);
+}
+
+// Format angka ringkas Indonesia (1.5jt, 500rb)
+export function formatCompact(value: number): string {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}jt`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}rb`;
+  return value.toString();
+}
+
+// Format angka lengkap Indonesia (1.234.567)
+export function formatFull(value: number): string {
+  return new Intl.NumberFormat("id-ID").format(value);
+}
 
 // Generate unique SKU from product name
 export function generateSKUFromName(
@@ -161,10 +198,8 @@ export const calculateProductSubtotal = (product: OrderProductItem) => {
     return baseTotal - product.discount;
 };
 
-/**
- * Extract error message from API response (Axios error), standard Error, or fallback.
- * Prioritizes `error.response.data.message` from API responses.
- */
+//  * Extract error message from API response (Axios error), standard Error, or fallback.
+//  * Prioritizes `error.response.data.message` from API responses.
 export function getApiErrorMessage(
   error: unknown,
   fallback = "Terjadi kesalahan"

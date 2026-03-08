@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { customerSchema, CustomerFormValues } from "@/schemas/zod.schemas";
-import { FormField } from "../field/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { Loader2, ChevronDown, Search } from "lucide-react";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks/useCustomers";
 import { useProvinces, useCities, useDistricts, useVillages } from "@/hooks/useRegions";

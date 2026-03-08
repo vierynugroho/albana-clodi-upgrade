@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { WarehouseFormValues, warehouseSchema } from "@/schemas/zod.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FormField } from "@/components/field/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreateDeliveryPlace, useUpdateDeliveryPlace } from "@/hooks/useDeliveryPlaces";

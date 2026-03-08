@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Card, CardContent } from "../ui";
 import { Loader2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { LoadingState } from "../shared/LoadingState";
 
 interface ProfitCardsProps {
   penjualanKotor: number;
@@ -29,11 +30,7 @@ export const ProfitCards = memo(function ProfitCards({
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="h-24 animate-pulse">
-            <CardContent className="flex items-center justify-center h-full">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </CardContent>
-          </Card>
+          <LoadingState key={i} />
         ))}
       </div>
     );

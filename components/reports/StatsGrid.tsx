@@ -2,6 +2,7 @@ import { formatCurrency } from "@/lib/utils";
 import { CheckCircle, DollarSign, Loader2, Package, ShoppingCart } from "lucide-react";
 import { memo } from "react";
 import { Card, CardContent, StatCard } from "../ui";
+import { LoadingState } from "../shared/LoadingState";
 
 interface StatsGridProps {
   expenses: number;
@@ -53,11 +54,7 @@ export const StatsGrid = memo(function StatsGrid({
     return (
       <div className={`grid gap-4 sm:grid-cols-2 ${gridCols}`}>
         {allStats.map((_, i) => (
-          <Card key={i} className="h-32 animate-pulse">
-            <CardContent className="flex items-center justify-center h-full">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </CardContent>
-          </Card>
+          <LoadingState key={i}/>
         ))}
       </div>
     );

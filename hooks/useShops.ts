@@ -1,4 +1,3 @@
-// hooks/useShop.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as shopService from "@/lib/services/shop.service";
 

@@ -11,9 +11,7 @@ export const categoryKeys = {
     detail: (id: string) => [...categoryKeys.details(), id] as const,
 };
 
-/**
- * Hook to fetch all categories
- */
+// * Hook to fetch all categories
 export function useCategories(params?: CategoryQueryParams) {
     return useQuery({
         queryKey: categoryKeys.list(params || {}),
@@ -21,9 +19,7 @@ export function useCategories(params?: CategoryQueryParams) {
     });
 }
 
-/**
- * Hook to fetch a single category by ID
- */
+ //* Hook to fetch a single category by ID
 export function useCategory(id: string) {
     return useQuery({
         queryKey: categoryKeys.detail(id),
@@ -32,9 +28,7 @@ export function useCategory(id: string) {
     });
 }
 
-/**
- * Hook to create a new category
- */
+//* Hook to create a new category
 export function useCreateCategory() {
     const queryClient = useQueryClient();
 
@@ -47,9 +41,7 @@ export function useCreateCategory() {
     });
 }
 
-/**
- * Hook to update an existing category
- */
+// * Hook to update an existing category
 export function useUpdateCategory() {
     const queryClient = useQueryClient();
 
@@ -63,9 +55,7 @@ export function useUpdateCategory() {
     });
 }
 
-/**
- * Hook to delete a category
- */
+// * Hook to delete a category
 export function useDeleteCategory() {
     const queryClient = useQueryClient();
 

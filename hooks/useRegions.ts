@@ -1,4 +1,3 @@
-// hooks/useRegions.ts
 import { useQuery } from "@tanstack/react-query";
 import {
     fetchProvinces,
@@ -7,10 +6,6 @@ import {
     fetchVillages,
 } from "@/lib/services/region.service";
 
-/**
- * Hook to fetch all provinces
- * Fetches on mount
- */
 export function useProvinces() {
     return useQuery({
         queryKey: ["regions", "provinces"],
@@ -19,10 +14,6 @@ export function useProvinces() {
     });
 }
 
-/**
- * Hook to fetch cities by province ID
- * Only fetches when provinceId is provided
- */
 export function useCities(provinceId: string | undefined) {
     return useQuery({
         queryKey: ["regions", "cities", provinceId],
@@ -32,10 +23,6 @@ export function useCities(provinceId: string | undefined) {
     });
 }
 
-/**
- * Hook to fetch districts by city ID
- * Only fetches when cityId is provided
- */
 export function useDistricts(cityId: string | undefined) {
     return useQuery({
         queryKey: ["regions", "districts", cityId],
@@ -45,10 +32,6 @@ export function useDistricts(cityId: string | undefined) {
     });
 }
 
-/**
- * Hook to fetch villages by district ID
- * Only fetches when districtId is provided
- */
 export function useVillages(districtId: string | undefined) {
     return useQuery({
         queryKey: ["regions", "villages", districtId],

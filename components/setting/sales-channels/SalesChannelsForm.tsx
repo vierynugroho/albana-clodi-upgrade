@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SalesFormValues, salesSchema } from "@/schemas/zod.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FormField, RadioBtnField } from "@/components/field/FormField";
+import { FormField, RadioBtnField } from "@/components/ui/FormField";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreateSalesChannel, useUpdateSalesChannel } from "@/hooks/useSalesChannels";

@@ -1,4 +1,3 @@
-// lib/services/product.service.ts
 import api from "@/lib/api";
 import type {
     ApiResponse,
@@ -73,24 +72,8 @@ function convertProductToFormData(data: ProductCreatePayload): FormData {
                     );
                 });
             });
-        } else {
-            // If empty array needs to be sent explicitly? usually not for FormData arrays but sticking to request imply behavior
-            // If the API explicitly needs empty array representation it might be tricky in FormData.
-            // Usually omitting it is enough for "empty". 
-            // Requirement says: productVariants[0].productWholesalers:[]
-            // But usually this means just not sending any `productWholesalers` keys.
-        }
+        } 
     });
-
-    // Debug: log FormData contents
-    if (process.env.NODE_ENV === 'development') {
-        // @debug — commented for production
-        // console.log('=== FormData Contents ===');
-        // for (const pair of formData.entries()) {
-        //     console.log(pair[0], pair[1]);
-        // }
-        // console.log('=========================');
-    }
 
     return formData;
 }
@@ -160,15 +143,6 @@ function convertToFormData(data: ProductFullCreatePayload): FormData {
             });
         }
     });
-
-    // Debug: log FormData contents
-    // if (process.env.NODE_ENV === 'development') {
-    //     console.log('=== FormData (Full) Contents ===');
-    //     for (const pair of formData.entries()) {
-    //         console.log(pair[0], pair[1]);
-    //     }
-    //     console.log('================================');
-    // }
 
     return formData;
 }

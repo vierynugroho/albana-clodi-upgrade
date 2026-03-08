@@ -106,27 +106,6 @@ export async function importCustomers(file: File): Promise<{ success: boolean; m
     }
 }
 
-// Export customers to Excel file
-// --- Old exportCustomers (tanpa query params) ---
-// export async function exportCustomers(): Promise<Blob> {
-//     try {
-//         const formData = new FormData();
-//         formData.append("customers_data", "");
-//         const res = await api.post("/customers/export/excel", formData, {
-//             responseType: "blob",
-//             headers: {
-//                 "Content-Type": "multipart/form-data",
-//                 "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-//             }
-//         });
-//         return res.data;
-//     } catch (error) {
-//         console.error("Export error:", error);
-//         throw new Error("Gagal mengekspor data. Pastikan Anda sudah login.");
-//     }
-// }
-// --- End old exportCustomers ---
-
 // POST /customers/export/excel with multipart/form-data (with optional date filter params)
 export async function exportCustomers(params?: ExportFilterParams): Promise<Blob> {
     try {

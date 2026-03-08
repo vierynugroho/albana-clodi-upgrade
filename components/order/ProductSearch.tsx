@@ -1,6 +1,8 @@
 import { ApiProductListItem } from "@/types/api";
 import { Loader2, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Input } from "../ui";
+import { LoadingState } from "../shared/LoadingState";
 
 // Product Search Component
 export function ProductSearch({
@@ -33,7 +35,7 @@ export function ProductSearch({
         <div className="relative">
             <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <input
+                <Input
                     type="text"
                     placeholder="Cari produk..."
                     value={search}
@@ -49,10 +51,7 @@ export function ProductSearch({
             {isOpen && search && (
                 <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg max-h-64 overflow-y-auto">
                     {isLoading ? (
-                        <div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                            <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
-                            Memuat produk...
-                        </div>
+                        <LoadingState />
                     ) : filteredProducts.length === 0 ? (
                         <div className="px-3 py-4 text-sm text-muted-foreground text-center">
                             Produk tidak ditemukan

@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
   Filter,
-  X,
   ChevronDown,
   ChevronUp,
   RotateCcw,
@@ -14,14 +13,9 @@ import {
 } from "lucide-react";
 import type { OrderQueryParams } from "@/types/api";
 import type { ApiSalesChannel, ApiPaymentMethod, ApiCustomer } from "@/types/api";
-
-/* ===============================
-   Filter Option Types
-================================ */
-interface FilterOption {
-  value: string;
-  label: string;
-}
+import { LoadingState } from "../shared/LoadingState";
+import type { FilterOption } from "@/lib/constants";
+import { FilterSelect, FilterDateInput, FilterTag } from "@/components/shared/FilterComponents";
 
 const PAYMENT_STATUS_OPTIONS: FilterOption[] = [
   { value: "", label: "Semua Status Pembayaran" },
@@ -51,80 +45,7 @@ const ORDER_OPTIONS: FilterOption[] = [
   { value: "asc", label: "Terlama" },
 ];
 
-
-
-/* ===============================
-   Filter Select Component
-================================ */
-interface FilterSelectProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: FilterOption[];
-  className?: string;
-}
-
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-  className = "",
-}: FilterSelectProps) {
-  return (
-    <div className={`space-y-1.5 ${className}`}>
-      <label className="text-xs font-medium text-muted-foreground">
-        {label}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-/* ===============================
-   Filter Date Input Component
-================================ */
-interface FilterDateInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  className?: string;
-}
-
-function FilterDateInput({
-  label,
-  value,
-  onChange,
-  className = "",
-}: FilterDateInputProps) {
-  return (
-    <div className={`space-y-1.5 ${className}`}>
-      <label className="text-xs font-medium text-muted-foreground">
-        {label}
-      </label>
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-      />
-    </div>
-  );
-}
-
-/* ===============================
-   Main OrderFilters Component
-================================ */
+//   Main OrderFilters Component
 interface OrderFiltersProps {
   filters: OrderQueryParams;
   onFiltersChange: (filters: OrderQueryParams) => void;
@@ -144,10 +65,6 @@ export function OrderFilters({
 }: OrderFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [localFilters, setLocalFilters] = useState<OrderQueryParams>(filters);
-
-  // Sync localFilters if external filters prop changes entirely (e.g., from reset on parent)
-  // Optional, but good practice when parent state might wipe out children state.
-  // useEffect(() => { setLocalFilters(filters); }, [filters]);
 
   // Convert API data to FilterOption format
   const salesChannelOptions: FilterOption[] = [
@@ -284,12 +201,7 @@ export function OrderFilters({
       {isExpanded && (
         <div className="mt-4 pt-4 border-t animate-fade-in">
           {isLoadingOptions ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-              <span className="ml-2 text-sm text-muted-foreground">
-                Memuat opsi filter...
-              </span>
-            </div>
+            <LoadingState />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {/* Date Range */}
@@ -418,27 +330,5 @@ export function OrderFilters({
         </div>
       )}
     </Card>
-  );
-}
-
-/* ===============================
-   Filter Tag Component
-================================ */
-interface FilterTagProps {
-  label: string;
-  onRemove: () => void;
-}
-
-function FilterTag({ label, onRemove }: FilterTagProps) {
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-      {label}
-      <button
-        onClick={onRemove}
-        className="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-      >
-        <X className="h-3 w-3" />
-      </button>
-    </span>
   );
 }

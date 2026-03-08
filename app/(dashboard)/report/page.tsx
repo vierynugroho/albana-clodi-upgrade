@@ -9,7 +9,8 @@ import { ProfitCards } from "@/components/reports/ProfitCards";
 import { SummaryHeader } from "@/components/reports/SummaryHeader";
 import { TransactionStatusCards } from "@/components/reports/TransactionStatusCard";
 import { FilterSection } from "@/components/reports/FilterSection";
-import { FileText, RefreshCw, TrendingUp } from "lucide-react";
+import { FileText, TrendingUp } from "lucide-react";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { ChartPlaceholder } from "@/components/reports/ChartPlaceholder";
 import { useCustomerChartData, useExpensesChartData, useOrderChartData, useProductChartData } from "@/hooks/useCharts";
 import { useCurrentUser } from "@/hooks/useAuth";
@@ -107,18 +108,10 @@ export default function ReportPage() {
           </h1>
           <p className="page-description">Semua data laporan penjualan</p>
         </div>
-        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-          <div className="text-center">
-            <p className="font-semibold text-destructive">Gagal memuat data</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Terjadi kesalahan saat memuat data laporan
-            </p>
-          </div>
-          <Button onClick={() => refetchOrders()} variant="outline" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Coba lagi
-          </Button>
-        </div>
+        <ErrorState
+          message="Terjadi kesalahan saat memuat data laporan"
+          onRetry={() => refetchOrders()}
+        />
       </div>
     );
   }

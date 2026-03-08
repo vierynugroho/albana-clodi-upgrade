@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
   Filter,
-  X,
   ChevronDown,
   ChevronUp,
   RotateCcw,
@@ -14,12 +13,10 @@ import {
 } from "lucide-react";
 import type { ProductQueryParams } from "@/types/api";
 import type { ApiCategory } from "@/types/api";
-
-
-interface FilterOption {
-  value: string;
-  label: string;
-}
+import type { FilterOption } from "@/lib/constants";
+import { MONTH_OPTIONS, YEAR_OPTIONS } from "@/lib/constants";
+import { FilterSelect, FilterDateInput, FilterTag } from "@/components/shared/FilterComponents";
+import { getISOWeek, formatDateID } from "@/lib/utils";
 
 const PRODUCT_TYPE_OPTIONS: FilterOption[] = [
   { value: "", label: "Semua Tipe" },
@@ -39,96 +36,6 @@ const ORDER_OPTIONS: FilterOption[] = [
   { value: "desc", label: "Terbaru" },
   { value: "asc", label: "Terlama" },
 ];
-
-const MONTH_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Bulan" },
-  { value: "1", label: "Januari" },
-  { value: "2", label: "Februari" },
-  { value: "3", label: "Maret" },
-  { value: "4", label: "April" },
-  { value: "5", label: "Mei" },
-  { value: "6", label: "Juni" },
-  { value: "7", label: "Juli" },
-  { value: "8", label: "Agustus" },
-  { value: "9", label: "September" },
-  { value: "10", label: "Oktober" },
-  { value: "11", label: "November" },
-  { value: "12", label: "Desember" },
-];
-
-const currentYear = new Date().getFullYear();
-const YEAR_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Tahun" },
-  { value: String(currentYear), label: String(currentYear) },
-  { value: String(currentYear - 1), label: String(currentYear - 1) },
-  { value: String(currentYear - 2), label: String(currentYear - 2) },
-];
-
-interface FilterSelectProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: FilterOption[];
-  className?: string;
-}
-
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-  className = "",
-}: FilterSelectProps) {
-  return (
-    <div className={`space-y-1.5 ${className}`}>
-      <label className="text-xs font-medium text-muted-foreground">
-        {label}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-/* ===============================
-   Filter Date Input Component
-================================ */
-interface FilterDateInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  className?: string;
-}
-
-function FilterDateInput({
-  label,
-  value,
-  onChange,
-  className = "",
-}: FilterDateInputProps) {
-  return (
-    <div className={`space-y-1.5 ${className}`}>
-      <label className="text-xs font-medium text-muted-foreground">
-        {label}
-      </label>
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-      />
-    </div>
-  );
-}
 
 /* ===============================
    Main ProductFilters Component
@@ -150,28 +57,6 @@ export function ProductFilters({
   const [localFilters, setLocalFilters] = useState<ProductQueryParams>(filters);
   // Tracks the date the user picked (for display), week number is derived from it
   const [weekDate, setWeekDate] = useState("");
-
-  // Helper: compute ISO week number from a date string (YYYY-MM-DD)
-  function getISOWeek(dateStr: string): string {
-    const d = new Date(dateStr);
-    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const day = date.getUTCDay() || 7;
-    date.setUTCDate(date.getUTCDate() + 4 - day);
-    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-    const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-    return String(week);
-  }
-
-  // Helper: format date to Indonesian readable string
-  function formatDateID(dateStr: string): string {
-    if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
 
   // Convert API data to FilterOption format
   const categoryOptions: FilterOption[] = [
@@ -479,27 +364,5 @@ export function ProductFilters({
         </div>
       )}
     </Card>
-  );
-}
-
-/* ===============================
-   Filter Tag Component
-================================ */
-interface FilterTagProps {
-  label: string;
-  onRemove: () => void;
-}
-
-function FilterTag({ label, onRemove }: FilterTagProps) {
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-      {label}
-      <button
-        onClick={onRemove}
-        className="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-      >
-        <X className="h-3 w-3" />
-      </button>
-    </span>
   );
 }

@@ -22,7 +22,6 @@ import { generateSKUFromName, getApiErrorMessage } from "@/lib/utils";
 import { productFormSchema, ProductFormValues } from "@/schemas/zod.schemas";
 import { ToggleSwitch } from "./ToggleSwitchProduct";
 import VariantCards from "./VariantCards";
-import { useCurrentUser } from "@/hooks/useAuth";
 
 // Product type options matching API
 const PRODUCT_TYPE_OPTIONS = [
@@ -213,9 +212,7 @@ export function ProductForm({
   };
 
   const onSubmit = async (data: ProductFormValues) => {
-    // @debug — commented for production
-    // console.log("=== onSubmit called ===");
-    // console.log("Form data:", data);
+
     try {
       const payload = transformToPayload(data);
 
@@ -414,11 +411,7 @@ export function ProductForm({
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               </div>
-              {/* {errors.name && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.name.message}
-                </p>
-              )} */}
+  
             </FormFieldWrapper>
 
             {/* Category */}
@@ -523,22 +516,6 @@ export function ProductForm({
                 />
               </FormFieldWrapper>
 
-              {/* {showDiscount && (
-                <FormFieldWrapper
-                  label="Diskon"
-                  className="flex-1 max-w-50"
-                >
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    min={1}
-                    leftIcon={<Percent className="h-4 w-4" />}
-                    {...register("productDiscount.value", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                </FormFieldWrapper>
-              )} */}
             </div>
           </CardContent>
         </Card>
@@ -558,11 +535,7 @@ export function ProductForm({
                 checked={showVariantToggle}
                 onChange={setShowVariantToggle}
               />
-              {/* <ToggleSwitch
-                label="Diskon"
-                checked={showDiscount}
-                onChange={setShowDiscount}
-              /> */}
+
             </CardContent>
           </Card>
 

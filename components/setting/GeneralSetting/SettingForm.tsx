@@ -64,7 +64,6 @@ export default function SettingForm() {
     if (banner.file) formData.append("banner", banner.file);
 
     await updateShop(formData);
-    // alert("Pengaturan berhasil disimpan!");
     toast({
         title: "Success",
         description: "Berhasil memperbaharui data.",
@@ -88,21 +87,13 @@ export default function SettingForm() {
         <CardContent className="grid md:grid-cols-[200px_1fr] gap-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              {/* <span className="text-sm font-medium">Logo Toko</span> */}
               <LogoUpload
                 logo={logo.preview}
                 onChange={(file) => setLogo({ file, preview: URL.createObjectURL(file) })}
                 onDelete={() => setLogo({ preview: DEFAULT_LOGO })}
               />
             </div>
-            {/* <div className="space-y-2 pt-4">
-              <span className="text-sm font-medium">Banner Toko</span>
-               <BannerUpload
-                banner={banner.preview}
-                onChange={(file) => setBanner({ file, preview: URL.createObjectURL(file) })}
-                onDelete={() => setBanner({ preview: DEFAULT_LOGO })}
-              />
-            </div> */}
+
           </div>
 
           <div className="space-y-4">

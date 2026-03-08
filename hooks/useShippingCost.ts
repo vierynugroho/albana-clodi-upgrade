@@ -1,4 +1,3 @@
-// hooks/useShippingCost.ts
 import { useMutation } from "@tanstack/react-query";
 import * as shippingService from "@/lib/services/shipping.service";
 

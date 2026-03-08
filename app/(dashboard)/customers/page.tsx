@@ -15,6 +15,7 @@ import { CustomerStats } from "@/components/customer/CustomerStats";
 import { CustomerExportDialog } from "@/components/customer/CustomerExportDialog";
 import { useRef, useState } from "react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function CustomersPage() {
   const router = useRouter();
@@ -132,18 +133,10 @@ export default function CustomersPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-        <div className="text-center">
-          <p className="font-semibold text-destructive">Gagal memuat data</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Terjadi kesalahan saat memuat data customers
-          </p>
-        </div>
-        <Button onClick={() => refetch()} variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Coba lagi
-        </Button>
-      </div>
+      <ErrorState
+        message="Terjadi kesalahan saat memuat data customers"
+        onRetry={() => refetch()}
+      />
     );
   }
 
