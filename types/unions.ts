@@ -1,5 +1,5 @@
 // types/unions.ts
-// Union types dan type aliases yang digunakan di berbagai tempat
+// Union types dan type aliases yang digunakan di berbagai tempatt
 
 // Print type union — digunakan oleh PrintManager, PrintSettings, PrintPreview
 export type PrintType =
