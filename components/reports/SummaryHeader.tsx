@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { GradientCard } from "../ui";
-import { BarChart3, Loader2, TrendingUp } from "lucide-react";
+import { BarChart3, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { LoadingState } from "@/components/shared/LoadingState";
 

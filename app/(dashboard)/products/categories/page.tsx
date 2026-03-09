@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Folder, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Folder, Loader2} from "lucide-react";
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/lib/utils";

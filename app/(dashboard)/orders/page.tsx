@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { OrderTable } from "@/components/order/OrderTable";
 import { OrderFilters } from "@/components/order/OrderFilters";
 import { OrderExportDialog } from "@/components/order/OrderExportDialog";
-import { Plus, ShoppingCart, RefreshCw, Download } from "lucide-react";
+import { Plus, ShoppingCart, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useDeleteOrder, useCancelOrder, useExportOrders } from "@/hooks/useOrders";

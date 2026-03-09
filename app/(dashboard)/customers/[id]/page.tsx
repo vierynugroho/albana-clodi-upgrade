@@ -5,10 +5,11 @@ import CustomerForm from "@/components/customer/CustomerForm";
 import { useCustomer } from "@/hooks/useCustomers";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
-import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { CustomerFormValues } from "@/schemas/zod.schemas";
 import type { ApiCustomer } from "@/types/api";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 function mapApiCustomerToFormValues(
   apiCustomer: ApiCustomer,
@@ -49,12 +50,7 @@ export default function EditCustomerPage() {
   const { data: customerData, isLoading, isError, refetch } = useCustomer(id);
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Memuat data customer...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (isError || !customerData) {

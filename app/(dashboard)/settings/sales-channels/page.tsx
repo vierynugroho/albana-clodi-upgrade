@@ -8,8 +8,6 @@ import { useRouter } from "next/navigation";
 import {
   Store,
   Plus,
-  Loader2,
-  RefreshCw,
 } from "lucide-react";
 import { useSalesChannels, useDeleteSalesChannel } from "@/hooks/useSalesChannels";
 import { useToast } from "@/hooks/use-toast";

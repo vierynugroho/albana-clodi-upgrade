@@ -13,7 +13,6 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  XCircle,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Order } from "@/types";
@@ -86,7 +85,6 @@ const OrderCard = memo(function OrderCard({
   onEdit,
   onPrint,
   onDelete,
-  onCancel,
 }: OrderCardProps) {
   const statusConfig = getPaymentStatusConfig(order.paymentStatus);
 

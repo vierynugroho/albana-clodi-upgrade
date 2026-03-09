@@ -1,8 +1,6 @@
 "use client";
 
 import { use } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import SalesChannelsForm from "@/components/setting/sales-channels/SalesChannelsForm";
 import { useSalesChannel } from "@/hooks/useSalesChannels";
 import { LoadingState } from "@/components/shared/LoadingState";

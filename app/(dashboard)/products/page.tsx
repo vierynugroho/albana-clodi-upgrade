@@ -8,7 +8,6 @@ import {
   Plus,
   Package,
   Loader2,
-  RefreshCw,
   Download,
   Folder,
   Barcode,

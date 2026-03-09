@@ -1,5 +1,5 @@
 import { formatCurrency } from "@/lib/utils";
-import { Calendar, Loader2, PieChart, TrendingDown, Wallet } from "lucide-react";
+import { Calendar, PieChart, TrendingDown, Wallet } from "lucide-react";
 import { memo } from "react";
 import { StatCard } from "../ui";
 import { useCurrentUser } from "@/hooks/useAuth";

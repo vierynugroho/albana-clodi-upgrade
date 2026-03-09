@@ -14,35 +14,14 @@ import {
 import type { OrderQueryParams } from "@/types/api";
 import type { ApiSalesChannel, ApiPaymentMethod, ApiCustomer } from "@/types/api";
 import { LoadingState } from "../shared/LoadingState";
-import type { FilterOption } from "@/lib/constants";
+import { FilterOption, PAYMENT_STATUS_OPTIONS, CUSTOMER_CATEGORY_OPTIONS, ORDER_OPTIONS } from "@/lib/constants";
 import { FilterSelect, FilterDateInput, FilterTag } from "@/components/shared/FilterComponents";
-
-const PAYMENT_STATUS_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Status Pembayaran" },
-  { value: "PENDING", label: "Pending" },
-  { value: "SETTLEMENT", label: "Settlement" },
-  { value: "CANCEL", label: "Dibatalkan" },
-];
-
-const CUSTOMER_CATEGORY_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Kategori" },
-  { value: "CUSTOMER", label: "Customer" },
-  { value: "RESELLER", label: "Reseller" },
-  { value: "AGENT", label: "Agent" },
-  { value: "MEMBER", label: "Member" },
-  { value: "DROPSHIPPER", label: "Dropshipper" },
-];
 
 const SORT_OPTIONS: FilterOption[] = [
   { value: "", label: "Default" },
   { value: "orderDate", label: "Tanggal Order" },
   { value: "createdAt", label: "Tanggal Dibuat" },
   { value: "updatedAt", label: "Tanggal Update" },
-];
-
-const ORDER_OPTIONS: FilterOption[] = [
-  { value: "desc", label: "Terbaru" },
-  { value: "asc", label: "Terlama" },
 ];
 
 //   Main OrderFilters Component

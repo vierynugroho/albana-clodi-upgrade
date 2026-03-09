@@ -3,7 +3,7 @@
 import { CustomerTable } from "@/components/customer/CustomerTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Users, Loader2, RefreshCw, Download, Upload } from "lucide-react";
+import { Plus, Users, Loader2, Download, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCustomers, useDeleteCustomer, useImportCustomers, useExportCustomers } from "@/hooks/useCustomers";
 import { useToast } from "@/hooks/use-toast";

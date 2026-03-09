@@ -8,8 +8,6 @@ import {
   CreditCard,
   Plus,
   Building2,
-  Loader2,
-  RefreshCw,
 } from "lucide-react";
 import { usePaymentMethods, useDeletePaymentMethod } from "@/hooks/usePaymentMethods";
 import { useToast } from "@/hooks/use-toast";

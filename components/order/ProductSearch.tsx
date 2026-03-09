@@ -1,5 +1,5 @@
 import { ApiProductListItem } from "@/types/api";
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Input } from "../ui";
 import { LoadingState } from "../shared/LoadingState";

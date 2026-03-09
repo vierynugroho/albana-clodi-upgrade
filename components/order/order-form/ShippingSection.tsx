@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Loader2, Edit2, Store } from "lucide-react";
-import type { ShippingOption } from "@/types/api";
 import type { UseOrderFormReturn } from "../../../hooks/useOrderStateForm";
 import { OrderSummary } from "../OrderSummary";
 

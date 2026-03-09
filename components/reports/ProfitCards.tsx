@@ -1,6 +1,5 @@
 import { memo } from "react";
 import { Card, CardContent } from "../ui";
-import { Loader2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { LoadingState } from "../shared/LoadingState";
 

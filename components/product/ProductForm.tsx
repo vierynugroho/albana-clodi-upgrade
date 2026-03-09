@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   RefreshCw,
   Loader2,
-  Percent,
   Scale,
   ChevronLeft,
 } from "lucide-react";
@@ -22,15 +21,7 @@ import { generateSKUFromName, getApiErrorMessage } from "@/lib/utils";
 import { productFormSchema, ProductFormValues } from "@/schemas/zod.schemas";
 import { ToggleSwitch } from "./ToggleSwitchProduct";
 import VariantCards from "./VariantCards";
-
-// Product type options matching API
-const PRODUCT_TYPE_OPTIONS = [
-  { value: "BARANG_STOK_SENDIRI", label: "Barang Stock Sendiri" },
-  { value: "BARANG_SUPPLIER_LAIN", label: "Barang Suplier Lain" },
-  { value: "BARANG_PRE_ORDER", label: "Barang Pre-Order" },
-] as const;
-
-// upload imagenya masih belom bisa
+import { PRODUCT_TYPE_OPTIONS } from "@/lib/constants";
 
 interface ProductFormProps {
   initialData?: ProductFormValues & { id?: string };
@@ -78,7 +69,7 @@ export function ProductForm({
 
   // Toggle states for "Atur Produk"
   const [showVariantToggle, setShowVariantToggle] = useState(false);
-  const [showDiscount, setShowDiscount] = useState(false);
+  const [, setShowDiscount] = useState(false);
 
   // Toggle states for "Atur Privor & Storefront"
   const [isPublish, setIsPublish] = useState(true);
@@ -259,7 +250,7 @@ export function ProductForm({
 
   const onFormError = (formErrors: FieldErrors<ProductFormValues>) => {
     // Get current form values for debugging
-    const currentValues = watch();
+    // const currentValues = watch();
 
     const errorMessages: string[] = [];
 

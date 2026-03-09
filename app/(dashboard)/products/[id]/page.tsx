@@ -3,8 +3,6 @@
 import { useParams, useRouter } from "next/navigation";
 import { ProductForm } from "@/components/product/ProductForm";
 import { useProductDetail } from "@/hooks/useProducts";
-import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import type { ApiProductDetail } from "@/types/api";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";

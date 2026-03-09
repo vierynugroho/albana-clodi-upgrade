@@ -1,4 +1,4 @@
-import { Clock, Loader2, XCircle } from "lucide-react";
+import { Clock, XCircle } from "lucide-react";
 import { memo } from "react";
 import { Card, CardContent } from "../ui";
 import { LoadingState } from "../shared/LoadingState";

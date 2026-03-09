@@ -5,7 +5,7 @@ import { useOrdersByIds } from "@/hooks/useOrders";
 import { PrintSettings } from "@/components/print/PrintSettings";
 import { PrintPreview } from "@/components/print/PrintPreview";
 import { PrintType, PrintSetting } from "@/types";
-import { Loader2, Printer } from "lucide-react";
+import { Printer } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { printDocument } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

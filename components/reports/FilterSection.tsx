@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "../ui";
 import { Calendar, Filter } from "lucide-react";
+import { MONTH_OPTIONS, YEAR_OPTIONS } from "@/lib/constants";
 
 interface FilterSectionProps {
   filterPreset: string;
@@ -24,33 +25,6 @@ const FILTER_PRESETS = [
   { label: "Bulan Ini", value: "month" },
   { label: "Tahun Ini", value: "year" },
   { label: "Custom", value: "custom" },
-];
-
-const MONTHS = [
-  { label: "Semua", value: "" },
-  { label: "Januari", value: "1" },
-  { label: "Februari", value: "2" },
-  { label: "Maret", value: "3" },
-  { label: "April", value: "4" },
-  { label: "Mei", value: "5" },
-  { label: "Juni", value: "6" },
-  { label: "Juli", value: "7" },
-  { label: "Agustus", value: "8" },
-  { label: "September", value: "9" },
-  { label: "Oktober", value: "10" },
-  { label: "November", value: "11" },
-  { label: "Desember", value: "12" },
-];
-
-// Years from 2024 to 2030
-const YEARS = [
-  { label: "2030", value: "2030" },
-  { label: "2029", value: "2029" },
-  { label: "2028", value: "2028" },
-  { label: "2027", value: "2027" },
-  { label: "2026", value: "2026" },
-  { label: "2025", value: "2025" },
-  { label: "2024", value: "2024" },
 ];
 
 export const FilterSection = memo(function FilterSection({
@@ -101,9 +75,9 @@ export const FilterSection = memo(function FilterSection({
                 onChange={(e) => onMonthChange(e.target.value)}
                 className="h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                {MONTHS.map((month) => (
+                {MONTH_OPTIONS.map((month) => (
                   <option key={month.value} value={month.value}>
-                    {month.label}
+                    {month.value === "" ? "Semua" : month.label}
                   </option>
                 ))}
               </select>
@@ -115,9 +89,9 @@ export const FilterSection = memo(function FilterSection({
                 onChange={(e) => onYearChange(e.target.value)}
                 className="h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                {YEARS.map((year) => (
+                {YEAR_OPTIONS.map((year) => (
                   <option key={year.value} value={year.value}>
-                    {year.label}
+                    {year.value === "" ? "Semua" : year.label}
                   </option>
                 ))}
               </select>

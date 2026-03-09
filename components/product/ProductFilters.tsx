@@ -13,17 +13,9 @@ import {
 } from "lucide-react";
 import type { ProductQueryParams } from "@/types/api";
 import type { ApiCategory } from "@/types/api";
-import type { FilterOption } from "@/lib/constants";
-import { MONTH_OPTIONS, YEAR_OPTIONS } from "@/lib/constants";
+import { FilterOption, MONTH_OPTIONS, YEAR_OPTIONS, PRODUCT_TYPE_OPTIONS, ORDER_OPTIONS } from "@/lib/constants";
 import { FilterSelect, FilterDateInput, FilterTag } from "@/components/shared/FilterComponents";
 import { getISOWeek, formatDateID } from "@/lib/utils";
-
-const PRODUCT_TYPE_OPTIONS: FilterOption[] = [
-  { value: "", label: "Semua Tipe" },
-  { value: "BARANG_STOK_SENDIRI", label: "Barang Stok Sendiri" },
-  { value: "BARANG_SUPPLIER_LAIN", label: "Barang Supplier Lain" },
-  { value: "BARANG_PRE_ORDER", label: "Barang Pre Order" },
-];
 
 const SORT_OPTIONS: FilterOption[] = [
   { value: "", label: "Default" },
@@ -32,14 +24,7 @@ const SORT_OPTIONS: FilterOption[] = [
   { value: "updatedAt", label: "Tanggal Update" },
 ];
 
-const ORDER_OPTIONS: FilterOption[] = [
-  { value: "desc", label: "Terbaru" },
-  { value: "asc", label: "Terlama" },
-];
-
-/* ===============================
-   Main ProductFilters Component
-================================ */
+//   Main ProductFilters Component
 interface ProductFiltersProps {
   filters: ProductQueryParams;
   onFiltersChange: (filters: ProductQueryParams) => void;
@@ -106,7 +91,7 @@ export function ProductFilters({
     setLocalFilters({});
     setWeekDate("");
     onFiltersChange({});
-  }, [onFiltersChange, setLocalFilters]);
+  }, [onFiltersChange, setLocalFilters, setWeekDate]);
 
   // Count active filters from actual PARENT state
   const activeFilterCount = Object.keys(filters).filter(

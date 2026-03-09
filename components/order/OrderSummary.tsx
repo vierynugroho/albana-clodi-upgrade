@@ -24,7 +24,6 @@ export function OrderSummary({
     shippingMode,
     grossShippingCost,
     totalShippingDiscount,
-    effectiveShippingCost,
     grandTotal,
 }: OrderSummaryProps) {
     return (

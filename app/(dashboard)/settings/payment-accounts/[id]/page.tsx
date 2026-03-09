@@ -1,8 +1,6 @@
 "use client";
 
 import { use } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import PaymentAccountForm from "@/components/setting/payment-accounts/PaymentAccountForm";
 import { usePaymentMethod } from "@/hooks/usePaymentMethods";
 import { LoadingState } from "@/components/shared/LoadingState";

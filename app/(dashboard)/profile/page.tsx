@@ -3,7 +3,7 @@
 import { useCurrentUser } from "@/hooks/useAuth";
 import UserProfileForm from "@/components/setting/user-profile/UserProfileForm";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, User, Shield, Loader2Icon } from "lucide-react";
+import { AlertCircle, User, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 

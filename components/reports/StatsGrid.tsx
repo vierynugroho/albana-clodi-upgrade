@@ -1,7 +1,7 @@
 import { formatCurrency } from "@/lib/utils";
-import { CheckCircle, DollarSign, Loader2, Package, ShoppingCart } from "lucide-react";
+import { CheckCircle, DollarSign, Package, ShoppingCart } from "lucide-react";
 import { memo } from "react";
-import { Card, CardContent, StatCard } from "../ui";
+import { StatCard } from "../ui";
 import { LoadingState } from "../shared/LoadingState";
 
 interface StatsGridProps {

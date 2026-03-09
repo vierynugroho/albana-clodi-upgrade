@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function ShippingLabel({ order, setting, adminName }: Props) {
-  const { customer, products, warehouse, orderStatus, paymentStatus } = order;
+  const { customer, products, warehouse, paymentStatus } = order;
 
   return (
     <div className="mb-4 page-break bg-white text-black" style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>

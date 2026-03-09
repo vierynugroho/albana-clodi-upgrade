@@ -11,11 +11,9 @@ import {
   Save,
   Store,
   FileText,
-  Loader2Icon,
 } from "lucide-react";
 import { useShop, useUpdateShop } from "@/hooks/useShops";
 import { LogoUpload } from "./LogoUpload";
-import { BannerUpload } from "./BannerUpload";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 

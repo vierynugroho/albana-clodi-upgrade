@@ -10,7 +10,7 @@ import { useCreateOrder, useUpdateOrder, useOrder } from "@/hooks/useOrders";
 import { useCalculateShippingCost } from "@/hooks/useShippingCost";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import type { OrderCreatePayload, ApiCustomer, ApiProductListItem, ApiDeliveryPlace } from "@/types/api";
+import type { OrderCreatePayload, ApiProductListItem, } from "@/types/api";
 import type { ShippingOption } from "@/types/api";
 import { calculateOrderDiscount, calculateProductSubtotal, getPriceForCustomer } from "@/lib/utils";
 import type { OrderProductItem, OrderFormProps } from "../types/index";
@@ -56,8 +56,8 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
 
     // Ensure data is always an array
     const salesChannels = Array.isArray(salesChannelsData) ? salesChannelsData : [];
-    const customers = Array.isArray(customersData) ? customersData : [];
-    const products = Array.isArray(productsData) ? productsData : [];
+    const customers = useMemo(() => Array.isArray(customersData) ? customersData : [], [customersData]);
+    const products = useMemo(() => Array.isArray(productsData) ? productsData : [], [productsData]);
     const paymentMethods = Array.isArray(paymentMethodsData) ? paymentMethodsData : [];
     const deliveryPlaces = Array.isArray(deliveryPlacesData) ? deliveryPlacesData : [];
 
@@ -183,7 +183,7 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                         service_fee: firstShipping.serviceFee ?? 0,
                         net_income: firstShipping.netIncome ?? 0,
                         grandtotal: firstShipping.grandtotal ?? 0,
-                        weight: firstShipping.weight ?? totalWeight,
+                        weight: firstShipping.weight ?? existingOrder.OrderDetail?.otherFees?.weight ?? 0,
                     };
                     setShippingOptions([syntheticOption]);
                     setSelectedShipping(syntheticOption);

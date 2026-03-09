@@ -127,7 +127,7 @@ const variantSchema = z.object({
     updatedAt: z.string().optional(),
   }).superRefine((prices, ctx) => {
 
-    const { buy, agent, reseller, member, normal } = prices;
+    const { buy, reseller, normal } = prices;
     
     const tooHigh = [
       { key: "reseller", value: reseller },

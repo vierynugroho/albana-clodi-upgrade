@@ -3,7 +3,7 @@ import { useCustomers } from "@/hooks/useCustomers";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useOrders } from "@/hooks/useOrders";
 import { useProducts } from "@/hooks/useProducts";
-import type { ChartItem, ChartDataItem } from "@/types/unions";
+import type { ChartDataItem } from "@/types/unions";
 
 export const monthOrder = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",

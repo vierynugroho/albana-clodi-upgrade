@@ -9,8 +9,6 @@ import {
   MapPin,
   Plus,
   Warehouse as WarehouseIcon,
-  Loader2,
-  RefreshCw,
 } from "lucide-react";
 import { useDeliveryPlaces, useDeleteDeliveryPlace } from "@/hooks/useDeliveryPlaces";
 import { useToast } from "@/hooks/use-toast";

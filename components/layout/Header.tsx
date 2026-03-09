@@ -3,7 +3,6 @@
 import { Moon, Sun, Bell, User, Menu, Search, Sparkles, LogOut, Settings, UserCircle, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CountBadge } from "@/components/ui/badge";
 import { memo, useCallback, useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "@/hooks/useAuth";
@@ -11,6 +10,8 @@ import { removeToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
+import { LoadingState } from "../shared/LoadingState";
+import { ErrorState } from "../shared/ErrorState";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -60,7 +61,8 @@ const ThemeToggle = memo(function ThemeToggle() {
   );
 });
 
-const NotificationButton = memo(function NotificationButton() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _NotificationButton = memo(function NotificationButton() {
   const [notificationCount] = useState(3);
   return (
     <Button
@@ -127,19 +129,13 @@ const UserMenu = memo(function UserMenu() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center gap-3 pl-4 border-l border-border/50">
-        <div className="hidden sm:block text-right">
-          <div className="h-4 w-20 bg-muted animate-pulse rounded mb-1" />
-          <div className="h-3 w-16 bg-muted animate-pulse rounded" />
-        </div>
-        <div className="h-10 w-10 rounded-xl bg-muted animate-pulse" />
-      </div>
+      <LoadingState />
     );
   }
 
   // Error state - show fallback
   if (error) {
-    console.error("Error loading user:", error);
+    <ErrorState />
   }
 
   return (
