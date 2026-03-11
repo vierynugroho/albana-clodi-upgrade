@@ -157,9 +157,10 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
 
     let shippingDiscountVal = 0;
     if (orderDetail?.otherFees?.shippingDiscountPerKg) {
-        // Rumus sama dengan useOrderStateForm: shippingDiscount * weightInKg (tanpa ceiling)
-        const weightInKg = (orderDetail.otherFees.weight || 0) / 1000;
-        shippingDiscountVal = orderDetail.otherFees.shippingDiscountPerKg * weightInKg;
+        // Kalkulasi diubah menjadi per gram agar selaras dengan Backend:
+        // Diskon per Kg dibagi 1000 untuk mendapat Diskon per Gram, lalu dikali total berat gram.
+        const weightInGrams = orderDetail.otherFees.weight || 0;
+        shippingDiscountVal = (orderDetail.otherFees.shippingDiscountPerKg / 1000) * weightInGrams;
     }
 
     // 5. Reconstruct TRUE Subtotal (Gross Subtotal)

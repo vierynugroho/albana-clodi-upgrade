@@ -343,11 +343,16 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
 
     const totalShippingDiscount = useMemo(() => {
         if (shippingMode === "calculate" && selectedShipping) {
-            const weightInKg = totalWeight / 1000;
-            return shippingDiscount * weightInKg;
+            // Kalkulasi diubah menjadi per gram agar selaras dengan Backend:
+            // Diskon per Kg dibagi 1000 untuk mendapat Diskon per Gram, lalu dikali total berat gram.
+            return (shippingDiscount / 1000) * totalWeight;
         }
         if (shippingMode === "manual") {
-            return shippingDiscount;
+            // Manual shipping juga harus dihitung per gram agar Grand Total sama dengan backend & /orders
+            return (shippingDiscount / 1000) * totalWeight;
+        }
+        if (shippingMode === "free") {
+            return 0; // Or whatever represents free shipping discount if any
         }
         return 0;
     }, [shippingMode, selectedShipping, totalWeight, shippingDiscount]);
@@ -556,9 +561,7 @@ export function useOrderForm({ mode = "create", orderId }: OrderFormProps) {
                 };
             }
 
-            /* =========================
-            * PAYLOAD (STRICT)
-            * ========================= */
+            //PAYLOAD (STRICT)
             const payload: OrderCreatePayload = {
                 order: {
                     ordererCustomerId: ordererId,

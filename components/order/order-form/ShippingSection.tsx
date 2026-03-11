@@ -407,7 +407,7 @@ export function ShippingSection({
                                             </div>
                                             {shippingDiscount > 0 && (
                                                 <div className="text-xs text-green-600">
-                                                    Net: Rp {Math.max(0, option.shipping_cost - (shippingDiscount * totalWeight / 1000)).toLocaleString("id-ID")}
+                                                    Net: Rp {Math.max(0, option.shipping_cost - ((shippingDiscount / 1000) * totalWeight)).toLocaleString("id-ID")}
                                                 </div>
                                             )}
                                         </div>
