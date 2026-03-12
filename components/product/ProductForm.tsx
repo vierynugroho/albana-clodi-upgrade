@@ -1,349 +1,594 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2 } from 'lucide-react';
-import type { Product, ProductVariant } from '@/types';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useForm, useFieldArray, Controller, FieldErrors } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input, Textarea, FormFieldWrapper } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  RefreshCw,
+  Loader2,
+  Scale,
+  ChevronLeft,
+} from "lucide-react";
+import { useCreateProduct, useUpdateProduct } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import type { ProductCreatePayload } from "@/types/api";
+import { generateSKUFromName, getApiErrorMessage } from "@/lib/utils";
+import { productFormSchema, ProductFormValues } from "@/schemas/zod.schemas";
+import { ToggleSwitch } from "./ToggleSwitchProduct";
+import VariantCards from "./VariantCards";
+import { PRODUCT_TYPE_OPTIONS } from "@/lib/constants";
 
-interface ProdukFormProps {
-  product?: Product;
-  onSubmit: (data: Partial<Product>) => void;
-  onCancel: () => void;
+interface ProductFormProps {
+  initialData?: ProductFormValues & { id?: string };
+  isEditMode?: boolean;
+  onSuccess?: () => void;
 }
 
-export function ProdukForm({ product, onSubmit, onCancel }: ProdukFormProps) {
-  const [formData, setFormData] = useState<Partial<Product>>({
-    name: product?.name || '',
-    sku: product?.sku || '',
-    category: product?.category || '',
-    type: product?.type || 'barang_sendiri',
-    description: product?.description || '',
-    weight: product?.weight || 0,
-    prices: product?.prices || {
-      beli: 0,
-      agent: 0,
-      reseller: 0,
-      member: 0,
-      normal: 0,
+// Default variant template
+const defaultVariant = (): ProductFormValues["productVariants"][0] => ({
+  sku: "",
+  stock: 0,
+  size: "",
+  color: "",
+  barcode: "",
+  imageUrl: null,
+  productPrices: {
+    buy: 0,
+    agent: 0,
+    reseller: 0,
+    member: 0,
+    normal: 0,
+  },
+  productWholesalers: [],
+});
+
+export function ProductForm({
+  initialData,
+  isEditMode = false,
+  onSuccess,
+}: ProductFormProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const existingSkus = useRef(new Set<string>());
+
+
+  // Mutation hooks
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+
+  // Fetch categories for dropdown
+  const { data: categories = [], isLoading: isCategoriesLoading } =
+    useCategories();
+
+  const isSubmitting = createProduct.isPending || updateProduct.isPending;
+
+  // Toggle states for "Atur Produk"
+  const [showVariantToggle, setShowVariantToggle] = useState(false);
+  const [, setShowDiscount] = useState(false);
+
+  // Toggle states for "Atur Privor & Storefront"
+  const [isPublish, setIsPublish] = useState(true);
+  const [showStock, setShowStock] = useState(true);
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: initialData || {
+      name: "",
+      categoryId: "",
+      type: "BARANG_STOK_SENDIRI",
+      description: "",
+      weight: 0,
+      isPublish: true,
+      showStock: true,
+      productDiscount: {
+        type: "PERCENTAGE",
+        value: 0,
+      },
+      productVariants: [defaultVariant()],
     },
-    stock: product?.stock || 0,
   });
 
-  const [variants, setVariants] = useState<ProductVariant[]>(
-    product?.variants || [
-      { id: '1', color: '', size: '', stock: 0, sku: '' },
-    ]
+  // Field array for variants
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "productVariants",
+  });
+
+  const productName = watch("name");
+  const selectedType = watch("type");
+
+  const [variantImages, setVariantImages] = useState<(string | null)[]>(
+    fields.map(() => null)
   );
 
-  const addVariant = () => {
-    setVariants([
-      ...variants,
-      {
-        id: Date.now().toString(),
-        color: '',
-        size: '',
-        stock: 0,
-        sku: '',
-      },
-    ]);
-  };
+  // Reset form when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData);
+      // Initialize variant images from existing data
+      const images = initialData.productVariants.map((v) =>
+        typeof v.imageUrl === "string" && v.imageUrl ? v.imageUrl : null,
+      );
+      setVariantImages(images);
 
-  const removeVariant = (id: string) => {
-    setVariants(variants.filter((v) => v.id !== id));
-  };
+      const discountValue = Number(initialData.productDiscount?.value) || 0;
+      if (discountValue > 0) {
+        setShowDiscount(true);
+      }
 
-  const updateVariant = (id: string, field: keyof ProductVariant, value: any) => {
-    setVariants(
-      variants.map((v) => (v.id === id ? { ...v, [field]: value } : v))
+      if (initialData.productVariants.length > 1) {
+        setShowVariantToggle(true);
+      }
+    }
+  }, [initialData, reset]);
+
+  // Auto-generate SKUs when product name changes
+  const handleGenerateSKUs = useCallback(() => {
+    if (!productName) return;
+    const skus = generateSKUFromName(
+      productName,
+      fields.length,
+      existingSkus.current,
     );
+    skus.forEach((sku, index) => {
+      setValue(`productVariants.${index}.sku`, sku);
+    });
+  }, [productName, fields.length, setValue]);
+
+
+  // Handle product type change
+  const handleTypeChange = useCallback(
+    (value: string) => {
+      setValue("type", value);
+    },
+    [setValue],
+  );
+
+  // Transform form data to API payload
+  const transformToPayload = (
+    data: ProductFormValues,
+  ): ProductCreatePayload => {
+    return {
+      product: {
+        categoryId: data.categoryId,
+        name: data.name,
+        type: data.type as
+          | "BARANG_STOK_SENDIRI"
+          | "BARANG_SUPPLIER_LAIN"
+          | "BARANG_PRE_ORDER",
+        description: data.description || "",
+        weight: data.weight,
+        isPublish: isPublish,
+      },
+      productDiscount: {
+        id: data.productDiscount?.id,
+        type: data.productDiscount?.type || "PERCENTAGE",
+        value: Number(data.productDiscount?.value) || 0,
+      },
+      productVariants: data.productVariants.map((v) => ({
+        id: v.id,
+        sku: v.sku,
+        stock: v.stock,
+        size: v.size || "",
+        color: v.color || "",
+        barcode: v.barcode || "",
+        images: v.imageUrl,
+        productPrices: {
+          id: v.productPrices.id,
+          productVariantId: v.productPrices.productVariantId,
+          buy: v.productPrices.buy,
+          agent: v.productPrices.agent,
+          reseller: v.productPrices.reseller,
+          member: v.productPrices.member,
+          normal: v.productPrices.normal,
+          createdAt: v.productPrices.createdAt,
+          updatedAt: v.productPrices.updatedAt,
+        },
+        productWholesalers: [], // Empty array as per requirement
+      })),
+    };
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      ...formData,
-      variants,
-      stock: variants.reduce((sum, v) => sum + v.stock, 0),
+  const onSubmit = async (data: ProductFormValues) => {
+
+    try {
+      const payload = transformToPayload(data);
+
+      if (isEditMode && initialData?.id) {
+        await updateProduct.mutateAsync({ id: initialData.id, payload });
+        toast({
+          title: "Berhasil",
+          description: "Produk berhasil diperbarui",
+          variant: "success",
+        });
+      } else {
+        await createProduct.mutateAsync(payload);
+        toast({
+          title: "Berhasil",
+          description: "Produk berhasil ditambahkan",
+          variant: "success",
+        });
+      }
+
+      onSuccess?.();
+      router.push("/products");
+    } catch (error) {
+      let message = getApiErrorMessage(
+        error,
+        "Terjadi kesalahan saat menyimpan produk"
+      );
+
+      // Translate specific backend errors to be more informative
+      if (
+        message.toLowerCase().includes("insufficient stock") ||
+        message.toLowerCase().includes("tidak cukup") ||
+        message.toLowerCase().includes("kurang")
+      ) {
+        message = "Gagal memperbarui: Stok yang dimasukkan tidak valid atau lebih kecil dari stok sebelumnya.";
+      }
+
+      toast({
+        title: "Gagal",
+        description: message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onFormError = (formErrors: FieldErrors<ProductFormValues>) => {
+    // Get current form values for debugging
+    // const currentValues = watch();
+
+    const errorMessages: string[] = [];
+
+    // Price label mapping for readable names
+    const priceLabels: Record<string, string> = {
+      buy: "Beli",
+      agent: "Agent",
+      reseller: "Reseller",
+      member: "Member",
+      normal: "Normal",
+    };
+
+    if (formErrors.name) errorMessages.push(`Nama Produk: ${formErrors.name.message}`);
+    if (formErrors.categoryId)
+      errorMessages.push(`Kategori: ${formErrors.categoryId.message}`);
+    if (formErrors.type)
+      errorMessages.push(`Jenis Produk: ${formErrors.type.message}`);
+    if (formErrors.weight)
+      errorMessages.push(`Berat: ${formErrors.weight.message}`);
+    if (formErrors.description)
+      errorMessages.push(`Deskripsi: ${formErrors.description.message}`);
+
+    if (formErrors.productVariants) {
+      if (Array.isArray(formErrors.productVariants)) {
+        formErrors.productVariants.forEach((v: FieldErrors<ProductFormValues["productVariants"][0]> | undefined, i: number) => {
+          if (!v) return;
+          const label = `Varian ${i + 1}`;
+          if (v.sku)
+            errorMessages.push(`${label} SKU: ${v.sku.message}`);
+          if (v.stock)
+            errorMessages.push(`${label} Stok: ${v.stock.message}`);
+          if (v.size)
+            errorMessages.push(`${label} Ukuran: ${v.size.message}`);
+          if (v.color)
+            errorMessages.push(`${label} Warna: ${v.color.message}`);
+          if (v.barcode)
+            errorMessages.push(`${label} Barcode: ${v.barcode.message}`);
+          if (v.imageUrl)
+            errorMessages.push(`${label} Gambar: ${v.imageUrl.message}`);
+          if (v.productPrices) {
+            // Handle individual price field errors
+            const priceKeys = ["buy", "agent", "reseller", "member", "normal"] as const;
+            priceKeys.forEach((key) => {
+              const priceError = v.productPrices?.[key];
+              if (priceError?.message) {
+                errorMessages.push(
+                  `${label} Harga ${priceLabels[key] || key}: ${priceError.message}`,
+                );
+              }
+            });
+            // Handle root-level superRefine errors (e.g., buy > normal/reseller)
+            if (v.productPrices.root?.message) {
+              errorMessages.push(`${label}: ${v.productPrices.root.message}`);
+            }
+          }
+        });
+      } else if (formErrors.productVariants.message) {
+        errorMessages.push(`Varian: ${formErrors.productVariants.message}`);
+      }
+    }
+
+    if (formErrors.productDiscount) {
+      if (formErrors.productDiscount.value?.message) {
+        errorMessages.push(`Diskon: ${formErrors.productDiscount.value.message}`);
+      } else if (formErrors.productDiscount.message) {
+        errorMessages.push(`Diskon: ${formErrors.productDiscount.message}`);
+      }
+    }
+
+    // If no specific errors found, list the field names
+    if (errorMessages.length === 0 && Object.keys(formErrors).length > 0) {
+      errorMessages.push(
+        `Terdapat error pada: ${Object.keys(formErrors).join(", ")}`,
+      );
+    }
+
+    toast({
+      title: "Validasi Gagal",
+      description:
+        errorMessages.length > 0
+          ? errorMessages.join(" | ")
+          : "Periksa kembali form. Lihat console untuk detail.",
+      variant: "destructive",
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Informasi Dasar */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Informasi Produk</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama Produk</label>
-              <Input
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="Masukkan nama produk"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">SKU</label>
-              <Input
-                value={formData.sku}
-                onChange={(e) =>
-                  setFormData({ ...formData, sku: e.target.value })
-                }
-                placeholder="SKU-001"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Kategori</label>
-              <select
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                required
-              >
-                <option value="">Pilih Kategori</option>
-                <option value="Pakaian">Pakaian</option>
-                <option value="Aksesoris">Aksesoris</option>
-                <option value="Elektronik">Elektronik</option>
-                <option value="Sepatu">Sepatu</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Jenis Produk</label>
-              <select
-                value={formData.type}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    type: e.target.value as Product['type'],
-                  })
-                }
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-              >
-                <option value="barang_sendiri">Barang Sendiri</option>
-                <option value="suplier">Suplier Lain</option>
-                <option value="pre_order">Pre Order</option>
-              </select>
-            </div>
-            <div className="md:col-span-2 space-y-2">
-              <label className="text-sm font-medium">Deskripsi</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className="w-full min-h-[100px] rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Deskripsi produk..."
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Berat (gram)</label>
-              <Input
-                type="number"
-                value={formData.weight}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    weight: parseFloat(e.target.value),
-                  })
-                }
-                placeholder="0"
-                required
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Harga */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Harga</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Harga Beli</label>
-              <Input
-                type="number"
-                value={formData.prices?.beli}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    prices: {
-                      ...formData.prices!,
-                      beli: parseFloat(e.target.value),
-                    },
-                  })
-                }
-                placeholder="0"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Harga Agent</label>
-              <Input
-                type="number"
-                value={formData.prices?.agent}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    prices: {
-                      ...formData.prices!,
-                      agent: parseFloat(e.target.value),
-                    },
-                  })
-                }
-                placeholder="0"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Harga Reseller</label>
-              <Input
-                type="number"
-                value={formData.prices?.reseller}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    prices: {
-                      ...formData.prices!,
-                      reseller: parseFloat(e.target.value),
-                    },
-                  })
-                }
-                placeholder="0"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Harga Member</label>
-              <Input
-                type="number"
-                value={formData.prices?.member}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    prices: {
-                      ...formData.prices!,
-                      member: parseFloat(e.target.value),
-                    },
-                  })
-                }
-                placeholder="0"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Harga Normal</label>
-              <Input
-                type="number"
-                value={formData.prices?.normal}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    prices: {
-                      ...formData.prices!,
-                      normal: parseFloat(e.target.value),
-                    },
-                  })
-                }
-                placeholder="0"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Variants */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Variant Produk</CardTitle>
-          <Button type="button" onClick={addVariant} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Variant
+    <form onSubmit={handleSubmit(onSubmit, onFormError)} className="space-y-6">
+      {/* Header with Back Button and Breadcrumb */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => router.back()}
+            className="p-2"
+          >
+            <ChevronLeft className="h-5 w-5" />
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {variants.map((variant) => (
-            <div key={variant.id} className="rounded-lg border p-4">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-medium">Variant</span>
-                {variants.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeVariant(variant.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+          <h1 className="text-xl font-semibold">
+            {isEditMode ? "Edit Produk" : "Tambah Produk"}
+          </h1>
+        </div>
+        <div className="text-sm text-muted-foreground hidden sm:block">
+          Home &gt; Halaman Produk &gt;{" "}
+          <span className="text-primary font-medium">
+            {isEditMode ? "Edit Produk" : "Tambah Produk"}
+          </span>
+        </div>
+      </div>
+
+      {/* Main Layout - Two Columns */}
+      <div className="grid gap-6 xl:grid-cols-[1fr,320px]">
+        {/* Left Column - Informasi Produk */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">
+              Informasi Produk
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Product Name */}
+            <FormFieldWrapper
+              label="Nama Produk"
+              required
+              error={errors.name?.message}
+            >
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Baju Anak"
+                  error={!!errors.name}
+                  {...register("name")}
+                  onChange={(e) => {
+                    register("name").onChange(e);
+                    if (!isEditMode) {
+                      // Auto generate SKU when name changes in create mode
+                      setTimeout(handleGenerateSKUs, 100);
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGenerateSKUs}
+                  title="Generate SKU otomatis"
+                  className="shrink-0"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+  
+            </FormFieldWrapper>
+
+            {/* Category */}
+            <FormFieldWrapper label="Kategori">
+              <div className="relative">
+                <Controller
+                  name="categoryId"
+                  control={control}
+                  render={({ field }) => (
+                    <select
+                      className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...field}
+                      disabled={isCategoriesLoading}
+                    >
+                      <option value="">
+                        {isCategoriesLoading
+                          ? "Memuat..."
+                          : "Pilih Kategori Produk"}
+                      </option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
+                {isCategoriesLoading && (
+                  <Loader2 className="absolute right-8 top-3 h-4 w-4 animate-spin text-muted-foreground" />
                 )}
               </div>
-              <div className="grid gap-4 md:grid-cols-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Warna</label>
-                  <Input
-                    value={variant.color}
-                    onChange={(e) =>
-                      updateVariant(variant.id, 'color', e.target.value)
-                    }
-                    placeholder="Merah"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Ukuran</label>
-                  <Input
-                    value={variant.size}
-                    onChange={(e) =>
-                      updateVariant(variant.id, 'size', e.target.value)
-                    }
-                    placeholder="L"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Stock</label>
-                  <Input
-                    type="number"
-                    value={variant.stock}
-                    onChange={(e) =>
-                      updateVariant(
-                        variant.id,
-                        'stock',
-                        parseInt(e.target.value)
-                      )
-                    }
-                    placeholder="0"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">SKU Variant</label>
-                  <Input
-                    value={variant.sku}
-                    onChange={(e) =>
-                      updateVariant(variant.id, 'sku', e.target.value)
-                    }
-                    placeholder="SKU-001-RED-L"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+            </FormFieldWrapper>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
-        <Button type="submit">Simpan Produk</Button>
+            {/* Product Type - Radio Buttons in Card Style */}
+            <FormFieldWrapper
+              label="Jenis Produk"
+              required
+              error={errors.type?.message}
+            >
+              <div className="flex flex-wrap gap-4">
+                {PRODUCT_TYPE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => handleTypeChange(opt.value)}
+                    className={`flex-1 min-w-40 p-4 rounded-xl border-2 transition-all text-sm font-medium ${selectedType === opt.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:bg-muted/50"
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedType === opt.value
+                          ? "border-primary"
+                          : "border-muted-foreground"
+                          }`}
+                      >
+                        {selectedType === opt.value && (
+                          <div className="w-2 h-2 rounded-full bg-primary" />
+                        )}
+                      </div>
+                      <span>{opt.label}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </FormFieldWrapper>
+
+            {/* Description */}
+            <FormFieldWrapper
+              label="Deskripsi Produk"
+              required
+              error={errors.description?.message}
+            >
+              <Textarea
+                placeholder="Tulis deskripsi produk di sini..."
+                className="min-h-30 resize-none"
+                {...register("description")}
+              />
+              {!watch("description") && (
+                <p className="text-destructive text-sm mt-1">
+                  Deskripsi Produk wajib diisi.
+                </p>
+              )}
+            </FormFieldWrapper>
+
+            {/* Weight and Discount */}
+            <div className="flex flex-wrap gap-4">
+              <FormFieldWrapper
+                label="Berat (gram)"
+                required
+                error={errors.weight?.message}
+                className="flex-1 max-w-50"
+              >
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="500"
+                  leftIcon={<Scale className="h-4 w-4" />}
+                  error={!!errors.weight}
+                  {...register("weight", { valueAsNumber: true })}
+                />
+              </FormFieldWrapper>
+
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Right Column - Atur Produk & Storefront */}
+        <div className="space-y-6">
+          {/* Atur Produk */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">
+                Atur Produk
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ToggleSwitch
+                label="Varian"
+                checked={showVariantToggle}
+                onChange={setShowVariantToggle}
+              />
+
+            </CardContent>
+          </Card>
+
+          {/* Atur Privor & Storefront */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">
+                Atur Privor & Storefront
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ToggleSwitch
+                label="Publish"
+                checked={isPublish}
+                onChange={setIsPublish}
+              />
+              <ToggleSwitch
+                label="Tampilkan Stock"
+                checked={showStock}
+                onChange={setShowStock}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      {/* Variant Section Header */}
+      <div className="overflow-x-auto">
+        <div className="p-4 bg-primary rounded-2xl min-w-200">
+          <div className="grid grid-cols-5 text-primary-foreground font-medium text-sm ml-24">
+            <span>Gambar</span>
+            <span>Spesifikasi</span>
+            <span>Harga</span>
+            <span>Variant</span>
+            <span>Stok</span>
+          </div>
+        </div>
+      </div>
+
+      <VariantCards
+        control={control}
+        register={register}
+        setValue={setValue}
+        errors={errors}
+        showVariantToggle={showVariantToggle}
+        variantImages={variantImages}
+        setVariantImages={setVariantImages}
+        fields={fields}
+        append={append}
+        remove={remove}
+      />
+
+
+      {/* Submit Button */}
+      <Button
+        type="submit"
+        className="w-full"
+        isLoading={isSubmitting}
+        size="lg"
+      >
+        {isEditMode ? "Simpan Perubahan" : "Tambah Produk"}
+      </Button>
     </form>
   );
 }
