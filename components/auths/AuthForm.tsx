@@ -23,6 +23,13 @@ interface AuthFormProps {
   auth_method: "login" | "register";
 }
 
+interface LoginErrorPayload {
+  message?: string;
+  error?: string;
+  responseObject?: { message?: string };
+  errors?: Array<{ message?: string } | string>;
+}
+
 const AuthForm = ({ auth_method }: AuthFormProps) => {
   return auth_method === "login" ? <LoginForm /> : <RegisterForm />;
 };
@@ -62,8 +69,20 @@ const LoginForm = memo(function LoginForm() {
       router.replace("/dashboard");
     } catch (err: unknown) {
       console.error("login error", err);
-      const axiosError = err as { response?: { data?: { message?: string } }; message?: string };
-      const msg = axiosError?.response?.data?.message || axiosError?.message || "Login gagal";
+      const axiosError = err as { response?: { data?: LoginErrorPayload }; message?: string };
+      const data = axiosError?.response?.data;
+      const firstError = Array.isArray(data?.errors)
+        ? typeof data.errors[0] === "string"
+          ? data.errors[0]
+          : data.errors[0]?.message
+        : undefined;
+      const msg =
+        data?.message ||
+        data?.error ||
+        data?.responseObject?.message ||
+        firstError ||
+        axiosError?.message ||
+        "Login gagal";
       setError(msg);
     }
   }, [router, queryClient]);

@@ -23,9 +23,16 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
   (resp: AxiosResponse) => resp,
   (error: unknown) => {
-    const axiosError = error as { response?: { status?: number } };
+    const axiosError = error as {
+      response?: { status?: number; config?: { url?: string } };
+      config?: { url?: string };
+    };
     const status = axiosError?.response?.status;
-    if (status === 401) {
+    const requestUrl = axiosError?.response?.config?.url || axiosError?.config?.url || "";
+    const isLoginRequest = requestUrl.includes("/auth/login");
+
+    // Jangan redirect otomatis ketika login gagal agar pesan error bisa ditampilkan di form.
+    if (status === 401 && !isLoginRequest) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
         // pakai replace supaya tidak menumpuk history
