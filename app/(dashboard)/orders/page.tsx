@@ -64,16 +64,13 @@ export default function OrderPage() {
   const apiOrders = paginatedResult?.data ?? [];
   const meta = useMemo(() => paginatedResult?.meta ?? {}, [paginatedResult?.meta]);
 
-  const prevMetaRef = useRef(meta);
   useEffect(() => {
-    if (meta !== prevMetaRef.current) {
-      prevMetaRef.current = meta;
-      const nc = meta.nextCursor ?? null;
-      setNextCursor(nc);
-      setHasNext(Boolean(nc) && apiOrders.length > 0);
-      if (meta.totalItems !== undefined) {
-        setTotalItems(meta.totalItems);
-      }
+    const nc = meta.nextCursor ?? null;
+    setNextCursor(nc);
+    setHasNext(Boolean(nc) && apiOrders.length > 0);
+
+    if (typeof meta.totalItems === "number") {
+      setTotalItems(meta.totalItems);
     }
   }, [meta, apiOrders.length]);
 
