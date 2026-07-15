@@ -13,15 +13,17 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
   const { customer, products, warehouse, paymentStatus } = order;
 
   return (
-    <div className="mb-4 page-break bg-white text-black" style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
+    <div
+      className="mb-4 page-break bg-white text-black"
+      style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}
+    >
       <div className="border border-gray-400 rounded-sm overflow-hidden">
-
         {/* ================= HEADER ================= */}
         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-300 bg-gray-50">
           <div className="flex flex-col gap-0.5">
             {setting.showLogo && (
               <Image
-                src="https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg"
+                src="https://albana-grosir.my.id/logo/albana-clodi-logo.svg"
                 width={120}
                 height={54}
                 alt="Albana Grosir"
@@ -68,11 +70,15 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
           {/* ===== LEFT: CUSTOMER ===== */}
           {setting.showCustomerAddress && (
             <div className="flex-1 px-4 py-3 text-[10px]">
-              <p className="font-bold text-[9px] uppercase tracking-widest text-gray-500 mb-1">Kepada</p>
+              <p className="font-bold text-[9px] uppercase tracking-widest text-gray-500 mb-1">
+                Kepada
+              </p>
               <p className="font-semibold text-[11px] leading-tight">
                 {customer?.name}
                 {customer?.category && (
-                  <span className="ml-1 font-normal text-[9px] text-gray-500">({customer.category})</span>
+                  <span className="ml-1 font-normal text-[9px] text-gray-500">
+                    ({customer.category})
+                  </span>
                 )}
               </p>
               <p className="leading-relaxed text-gray-700 mt-0.5">
@@ -89,10 +95,16 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
           {/* ===== RIGHT: WAREHOUSE / PENGIRIM ===== */}
           {setting.showWarehouse && warehouse && (
             <div className="flex-1 px-4 py-3 text-[10px] border-l border-dashed border-gray-300">
-              <p className="font-bold text-[9px] uppercase tracking-widest text-gray-500 mb-1">Pengirim</p>
-              <p className="font-semibold text-[11px] leading-tight">{warehouse.name}</p>
+              <p className="font-bold text-[9px] uppercase tracking-widest text-gray-500 mb-1">
+                Pengirim
+              </p>
+              <p className="font-semibold text-[11px] leading-tight">
+                {warehouse.name}
+              </p>
               {warehouse.address && (
-                <p className="leading-relaxed text-gray-700 mt-0.5">{warehouse.address}</p>
+                <p className="leading-relaxed text-gray-700 mt-0.5">
+                  {warehouse.address}
+                </p>
               )}
               {warehouse.phone && (
                 <p className="mt-1 text-gray-600">📞 {warehouse.phone}</p>
@@ -104,19 +116,34 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
         {/* ================= FRAGILE ================= */}
         {setting.showFragile && (
           <div className="px-4 py-2 border-b border-dashed border-gray-300">
-            <Image src="/fragile.png" width={120} height={120} alt="fragile logo" />
+            <Image
+              src="/fragile.png"
+              width={120}
+              height={120}
+              alt="fragile logo"
+            />
           </div>
         )}
 
         {/* ================= ORDER ITEMS ================= */}
         <div className="px-4 py-3 border-b border-dashed border-gray-300">
-          <p className="font-bold text-[9px] uppercase tracking-widest text-gray-500 mb-2">Detail Order</p>
+          <p className="font-bold text-[9px] uppercase tracking-widest text-gray-500 mb-2">
+            Detail Order
+          </p>
           <div className="space-y-0">
             {products?.map((item, idx) => (
-              <div key={idx} className={`flex justify-between items-center py-1.5 text-[10px] ${idx < products.length - 1 ? "border-b border-dotted border-gray-200" : ""}`}>
+              <div
+                key={idx}
+                className={`flex justify-between items-center py-1.5 text-[10px] ${idx < products.length - 1 ? "border-b border-dotted border-gray-200" : ""}`}
+              >
                 <div>
-                  <p className="font-medium text-[10px] leading-tight">{item.name}</p>
-                  <p className="text-[9px] text-gray-500">Qty: {item.quantity} &middot; Berat: {item.weight * item.quantity} g</p>
+                  <p className="font-medium text-[10px] leading-tight">
+                    {item.name}
+                  </p>
+                  <p className="text-[9px] text-gray-500">
+                    Qty: {item.quantity} &middot; Berat:{" "}
+                    {item.weight * item.quantity} g
+                  </p>
                 </div>
               </div>
             ))}
@@ -144,12 +171,14 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
               <span>Total</span>
               <span>{formatCurrency(order.total)}</span>
             </div>
-            {setting.showInstallmentAmount && order.installmentAmount != null && order.installmentAmount > 0 && (
-              <div className="flex justify-between text-gray-600 mt-0.5">
-                <span>Cicilan</span>
-                <span>{formatCurrency(order.installmentAmount)}</span>
-              </div>
-            )}
+            {setting.showInstallmentAmount &&
+              order.installmentAmount != null &&
+              order.installmentAmount > 0 && (
+                <div className="flex justify-between text-gray-600 mt-0.5">
+                  <span>Cicilan</span>
+                  <span>{formatCurrency(order.installmentAmount)}</span>
+                </div>
+              )}
           </div>
         </div>
 
@@ -172,7 +201,9 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
         {/* ================= BARCODE RESI ================= */}
         {setting.showBarcodeResi && (
           <div className="px-4 py-3 border-b border-dashed border-gray-300 text-center">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">Barcode Nota</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+              Barcode Nota
+            </p>
             <BarcodeDisplay value={order.orderNumber} height={40} />
           </div>
         )}
@@ -184,7 +215,6 @@ export function ShippingLabel({ order, setting, adminName }: Props) {
             <span className="text-gray-700">{order.note}</span>
           </div>
         )}
-
       </div>
     </div>
   );

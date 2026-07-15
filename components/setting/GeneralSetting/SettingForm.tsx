@@ -17,7 +17,7 @@ import { LogoUpload } from "./LogoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 
-const DEFAULT_LOGO = "https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg";
+const DEFAULT_LOGO = "https://albana-grosir.my.id/logo/albana-clodi-logo.svg";
 type ImageState = { preview: string; file?: File };
 
 export default function SettingForm() {

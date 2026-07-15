@@ -198,15 +198,22 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         className={cn(
           "fixed inset-y-0 left-0 z-40 w-72 flex flex-col border-r bg-card/95 backdrop-blur-sm transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0"
+          "md:translate-x-0",
         )}
       >
         <div className="flex h-16 items-center justify-between border-b px-5">
           <Link href="/dashboard" className="flex items-center gap-3 group">
             <div className="relative">
               {/* <div className="h-10 w-10 rounded-xl gradient-primary shadow-lg shadow-primary/25 flex items-center justify-center"> */}
-                {/* <span className="text-lg font-bold text-white">A</span> */}
-                <Image src={'https://albana-grosir.my.id/images/logo/albana-clodi-logo.svg'} height={45} width={45} alt="logo" style={{ width: "45px", height: "45px", objectFit: "contain" }} priority />
+              {/* <span className="text-lg font-bold text-white">A</span> */}
+              <Image
+                src={"https://albana-grosir.my.id/logo/albana-clodi-logo.svg"}
+                height={45}
+                width={45}
+                alt="logo"
+                style={{ width: "45px", height: "45px", objectFit: "contain" }}
+                priority
+              />
               {/* </div> */}
               <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-warning animate-pulse-subtle" />
             </div>
@@ -273,8 +280,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             />
           ))}
         </nav>
-
-        
       </aside>
     </>
   );
