@@ -16,6 +16,7 @@ import { InfoIcon } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import type { ChartDataItem } from "@/types/unions";
 import { formatCompact, formatFull } from "@/lib/utils";
+import { Skeleton } from "../ui/Skeleton";
 
 interface ChartPlaceholderProps {
   title: string;
@@ -53,16 +54,10 @@ function ChartTooltip({
         border: `1px solid ${colors.tooltipBorder}`,
       }}
     >
-      <p
-        className="text-xs font-medium"
-        style={{ color: colors.tooltipMuted }}
-      >
+      <p className="text-xs font-medium" style={{ color: colors.tooltipMuted }}>
         {label}
       </p>
-      <p
-        className="text-sm font-bold"
-        style={{ color: colors.tooltipText }}
-      >
+      <p className="text-sm font-bold" style={{ color: colors.tooltipText }}>
         {formatFull(payload[0].value)}
       </p>
     </div>
@@ -89,7 +84,8 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
   }, []);
 
   useEffect(() => {
-    if (!mounted || isLoading || data.length === 0 || !containerRef.current) return;
+    if (!mounted || isLoading || data.length === 0 || !containerRef.current)
+      return;
 
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -101,11 +97,11 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
         }
       }
     });
-    
+
     observer.observe(containerRef.current);
-    
+
     return () => {
-       observer.disconnect();
+      observer.disconnect();
     };
   }, [mounted, isLoading, data.length]);
 
@@ -121,13 +117,23 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
       tooltipText: isDark ? "#fafafa" : "#18181b",
       tooltipMuted: isDark ? "#a1a1aa" : "#71717a",
     }),
-    [isDark]
+    [isDark],
   );
 
   const shortName = useCallback((name: string) => {
     return name.length > 3 ? name.slice(0, 3) : name;
   }, []);
 
+  if (isLoading) {
+    return (
+      <ChartPlaceholderSkeleton
+        title={title}
+        description={description}
+        icon={Icon}
+        color={color}
+      />
+    );
+  }
   return (
     <Card className="overflow-hidden">
       {/* HEADER */}
@@ -146,9 +152,6 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
         <div
           className={`relative w-full rounded-lg border border-dashed ${color} bg-muted/10 overflow-hidden`}
         >
-          {/* LOADING */}
-          {isLoading && <LoadingState />}
-
           {/* EMPTY */}
           {!isLoading && !hasData && (
             <div className="h-[360px] flex flex-col items-center justify-center gap-2">
@@ -178,7 +181,11 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
                       y2="1"
                     >
                       <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0.02} />
+                      <stop
+                        offset="95%"
+                        stopColor="#6366f1"
+                        stopOpacity={0.02}
+                      />
                     </linearGradient>
                   </defs>
 
@@ -232,6 +239,52 @@ export const ChartPlaceholder = memo(function ChartPlaceholder({
               )}
             </div>
           )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+const ChartPlaceholderSkeleton = memo(function ChartPlaceholderSkeleton({
+  title,
+  description,
+  icon: Icon,
+  color,
+}: Pick<ChartPlaceholderProps, "title" | "description" | "icon" | "color">) {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="flex flex-row items-center gap-3 pb-2">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+
+        <div>
+          <CardTitle className="text-base">{title}</CardTitle>
+          <p className="text-xs text-muted-foreground">{description}</p>
+        </div>
+      </CardHeader>
+
+      <CardContent className="px-2 pb-4 sm:px-4">
+        <div
+          className={`h-[360px] rounded-lg border border-dashed ${color} bg-muted/10 p-6`}
+        >
+          <div className="flex h-full flex-col justify-between">
+            {/* Fake Chart */}
+            <div className="flex h-full items-end gap-2">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="flex-1 rounded-md"
+                  style={{
+                    height: `${35 + ((i * 17) % 55)}%`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Brush */}
+            <Skeleton className="mt-6 h-8 w-full rounded-md" />
+          </div>
         </div>
       </CardContent>
     </Card>

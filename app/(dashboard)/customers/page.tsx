@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Users, Loader2, Download, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCustomers, useDeleteCustomer, useImportCustomers, useExportCustomers } from "@/hooks/useCustomers";
+import {
+  useCustomers,
+  useDeleteCustomer,
+  useImportCustomers,
+  useExportCustomers,
+} from "@/hooks/useCustomers";
 import { useToast } from "@/hooks/use-toast";
 import { mapApiCustomersToCustomers } from "@/lib/mappers";
 import { getApiErrorMessage } from "@/lib/utils";
@@ -19,7 +24,12 @@ import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function CustomersPage() {
   const router = useRouter();
-  const { data: apiCustomers = [], isLoading, isError, refetch } = useCustomers();
+  const {
+    data: apiCustomers = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useCustomers();
   const deleteMutation = useDeleteCustomer();
   const importMutation = useImportCustomers();
   const exportMutation = useExportCustomers();
@@ -101,7 +111,8 @@ export default function CustomersPage() {
     } catch (error) {
       toast({
         title: "Gagal mengimport",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+        description:
+          error instanceof Error ? error.message : "Terjadi kesalahan",
         variant: "destructive",
       });
     } finally {
@@ -111,25 +122,25 @@ export default function CustomersPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="page-title flex items-center gap-2">
-              <Users className="h-7 w-7 text-pink" />
-              Customers
-            </h1>
-            <p className="page-description">Kelola semua data customer Anda</p>
-          </div>
-        </div>
+  // if (isLoading) {
+  //   return (
+  //     <div className="space-y-6">
+  //       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  //         <div>
+  //           <h1 className="page-title flex items-center gap-2">
+  //             <Users className="h-7 w-7 text-pink" />
+  //             Customers
+  //           </h1>
+  //           <p className="page-description">Kelola semua data customer Anda</p>
+  //         </div>
+  //       </div>
 
-        <CustomerStats customers={[]} isLoading={true} />
+  //       <CustomerStats customers={[]} isLoading={true} />
 
-        <LoadingState />
-      </div>
-    );
-  }
+  //       <LoadingState />
+  //     </div>
+  //   );
+  // }
 
   if (isError) {
     return (
@@ -203,9 +214,10 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      <CustomerStats customers={customers} />
+      <CustomerStats isLoading={isLoading} customers={customers} />
 
       <CustomerTable
+        isLoading={isLoading}
         customers={customers}
         onEdit={(c) => router.push(`/customers/${c.id}`)}
         onView={(c) => router.push(`/customers/${c.id}`)}

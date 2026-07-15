@@ -1,6 +1,4 @@
-
 "use client";
-
 import { useState, memo, useCallback } from "react";
 import { Button, IconButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +14,7 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Order } from "@/types";
+import { Skeleton } from "../ui/Skeleton";
 
 //   Toolbar
 interface TableToolbarProps {
@@ -49,7 +48,7 @@ type PaymentStatus = Order["paymentStatus"];
 type BadgeVariant = "success" | "warning" | "outline" | "destructive";
 
 const getPaymentStatusConfig = (
-  status: PaymentStatus
+  status: PaymentStatus,
 ): { variant: BadgeVariant; label: string } => {
   const configs: Record<
     PaymentStatus,
@@ -108,8 +107,7 @@ const OrderCard = memo(function OrderCard({
               #{order.orderNumber}
             </p>
             <p className="text-xs text-muted-foreground">
-              dari {order.salesChannel} (
-              {formatDate(order.date)})
+              dari {order.salesChannel} ({formatDate(order.date)})
             </p>
             <p className="text-xs text-muted-foreground">
               ⚖️ {order.weight ?? 0} gram
@@ -117,33 +115,24 @@ const OrderCard = memo(function OrderCard({
           </div>
         </div>
 
-        <Badge variant={statusConfig.variant}>
-          {statusConfig.label}
-        </Badge>
+        <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
       </div>
 
       {/* ================= Content ================= */}
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* ===== Customer Info ===== */}
         <div>
-          <p className="text-xs text-muted-foreground mb-1">
-            Pemesan
-          </p>
-          <p className="text-sm font-medium">
-            {order.customer?.name ?? "-"}
-          </p>
+          <p className="text-xs text-muted-foreground mb-1">Pemesan</p>
+          <p className="text-sm font-medium">{order.customer?.name ?? "-"}</p>
 
           <span className="inline-block mt-1 text-xs font-semibold uppercase text-primary">
             {order.customer?.category ?? "-"}
           </span>
 
           <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-            {order.customer?.address},{" "}
-            {order.customer?.village},{" "}
-            {order.customer?.district},{" "}
-            {order.customer?.city},{" "}
-            {order.customer?.province}{" "}
-            {order.customer?.postalCode}
+            {order.customer?.address}, {order.customer?.village},{" "}
+            {order.customer?.district}, {order.customer?.city},{" "}
+            {order.customer?.province} {order.customer?.postalCode}
           </p>
 
           <p className="mt-1 text-xs text-muted-foreground">
@@ -161,26 +150,29 @@ const OrderCard = memo(function OrderCard({
 
         {/* ===== Cost Summary ===== */}
         <div>
-          <p className="text-xs text-muted-foreground mb-1">
-            Ringkasan Biaya
-          </p>
+          <p className="text-xs text-muted-foreground mb-1">Ringkasan Biaya</p>
 
           <ul className="text-xs space-y-1">
             <li className="flex justify-between">
               <span>Subtotal Produk</span>
               <span>{formatCurrency(order.subtotal ?? 0)}</span>
             </li>
-            
+
             {(order.productDiscount ?? 0) > 0 && (
               <li className="flex justify-between text-green-600">
                 <span>Diskon Produk</span>
                 <span>-{formatCurrency(order.productDiscount ?? 0)}</span>
               </li>
             )}
-            
+
             {(order.orderDiscount ?? 0) > 0 && (
               <li className="flex justify-between text-green-600">
-                <span>Diskon Order {order.orderDiscountType === "percent" ? `(${order.orderDiscountValue}%)` : ""}</span>
+                <span>
+                  Diskon Order{" "}
+                  {order.orderDiscountType === "percent"
+                    ? `(${order.orderDiscountValue}%)`
+                    : ""}
+                </span>
                 <span>-{formatCurrency(order.orderDiscount ?? 0)}</span>
               </li>
             )}
@@ -208,7 +200,9 @@ const OrderCard = memo(function OrderCard({
           <div className="mt-2 pt-2 border-t">
             <div className="flex justify-between font-bold text-sm">
               <span>Grand Total</span>
-              <span className="text-primary">{formatCurrency(order.total ?? 0)}</span>
+              <span className="text-primary">
+                {formatCurrency(order.total ?? 0)}
+              </span>
             </div>
           </div>
         </div>
@@ -226,16 +220,9 @@ const OrderCard = memo(function OrderCard({
               </p>
             ) : (
               order.products.map((product, idx) => (
-                <div
-                  key={idx}
-                  className="text-xs p-2 rounded bg-muted/50"
-                >
-                  <p className="font-medium truncate">
-                    {product.name}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {product.quantity}x
-                  </p>
+                <div key={idx} className="text-xs p-2 rounded bg-muted/50">
+                  <p className="font-medium truncate">{product.name}</p>
+                  <p className="text-muted-foreground">{product.quantity}x</p>
                 </div>
               ))
             )}
@@ -297,8 +284,10 @@ const Pagination = memo(function Pagination({
   hasNext,
   hasPrev,
 }: PaginationProps) {
-  const prevDisabled = typeof hasPrev === "boolean" ? !hasPrev : currentPage === 1;
-  const nextDisabled = typeof hasNext === "boolean" ? !hasNext : currentPage === totalPages;
+  const prevDisabled =
+    typeof hasPrev === "boolean" ? !hasPrev : currentPage === 1;
+  const nextDisabled =
+    typeof hasNext === "boolean" ? !hasNext : currentPage === totalPages;
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border-t bg-muted/20">
@@ -345,6 +334,7 @@ interface OrderTableProps {
   onView: (order: Order) => void;
   onPrint: (orderIds: string[]) => void;
   onCancel?: (orderId: string) => void;
+  isLoading: boolean;
   // Cursor-based pagination props (optional, for server-side pagination)
   serverPagination?: {
     currentPage: number;
@@ -365,9 +355,9 @@ export function OrderTable({
   onPrint,
   onCancel,
   serverPagination,
+  isLoading,
 }: OrderTableProps) {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-
 
   const [clientPage, setClientPage] = useState(1);
   const clientItemsPerPage = 10;
@@ -375,14 +365,20 @@ export function OrderTable({
   const useServerPagination = !!serverPagination;
   const displayOrders = useServerPagination
     ? orders
-    : orders.slice((clientPage - 1) * clientItemsPerPage, clientPage * clientItemsPerPage);
+    : orders.slice(
+        (clientPage - 1) * clientItemsPerPage,
+        clientPage * clientItemsPerPage,
+      );
 
   const paginationProps = useServerPagination
     ? {
         currentPage: serverPagination.currentPage,
         totalPages: serverPagination.totalPages,
-        startIndex: (serverPagination.currentPage - 1) * serverPagination.itemsPerPage,
-        endIndex: (serverPagination.currentPage - 1) * serverPagination.itemsPerPage + orders.length,
+        startIndex:
+          (serverPagination.currentPage - 1) * serverPagination.itemsPerPage,
+        endIndex:
+          (serverPagination.currentPage - 1) * serverPagination.itemsPerPage +
+          orders.length,
         totalItems: serverPagination.totalItems,
         onPageChange: serverPagination.onPageChange,
         hasNext: serverPagination.hasNext,
@@ -401,7 +397,7 @@ export function OrderTable({
     setSelectedOrders((prev) =>
       prev.includes(orderId)
         ? prev.filter((id) => id !== orderId)
-        : [...prev, orderId]
+        : [...prev, orderId],
     );
   }, []);
 
@@ -413,35 +409,97 @@ export function OrderTable({
       />
 
       <div className="space-y-3">
-        {displayOrders.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Search className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-            <p className="font-semibold">Tidak ada order</p>
-            <p className="text-sm text-muted-foreground">
-              Tidak ditemukan data yang sesuai
-            </p>
-          </Card>
-        ) : (
-          displayOrders.map((order, index) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              index={index}
-              isSelected={selectedOrders.includes(order.id)}
-              onToggleSelect={toggleSelectOrder}
-              onView={onView}
-              onEdit={onEdit}
-              onPrint={onPrint}
-              onDelete={onDelete}
-              onCancel={onCancel}
-            />
-          ))
-        )}
+        <div className="space-y-3">
+          {isLoading ? (
+            <OrderListSkeleton />
+          ) : displayOrders.length === 0 ? (
+            <Card className="p-12 text-center">
+              <Search className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+              <p className="font-semibold">Tidak ada order</p>
+              <p className="text-sm text-muted-foreground">
+                Tidak ditemukan data yang sesuai
+              </p>
+            </Card>
+          ) : (
+            displayOrders.map((order, index) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                index={index}
+                isSelected={selectedOrders.includes(order.id)}
+                onToggleSelect={toggleSelectOrder}
+                onView={onView}
+                onEdit={onEdit}
+                onPrint={onPrint}
+                onDelete={onDelete}
+                onCancel={onCancel}
+              />
+            ))
+          )}
+        </div>
       </div>
 
-      {(useServerPagination ? serverPagination.totalItems > 0 : orders.length > 0) && (
-        <Pagination {...paginationProps} />
-      )}
+      {(useServerPagination
+        ? serverPagination.totalItems > 0
+        : orders.length > 0) && <Pagination {...paginationProps} />}
+    </div>
+  );
+}
+
+function OrderCardSkeleton() {
+  return (
+    <Card className="p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex gap-3">
+          <Skeleton className="mt-1 h-4 w-4 rounded" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Customer */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-3/4" />
+        </div>
+        {/* Cost */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-4 w-2/3 mt-2" />
+        </div>
+        {/* Products */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        {/* Actions */}
+        <div className="flex lg:justify-end gap-1">
+          <Skeleton className="h-8 w-8 rounded" />
+          <Skeleton className="h-8 w-8 rounded" />
+          <Skeleton className="h-8 w-8 rounded" />
+          <Skeleton className="h-8 w-8 rounded" />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+export function OrderListSkeleton({ count = 5 }: { count?: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <OrderCardSkeleton key={i} />
+      ))}
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { CheckCircle, DollarSign, Package, ShoppingCart } from "lucide-react";
 import { memo } from "react";
 import { StatCard } from "../ui";
 import { LoadingState } from "../shared/LoadingState";
+import { Skeleton } from "../ui/Skeleton";
 
 interface StatsGridProps {
   expenses: number;
@@ -22,12 +23,16 @@ export const StatsGrid = memo(function StatsGrid({
   hideExpenses = false,
 }: StatsGridProps) {
   const allStats = [
-    ...(!hideExpenses ? [{
-      label: "Pengeluaran",
-      value: formatCurrency(expenses),
-      icon: DollarSign,
-      color: "orange" as const,
-    }] : []),
+    ...(!hideExpenses
+      ? [
+          {
+            label: "Pengeluaran",
+            value: formatCurrency(expenses),
+            icon: DollarSign,
+            color: "orange" as const,
+          },
+        ]
+      : []),
     {
       label: "Total Item Terjual",
       value: itemsSold.toLocaleString(),
@@ -51,13 +56,7 @@ export const StatsGrid = memo(function StatsGrid({
   const gridCols = hideExpenses ? "lg:grid-cols-3" : "lg:grid-cols-4";
 
   if (isLoading) {
-    return (
-      <div className={`grid gap-4 sm:grid-cols-2 ${gridCols}`}>
-        {allStats.map((_, i) => (
-          <LoadingState key={i}/>
-        ))}
-      </div>
-    );
+    return <StatsGridSkeleton hideExpenses={hideExpenses} />;
   }
 
   return (
@@ -74,6 +73,37 @@ export const StatsGrid = memo(function StatsGrid({
           />
         );
       })}
+    </div>
+  );
+});
+
+const StatsGridSkeleton = memo(function StatsGridSkeleton({
+  hideExpenses = false,
+}: {
+  hideExpenses?: boolean;
+}) {
+  const cardCount = hideExpenses ? 3 : 4;
+  const gridCols = hideExpenses ? "lg:grid-cols-3" : "lg:grid-cols-4";
+
+  return (
+    <div className={`grid gap-4 sm:grid-cols-2 ${gridCols}`}>
+      {Array.from({ length: cardCount }).map((_, index) => (
+        <div
+          key={index}
+          className="rounded-xl border bg-card p-6 shadow-xs space-y-5"
+        >
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+
+            <Skeleton className="h-11 w-11 rounded-xl" />
+          </div>
+
+          <Skeleton className="h-3 w-20" />
+        </div>
+      ))}
     </div>
   );
 });

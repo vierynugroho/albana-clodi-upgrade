@@ -4,6 +4,7 @@ import { memo } from "react";
 import { StatCard } from "../ui";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { LoadingState } from "../shared/LoadingState";
+import { Skeleton } from "../ui/Skeleton";
 
 interface ExpenseStatsProps {
   totalExpenses: number;
@@ -25,7 +26,8 @@ export const ExpenseStats = memo(function ExpenseStats({
   isLoading,
 }: ExpenseStatsProps) {
   const { data: userData } = useCurrentUser();
-  const isSuperAdmin = userData?.responseObject?.role?.toLowerCase() === "superadmin";
+  const isSuperAdmin =
+    userData?.responseObject?.role?.toLowerCase() === "superadmin";
 
   // Hide financial metrics if not superadmin
   if (!isSuperAdmin) {
@@ -33,13 +35,7 @@ export const ExpenseStats = memo(function ExpenseStats({
   }
 
   if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <LoadingState key={i} />
-        ))}
-      </div>
-    );
+    return <ExpenseStatsSkeleton />;
   }
 
   const stats = [
@@ -56,7 +52,10 @@ export const ExpenseStats = memo(function ExpenseStats({
       value: formatCurrency(thisMonthTotal),
       icon: Calendar,
       color: "pink" as const,
-      trend: monthTrend !== 0 ? `${monthTrend > 0 ? "+" : ""}${monthTrend}%` : undefined,
+      trend:
+        monthTrend !== 0
+          ? `${monthTrend > 0 ? "+" : ""}${monthTrend}%`
+          : undefined,
       isPositive: monthTrend < 0,
     },
     {
@@ -69,9 +68,10 @@ export const ExpenseStats = memo(function ExpenseStats({
     },
     {
       title: "Pembelian Terbesar",
-      value: largestCategory.length > 12
-        ? largestCategory.slice(0, 12) + "..."
-        : largestCategory,
+      value:
+        largestCategory.length > 12
+          ? largestCategory.slice(0, 12) + "..."
+          : largestCategory,
       icon: TrendingDown,
       color: "cyan" as const,
       trend: largestPercentage,
@@ -90,11 +90,42 @@ export const ExpenseStats = memo(function ExpenseStats({
             value={stat.value}
             icon={<Icon className="h-5 w-5" />}
             color={stat.color}
-            trend={stat.trend ? { value: stat.trend, isPositive: stat.isPositive } : undefined}
+            trend={
+              stat.trend
+                ? { value: stat.trend, isPositive: stat.isPositive }
+                : undefined
+            }
             description={stat.trend ? "dari bulan lalu" : undefined}
           />
         );
       })}
+    </div>
+  );
+});
+
+const ExpenseStatsSkeleton = memo(function ExpenseStatsSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={index}
+          className="rounded-xl border bg-card p-6 shadow-xs space-y-5"
+        >
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+
+            <Skeleton className="h-11 w-11 rounded-xl" />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-12" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 });

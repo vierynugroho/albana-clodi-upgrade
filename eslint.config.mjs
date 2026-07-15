@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/static-components": "off",
       "react-hooks/incompatible-library": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
     },
   },
 ]);

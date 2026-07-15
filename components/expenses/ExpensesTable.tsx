@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/lib/utils";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ExpenseExportDialog } from "@/components/expenses/ExpenseExportDialog";
+import { Skeleton } from "../ui/Skeleton";
 
 interface ExpenseTableProps {
   expenses: Expense[];
@@ -55,7 +56,13 @@ const Toolbar = memo(function Toolbar({
 
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
-  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
+  const handleExport = (exportParams: {
+    startDate?: string;
+    endDate?: string;
+    month?: string;
+    year?: string;
+    week?: string;
+  }) => {
     exportExpenses.mutate(exportParams, {
       onSuccess: () => {
         toast({
@@ -80,8 +87,8 @@ const Toolbar = memo(function Toolbar({
 
     // Validate file type
     const validTypes = [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
     ];
     if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
       toast({
@@ -105,7 +112,10 @@ const Toolbar = memo(function Toolbar({
       console.error("Import error:", error);
       toast({
         title: "Error",
-        description: getApiErrorMessage(error, "Gagal mengimpor data. Pastikan format file sesuai."),
+        description: getApiErrorMessage(
+          error,
+          "Gagal mengimpor data. Pastikan format file sesuai.",
+        ),
         variant: "destructive",
       });
     }
@@ -148,8 +158,9 @@ const Toolbar = memo(function Toolbar({
             disabled={importExpenses.isPending}
           />
           <span
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 px-3 ${importExpenses.isPending ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+            className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 px-3 ${
+              importExpenses.isPending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             {importExpenses.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -289,25 +300,45 @@ const ExpenseMobileCard = memo(function ExpenseMobileCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="font-semibold text-sm truncate">{expense.itemName}</p>
-              <p className="text-xs text-muted-foreground">Qty: {expense.qty || 1}</p>
+              <p className="font-semibold text-sm truncate">
+                {expense.itemName}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Qty: {expense.qty || 1}
+              </p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              <IconButton color="info" size="sm" onClick={() => onView(expense)}>
+              <IconButton
+                color="info"
+                size="sm"
+                onClick={() => onView(expense)}
+              >
                 <Eye className="h-4 w-4" />
               </IconButton>
-              <IconButton color="warning" size="sm" onClick={() => onEdit(expense)}>
+              <IconButton
+                color="warning"
+                size="sm"
+                onClick={() => onEdit(expense)}
+              >
                 <Edit className="h-4 w-4" />
               </IconButton>
-              <IconButton color="destructive" size="sm" onClick={() => onDelete(expense.id)}>
+              <IconButton
+                color="destructive"
+                size="sm"
+                onClick={() => onDelete(expense.id)}
+              >
                 <Trash2 className="h-4 w-4" />
               </IconButton>
             </div>
           </div>
           <div className="flex items-center justify-between mt-2">
             <div>
-              <p className="text-xs text-muted-foreground">@{formatCurrency(expense.itemPrice)}</p>
-              <p className="text-sm font-bold gradient-text-warm">{formatCurrency(expense.totalPrice)}</p>
+              <p className="text-xs text-muted-foreground">
+                @{formatCurrency(expense.itemPrice)}
+              </p>
+              <p className="text-sm font-bold gradient-text-warm">
+                {formatCurrency(expense.totalPrice)}
+              </p>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Calendar className="h-3 w-3 text-info" />
@@ -316,7 +347,9 @@ const ExpenseMobileCard = memo(function ExpenseMobileCard({
           </div>
           {expense.personResponsible && (
             <div className="mt-1.5">
-              <Badge variant="purple" dot>{expense.personResponsible}</Badge>
+              <Badge variant="purple" dot>
+                {expense.personResponsible}
+              </Badge>
             </div>
           )}
         </div>
@@ -350,9 +383,24 @@ const Pagination = memo(function Pagination({
       if (currentPage <= 3) {
         pages.push(1, 2, 3, 4, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        pages.push(
+          1,
+          "...",
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages,
+        );
       } else {
-        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages,
+        );
       }
     }
     return pages;
@@ -378,7 +426,7 @@ const Pagination = memo(function Pagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        {getPageNumbers().map((page, idx) => (
+        {getPageNumbers().map((page, idx) =>
           typeof page === "number" ? (
             <Button
               key={idx}
@@ -390,9 +438,11 @@ const Pagination = memo(function Pagination({
               {page}
             </Button>
           ) : (
-            <span key={idx} className="px-2 text-muted-foreground">...</span>
-          )
-        ))}
+            <span key={idx} className="px-2 text-muted-foreground">
+              ...
+            </span>
+          ),
+        )}
         <Button
           variant="outline"
           size="icon"
@@ -416,7 +466,11 @@ function filterByPeriod(expenses: Expense[], period: string): Expense[] {
 
   return expenses.filter((expense) => {
     const expenseDate = new Date(expense.expenseDate);
-    const expenseDateOnly = new Date(expenseDate.getFullYear(), expenseDate.getMonth(), expenseDate.getDate());
+    const expenseDateOnly = new Date(
+      expenseDate.getFullYear(),
+      expenseDate.getMonth(),
+      expenseDate.getDate(),
+    );
 
     switch (period) {
       case "today":
@@ -429,7 +483,10 @@ function filterByPeriod(expenses: Expense[], period: string): Expense[] {
         return expenseDateOnly >= weekStart && expenseDateOnly <= weekEnd;
       }
       case "month":
-        return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear();
+        return (
+          expenseDate.getMonth() === now.getMonth() &&
+          expenseDate.getFullYear() === now.getFullYear()
+        );
       case "year":
         return expenseDate.getFullYear() === now.getFullYear();
       default:
@@ -486,6 +543,20 @@ export function ExpenseTable({
     setCurrentPage(1);
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Toolbar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          filterPeriod={filterPeriod}
+          onFilterChange={handleFilterChange}
+        />
+
+        <ExpenseTableSkeleton />
+      </div>
+    );
+  }
   return (
     <div className="space-y-4">
       <Toolbar
@@ -513,16 +584,7 @@ export function ExpenseTable({
       <Card className="overflow-hidden">
         {/* Mobile Card Layout */}
         <div className="md:hidden">
-          {isLoading ? (
-            <div className="p-8">
-              <LoadingState
-                className="py-12 h-auto"
-                iconClassName="h-8 w-8 text-orange mb-4"
-                message="Memuat data pengeluaran..."
-                textClassName="text-sm"
-              />
-            </div>
-          ) : paginatedExpenses.length === 0 ? (
+          {paginatedExpenses.length === 0 ? (
             <div className="p-8 text-center">
               <div className="py-12">
                 <div className="h-16 w-16 rounded-2xl bg-orange/10 flex items-center justify-center mx-auto mb-4">
@@ -530,7 +592,11 @@ export function ExpenseTable({
                 </div>
                 <p className="text-base font-semibold">Tidak ada pengeluaran</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {searchQuery ? "Coba ubah kata kunci pencarian" : filterPeriod !== "all" ? "Tidak ada data untuk periode ini" : "Belum ada data pengeluaran"}
+                  {searchQuery
+                    ? "Coba ubah kata kunci pencarian"
+                    : filterPeriod !== "all"
+                      ? "Tidak ada data untuk periode ini"
+                      : "Belum ada data pengeluaran"}
                 </p>
               </div>
             </div>
@@ -553,36 +619,43 @@ export function ExpenseTable({
           <table className="w-full">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Item</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tanggal</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Biaya</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Responsible</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Catatan</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">Aksi</th>
+                <th className="p-4 text-left text-xs! font-semibold text-muted-foreground uppercase tracking-wide">
+                  Item
+                </th>
+                <th className="p-4 text-left text-xs! font-semibold text-muted-foreground uppercase tracking-wide">
+                  Tanggal
+                </th>
+                <th className="p-4 text-left text-xs! font-semibold text-muted-foreground uppercase tracking-wide">
+                  Biaya
+                </th>
+                <th className="p-4 text-left text-xs! font-semibold text-muted-foreground uppercase tracking-wide">
+                  Responsible
+                </th>
+                <th className="p-4 text-left text-xs! font-semibold text-muted-foreground uppercase tracking-wide">
+                  Catatan
+                </th>
+                <th className="p-4 text-left text-xs! font-semibold text-muted-foreground uppercase tracking-wide w-32">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center">
-                    <LoadingState
-                      className="py-12 h-auto"
-                      iconClassName="h-8 w-8 text-orange mb-4"
-                      message="Memuat data pengeluaran..."
-                      textClassName="text-sm"
-                    />
-                  </td>
-                </tr>
-              ) : paginatedExpenses.length === 0 ? (
+              {paginatedExpenses.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center">
                     <div className="py-12">
                       <div className="h-16 w-16 rounded-2xl bg-orange/10 flex items-center justify-center mx-auto mb-4">
                         <Wallet className="h-8 w-8 text-orange" />
                       </div>
-                      <p className="text-base font-semibold">Tidak ada pengeluaran</p>
+                      <p className="text-base font-semibold">
+                        Tidak ada pengeluaran
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {searchQuery ? "Coba ubah kata kunci pencarian" : filterPeriod !== "all" ? "Tidak ada data untuk periode ini" : "Belum ada data pengeluaran"}
+                        {searchQuery
+                          ? "Coba ubah kata kunci pencarian"
+                          : filterPeriod !== "all"
+                            ? "Tidak ada data untuk periode ini"
+                            : "Belum ada data pengeluaran"}
                       </p>
                     </div>
                   </td>
@@ -617,3 +690,75 @@ export function ExpenseTable({
     </div>
   );
 }
+
+const ExpenseTableSkeleton = memo(function ExpenseTableSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      {/* Mobile */}
+      <div className="space-y-3 p-4 md:hidden">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className="rounded-xl border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+            </div>
+
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-24" />
+
+            <div className="flex gap-2 pt-2">
+              <Skeleton className="h-8 flex-1 rounded-md" />
+              <Skeleton className="h-8 flex-1 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted/50 border-b">
+            <tr>
+              <th className="p-4 text-left">Item</th>
+              <th className="p-4 text-left">Tanggal</th>
+              <th className="p-4 text-left">Biaya</th>
+              <th className="p-4 text-left">Responsible</th>
+              <th className="p-4 text-left">Catatan</th>
+              <th className="p-4 text-left">Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {Array.from({ length: 8 }).map((_, index) => (
+              <tr key={index} className="border-b last:border-0">
+                <td className="p-4">
+                  <Skeleton className="h-5 w-40" />
+                </td>
+                <td className="p-4">
+                  <Skeleton className="h-5 w-24" />
+                </td>
+                <td className="p-4">
+                  <Skeleton className="h-5 w-28" />
+                </td>
+                <td className="p-4">
+                  <Skeleton className="h-5 w-32" />
+                </td>
+                <td className="p-4">
+                  <Skeleton className="h-5 w-48" />
+                </td>
+                <td className="p-4">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+});

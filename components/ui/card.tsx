@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-
+import { Skeleton } from "./Skeleton";
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "outline" | "ghost" | "elevated" | "gradient";
   hover?: boolean;
@@ -47,7 +47,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       accent = "none",
       ...props
     },
-    ref
+    ref,
   ) => (
     <div
       ref={ref}
@@ -56,11 +56,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         cardVariants[variant],
         accentStyles[accent],
         hover && "cursor-pointer hover:shadow-lg hover:-translate-y-0.5",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  ),
 );
 Card.displayName = "Card";
 
@@ -84,7 +84,7 @@ const CardTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />
@@ -166,16 +166,13 @@ const statCardGradient: Record<StatCardColor, string> = {
 };
 
 const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
-  (
-    { title, value, description, icon, color = "default", className },
-    ref
-  ) => (
+  ({ title, value, description, icon, color = "default", className }, ref) => (
     <Card
       ref={ref}
       className={cn(
         "relative overflow-hidden stat-card card-hover",
         statCardGradient[color],
-        className
+        className,
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -186,7 +183,7 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
           <div
             className={cn(
               "h-9 w-9 rounded-xl flex items-center justify-center",
-              iconColorStyles[color]
+              iconColorStyles[color],
             )}
           >
             {icon}
@@ -216,17 +213,31 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
             )}
           </div>
         )} */}
-        <span className="text-xs text-muted-foreground">
-          {description}
-        </span>
+        <span className="text-xs text-muted-foreground">{description}</span>
       </CardContent>
     </Card>
-  )
+  ),
 );
 StatCard.displayName = "StatCard";
 
-export interface GradientCardProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+function StatCardSkeleton() {
+  return (
+    <Card className="relative overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <Skeleton className="h-4 w-28" />
+
+        <Skeleton className="h-9 w-9 rounded-xl" />
+      </CardHeader>
+
+      <CardContent>
+        <Skeleton className="mb-3 h-8 w-24" />
+
+        <Skeleton className="h-3 w-32" />
+      </CardContent>
+    </Card>
+  );
+}
+export interface GradientCardProps extends React.HTMLAttributes<HTMLDivElement> {
   gradient?:
     | "primary"
     | "success"
@@ -259,13 +270,13 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
       className={cn(
         "rounded-xl p-6 text-white shadow-lg",
         gradientStyles[gradient],
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </div>
-  )
+  ),
 );
 GradientCard.displayName = "GradientCard";
 
@@ -278,4 +289,5 @@ export {
   CardContent,
   StatCard,
   GradientCard,
+  StatCardSkeleton,
 };

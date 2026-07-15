@@ -7,7 +7,11 @@ import { OrderExportDialog } from "@/components/order/OrderExportDialog";
 import { Plus, ShoppingCart, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useDeleteOrder, useCancelOrder, useExportOrders } from "@/hooks/useOrders";
+import {
+  useDeleteOrder,
+  useCancelOrder,
+  useExportOrders,
+} from "@/hooks/useOrders";
 import { useOrdersPaginated } from "@/hooks/useOrders";
 import { useSalesChannels } from "@/hooks/useSalesChannels";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
@@ -17,7 +21,6 @@ import { getApiErrorMessage } from "@/lib/utils";
 import { mapApiOrdersToOrders } from "@/lib/mappers";
 import type { Order } from "@/types";
 import type { OrderQueryParams } from "@/types/api";
-import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 const ITEMS_PER_PAGE = 20;
@@ -62,7 +65,10 @@ export default function OrderPage() {
   } = useOrdersPaginated(queryParams);
 
   const apiOrders = paginatedResult?.data ?? [];
-  const meta = useMemo(() => paginatedResult?.meta ?? {}, [paginatedResult?.meta]);
+  const meta = useMemo(
+    () => paginatedResult?.meta ?? {},
+    [paginatedResult?.meta],
+  );
 
   useEffect(() => {
     const nc = meta.nextCursor ?? null;
@@ -86,53 +92,67 @@ export default function OrderPage() {
     }
   }, [filters]);
 
-  const { data: salesChannels = [], isLoading: isLoadingSalesChannels } = useSalesChannels();
-  const { data: paymentMethods = [], isLoading: isLoadingPaymentMethods } = usePaymentMethods();
-  const { data: customers = [], isLoading: isLoadingCustomers } = useCustomers();
+  const { data: salesChannels = [], isLoading: isLoadingSalesChannels } =
+    useSalesChannels();
+  const { data: paymentMethods = [], isLoading: isLoadingPaymentMethods } =
+    usePaymentMethods();
+  const { data: customers = [], isLoading: isLoadingCustomers } =
+    useCustomers();
 
-  const isLoadingOptions = isLoadingSalesChannels || isLoadingPaymentMethods || isLoadingCustomers;
+  const isLoadingOptions =
+    isLoadingSalesChannels || isLoadingPaymentMethods || isLoadingCustomers;
 
   const deleteMutation = useDeleteOrder();
   const cancelMutation = useCancelOrder();
   const exportMutation = useExportOrders();
 
   const orders: Order[] = mapApiOrdersToOrders(apiOrders);
-  const totalPages = totalItems > 0
-    ? Math.ceil(totalItems / ITEMS_PER_PAGE)
-    : currentPage + (hasNext ? 1 : 0);
+  const totalPages =
+    totalItems > 0
+      ? Math.ceil(totalItems / ITEMS_PER_PAGE)
+      : currentPage + (hasNext ? 1 : 0);
 
-  const handlePageChange = useCallback((page: number) => {
-    if (isLoading) return;
-    if (page < 1) return;
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (isLoading) return;
+      if (page < 1) return;
 
-    if (page === 1) {
-      setCursorHistory([null]);
-      setCurrentPage(1);
-      return;
-    }
+      if (page === 1) {
+        setCursorHistory([null]);
+        setCurrentPage(1);
+        return;
+      }
 
-    if (page < currentPage) {
-      setCurrentPage(page);
-      return;
-    }
+      if (page < currentPage) {
+        setCurrentPage(page);
+        return;
+      }
 
-    if (page === currentPage + 1) {
-      if (!hasNext || !nextCursor) return;
-      setCursorHistory((prev) => {
-        const copy = [...prev];
-        copy[page - 1] = nextCursor;
-        return copy;
-      });
-      setCurrentPage(page);
-      return;
-    }
-  }, [isLoading, currentPage, hasNext, nextCursor]);
+      if (page === currentPage + 1) {
+        if (!hasNext || !nextCursor) return;
+        setCursorHistory((prev) => {
+          const copy = [...prev];
+          copy[page - 1] = nextCursor;
+          return copy;
+        });
+        setCurrentPage(page);
+        return;
+      }
+    },
+    [isLoading, currentPage, hasNext, nextCursor],
+  );
 
   const handleExportClick = () => {
     setIsExportDialogOpen(true);
   };
 
-  const handleExport = (exportParams: { startDate?: string; endDate?: string; month?: string; year?: string; week?: string }) => {
+  const handleExport = (exportParams: {
+    startDate?: string;
+    endDate?: string;
+    month?: string;
+    year?: string;
+    week?: string;
+  }) => {
     exportMutation.mutate(exportParams, {
       onSuccess: () => {
         toast({
@@ -210,12 +230,6 @@ export default function OrderPage() {
     router.push(`/print/shipping-label?ids=${orderIds.join(",")}`);
   };
 
-  if (isLoading && apiOrders.length === 0) {
-    return (
-      <LoadingState />
-    );
-  }
-
   if (isError) {
     return (
       <ErrorState
@@ -260,12 +274,23 @@ export default function OrderPage() {
         <p className="text-sm text-muted-foreground">
           {totalItems > 0 ? (
             <>
-              Menampilkan <span className="font-semibold text-foreground">{orders.length}</span> dari{" "}
-              <span className="font-semibold text-foreground">{totalItems}</span> order
+              Menampilkan{" "}
+              <span className="font-semibold text-foreground">
+                {orders.length}
+              </span>{" "}
+              dari{" "}
+              <span className="font-semibold text-foreground">
+                {totalItems}
+              </span>{" "}
+              order
             </>
           ) : (
             <>
-              Menampilkan <span className="font-semibold text-foreground">{orders.length}</span> order
+              Menampilkan{" "}
+              <span className="font-semibold text-foreground">
+                {orders.length}
+              </span>{" "}
+              order
             </>
           )}
           {Object.keys(filters).length > 0 && " (dengan filter)"}
@@ -283,6 +308,7 @@ export default function OrderPage() {
       </div>
 
       <OrderTable
+        isLoading={isLoading}
         orders={orders}
         onEdit={handleEdit}
         onDelete={handleDelete}

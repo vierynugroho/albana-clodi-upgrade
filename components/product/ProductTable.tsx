@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, memo, useCallback } from "react";
 import { Button, IconButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +14,14 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { Skeleton } from "../ui/Skeleton";
 
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
   onDelete: (productId: string) => void;
   onView: (product: Product) => void;
+  isLoading: boolean;
 }
 
 type ProductType = Product["type"];
@@ -44,10 +45,8 @@ const typeConfig: Record<
   pre_order: { label: "Pre Order", variant: "warning" },
 };
 
-
-
 const getStockConfig = (
-  stock: number
+  stock: number,
 ): { variant: BadgeVariant; label: string } => {
   if (stock === 0)
     return { variant: "destructive" as BadgeVariant, label: "Habis" };
@@ -83,8 +82,8 @@ const ProductRow = memo(function ProductRow({
   ];
   const gradientIndex = index % gradientColors.length;
 
-  const { data } = useCurrentUser()
-  const role = data?.responseObject.role
+  const { data } = useCurrentUser();
+  const role = data?.responseObject.role;
 
   return (
     <tr
@@ -141,17 +140,17 @@ const ProductRow = memo(function ProductRow({
             <Edit className="h-4 w-4" />
           </IconButton>
 
-          {
-            role?.toLocaleLowerCase() === "superadmin" ?
-              <IconButton
-                color="destructive"
-                size="sm"
-                onClick={() => onDelete(product.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </IconButton>
-              : <></>
-          }
+          {role?.toLocaleLowerCase() === "superadmin" ? (
+            <IconButton
+              color="destructive"
+              size="sm"
+              onClick={() => onDelete(product.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </IconButton>
+          ) : (
+            <></>
+          )}
         </div>
       </td>
     </tr>
@@ -195,31 +194,55 @@ const ProductMobileCard = memo(function ProductMobileCard({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">{product.name}</p>
-              <p className="text-xs text-muted-foreground">{product.variants.length} variant</p>
+              <p className="text-xs text-muted-foreground">
+                {product.variants.length} variant
+              </p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              <IconButton color="info" size="sm" onClick={() => onView(product)}>
+              <IconButton
+                color="info"
+                size="sm"
+                onClick={() => onView(product)}
+              >
                 <Eye className="h-4 w-4" />
               </IconButton>
-              <IconButton color="warning" size="sm" onClick={() => onEdit(product)}>
+              <IconButton
+                color="warning"
+                size="sm"
+                onClick={() => onEdit(product)}
+              >
                 <Edit className="h-4 w-4" />
               </IconButton>
               {role?.toLocaleLowerCase() === "superadmin" && (
-                <IconButton color="destructive" size="sm" onClick={() => onDelete(product.id)}>
+                <IconButton
+                  color="destructive"
+                  size="sm"
+                  onClick={() => onDelete(product.id)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </IconButton>
               )}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <code className="text-xs bg-muted px-2 py-0.5 rounded-md font-mono">{product.sku}</code>
-            <span className="text-xs text-muted-foreground">{product.category}</span>
-            <Badge variant={typeConf.variant} dot>{typeConf.label}</Badge>
+            <code className="text-xs bg-muted px-2 py-0.5 rounded-md font-mono">
+              {product.sku}
+            </code>
+            <span className="text-xs text-muted-foreground">
+              {product.category}
+            </span>
+            <Badge variant={typeConf.variant} dot>
+              {typeConf.label}
+            </Badge>
           </div>
           <div className="flex items-center justify-between mt-2">
             <div>
-              <p className="text-sm font-bold gradient-text">{formatCurrency(product.prices.normal)}</p>
-              <p className="text-[11px] text-muted-foreground">Agent: {formatCurrency(product.prices.agent)}</p>
+              <p className="text-sm font-bold gradient-text">
+                {formatCurrency(product.prices.normal)}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Agent: {formatCurrency(product.prices.agent)}
+              </p>
             </div>
             <Badge variant={stockConf.variant}>{stockConf.label}</Badge>
           </div>
@@ -278,7 +301,7 @@ const Pagination = memo(function Pagination({
             >
               {page}
             </Button>
-          )
+          ),
         )}
 
         <Button
@@ -295,11 +318,141 @@ const Pagination = memo(function Pagination({
   );
 });
 
+const ProductTableSkeleton = memo(function ProductTableSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      {/* Mobile */}
+      <div className="md:hidden">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <div key={index} className="p-4 border-b last:border-b-0">
+            <div className="flex items-start gap-3">
+              <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
+
+              <div className="flex-1 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+
+                  <div className="flex gap-1">
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Skeleton className="h-5 w-20 rounded-full" />
+                  <Skeleton className="h-5 w-24 rounded-full" />
+                  <Skeleton className="h-5 w-24 rounded-full" />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted/50 border-b">
+            <tr>
+              <th className="p-4 text-left text-xs font-semibold uppercase w-16">
+                Foto
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Produk
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                SKU
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Kategori
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Jenis
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Harga
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Stock
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase w-32">
+                Aksi
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <tr key={index} className="border-b">
+                <td className="p-4">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                </td>
+
+                <td className="p-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                </td>
+
+                <td className="p-4">
+                  <Skeleton className="h-6 w-24 rounded-md" />
+                </td>
+
+                <td className="p-4">
+                  <Skeleton className="h-4 w-28" />
+                </td>
+
+                <td className="p-4">
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </td>
+
+                <td className="p-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                </td>
+
+                <td className="p-4">
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </td>
+
+                <td className="p-4">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+});
+
 export function ProductTable({
   products,
   onEdit,
   onDelete,
   onView,
+  isLoading,
 }: ProductTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -313,6 +466,9 @@ export function ProductTable({
     setCurrentPage(page);
   }, []);
 
+  if (isLoading) {
+    return <ProductTableSkeleton />;
+  }
   return (
     <div className="space-y-4">
       <Card className="overflow-hidden">
@@ -325,7 +481,9 @@ export function ProductTable({
                   <Package className="h-8 w-8 text-success" />
                 </div>
                 <p className="text-base font-semibold">Tidak ada produk</p>
-                <p className="text-sm text-muted-foreground mt-1">Belum ada produk yang tersedia</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Belum ada produk yang tersedia
+                </p>
               </div>
             </div>
           ) : (
@@ -381,8 +539,12 @@ export function ProductTable({
                       <div className="h-16 w-16 rounded-2xl bg-success/10 flex items-center justify-center mx-auto mb-4">
                         <Package className="h-8 w-8 text-success" />
                       </div>
-                      <p className="text-base font-semibold">Tidak ada produk</p>
-                      <p className="text-sm text-muted-foreground mt-1">Belum ada produk yang tersedia</p>
+                      <p className="text-base font-semibold">
+                        Tidak ada produk
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Belum ada produk yang tersedia
+                      </p>
                     </div>
                   </td>
                 </tr>

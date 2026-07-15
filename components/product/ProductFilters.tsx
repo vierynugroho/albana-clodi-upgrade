@@ -13,8 +13,18 @@ import {
 } from "lucide-react";
 import type { ProductQueryParams } from "@/types/api";
 import type { ApiCategory } from "@/types/api";
-import { FilterOption, MONTH_OPTIONS, YEAR_OPTIONS, PRODUCT_TYPE_OPTIONS, ORDER_OPTIONS } from "@/lib/constants";
-import { FilterSelect, FilterDateInput, FilterTag } from "@/components/shared/FilterComponents";
+import {
+  FilterOption,
+  MONTH_OPTIONS,
+  YEAR_OPTIONS,
+  PRODUCT_TYPE_OPTIONS,
+  ORDER_OPTIONS,
+} from "@/lib/constants";
+import {
+  FilterSelect,
+  FilterDateInput,
+  FilterTag,
+} from "@/components/shared/FilterComponents";
 import { getISOWeek, formatDateID } from "@/lib/utils";
 
 const SORT_OPTIONS: FilterOption[] = [
@@ -30,6 +40,7 @@ interface ProductFiltersProps {
   onFiltersChange: (filters: ProductQueryParams) => void;
   categories?: ApiCategory[];
   isLoadingOptions?: boolean;
+  isLoading: boolean;
 }
 
 export function ProductFilters({
@@ -37,6 +48,7 @@ export function ProductFilters({
   onFiltersChange,
   categories = [],
   isLoadingOptions = false,
+  isLoading,
 }: ProductFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [localFilters, setLocalFilters] = useState<ProductQueryParams>(filters);
@@ -62,7 +74,7 @@ export function ProductFilters({
         return newFilters;
       });
     },
-    [setLocalFilters]
+    [setLocalFilters],
   );
 
   // Apply filters (triggers fetch)
@@ -99,7 +111,7 @@ export function ProductFilters({
       key !== "page" &&
       key !== "limit" &&
       key !== "order" &&
-      filters[key as keyof ProductQueryParams]
+      filters[key as keyof ProductQueryParams],
   ).length;
 
   return (
@@ -242,26 +254,31 @@ export function ProductFilters({
                   }}
                   className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 />
-                {weekDate && (() => {
-                  const d = new Date(weekDate);
-                  const day = d.getDay() || 7; // Mon=1 … Sun=7
-                  const monday = new Date(d);
-                  monday.setDate(d.getDate() - day + 1);
-                  const sunday = new Date(monday);
-                  sunday.setDate(monday.getDate() + 6);
-                  const fmt = (dt: Date) =>
-                    dt.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
-                  return (
-                    <div className="text-xs text-muted-foreground space-y-0.5">
-                      <p className="font-medium">
-                        Minggu ke-{getISOWeek(weekDate)}
-                      </p>
-                      <p>
-                        {fmt(monday)} — {fmt(sunday)}
-                      </p>
-                    </div>
-                  );
-                })()}
+                {weekDate &&
+                  (() => {
+                    const d = new Date(weekDate);
+                    const day = d.getDay() || 7; // Mon=1 … Sun=7
+                    const monday = new Date(d);
+                    monday.setDate(d.getDate() - day + 1);
+                    const sunday = new Date(monday);
+                    sunday.setDate(monday.getDate() + 6);
+                    const fmt = (dt: Date) =>
+                      dt.toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      });
+                    return (
+                      <div className="text-xs text-muted-foreground space-y-0.5">
+                        <p className="font-medium">
+                          Minggu ke-{getISOWeek(weekDate)}
+                        </p>
+                        <p>
+                          {fmt(monday)} — {fmt(sunday)}
+                        </p>
+                      </div>
+                    );
+                  })()}
               </div>
 
               {/* Sort & Order */}
@@ -274,9 +291,7 @@ export function ProductFilters({
               <FilterSelect
                 label="Urutan"
                 value={localFilters.order || "desc"}
-                onChange={(v) =>
-                  updateFilter("order", v as "asc" | "desc")
-                }
+                onChange={(v) => updateFilter("order", v as "asc" | "desc")}
                 options={ORDER_OPTIONS}
               />
             </div>
@@ -333,7 +348,11 @@ export function ProductFilters({
                 )}
                 {filters.week && (
                   <FilterTag
-                    label={weekDate ? `Minggu: ${formatDateID(weekDate)} (ke-${filters.week})` : `Minggu ke-${filters.week}`}
+                    label={
+                      weekDate
+                        ? `Minggu: ${formatDateID(weekDate)} (ke-${filters.week})`
+                        : `Minggu ke-${filters.week}`
+                    }
                     onRemove={() => handleRemoveTag("week")}
                   />
                 )}

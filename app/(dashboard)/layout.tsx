@@ -43,10 +43,11 @@ export default function DashboardLayout({
 
   if (isChecking) {
     return (
-      <LoadingState />
+      <div className="grid min-h-screen place-items-center bg-muted/20">
+        <LoadingState />
+      </div>
     );
   }
-
   return (
     <div className="flex min-h-screen bg-muted/20">
       <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />

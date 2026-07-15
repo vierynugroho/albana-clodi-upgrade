@@ -113,12 +113,6 @@ export default function ProductPage() {
     router.push(`/products/${product.id}`);
   };
 
-  if (isLoading) {
-    return (
-      <LoadingState />
-    );
-  }
-
   if (isError) {
     return (
       <ErrorState
@@ -176,15 +170,17 @@ export default function ProductPage() {
       </div>
 
       <ProductFilters
+        isLoading={isLoading}
         filters={filters}
         onFiltersChange={setFilters}
         categories={categories}
         isLoadingOptions={isLoadingCategories}
       />
 
-      <ProductStats products={products} />
+      <ProductStats isLoading={isLoading} products={products} />
 
       <ProductTable
+        isLoading={isLoading}
         products={products}
         onEdit={handleEdit}
         onDelete={handleDelete}

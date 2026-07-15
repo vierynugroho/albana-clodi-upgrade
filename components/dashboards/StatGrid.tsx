@@ -4,9 +4,16 @@ import { FilterType } from "./FilterButton";
 import { ReportQueryParams } from "@/types/api";
 import { useReportOrders } from "@/hooks/useReports";
 import { useCurrentUser } from "@/hooks/useAuth";
-import { BanknoteArrowDown, BanknoteX, DollarSign, PackageCheckIcon, Wallet, WalletCards } from "lucide-react";
-import { LoadingState } from "../shared/LoadingState";
+import {
+  BanknoteArrowDown,
+  BanknoteX,
+  DollarSign,
+  PackageCheckIcon,
+  Wallet,
+  WalletCards,
+} from "lucide-react";
 import { formatDateISO } from "@/lib/utils";
+import { StatCardSkeleton } from "../ui/card";
 
 interface Stat {
   title: string;
@@ -18,9 +25,12 @@ interface Stat {
 
 export const StatsGrid = memo(function StatsGrid({
   filter,
-}: {filter: FilterType}) {
+}: {
+  filter: FilterType;
+}) {
   const { data: userData } = useCurrentUser();
-  const isSuperAdmin = userData?.responseObject?.role?.toLowerCase() === "superadmin";
+  const isSuperAdmin =
+    userData?.responseObject?.role?.toLowerCase() === "superadmin";
   const queryParams: ReportQueryParams = useMemo(() => {
     const today = new Date();
 
@@ -41,10 +51,17 @@ export const StatsGrid = memo(function StatsGrid({
 
   const { data, isLoading } = useReportOrders(queryParams);
 
-  if (isLoading)
+  if (isLoading) {
+    const skeletonCount = 6;
+
     return (
-      <LoadingState />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: skeletonCount }).map((_, index) => (
+          <StatCardSkeleton key={index} />
+        ))}
+      </div>
     );
+  }
 
   const stats: Stat[] = [
     {
@@ -94,11 +111,12 @@ export const StatsGrid = memo(function StatsGrid({
   // Filter: admin hanya lihat non-keuangan
   const visibleStats = isSuperAdmin
     ? stats
-    : stats.filter(s => ![
-        "Amount Expenses",
-        "Total Expenses",
-        "Transactions",
-      ].includes(s.title));
+    : stats.filter(
+        (s) =>
+          !["Amount Expenses", "Total Expenses", "Transactions"].includes(
+            s.title,
+          ),
+      );
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
