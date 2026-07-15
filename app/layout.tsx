@@ -13,6 +13,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Stock Management System",
   description: "Sistem pengelolaan stock barang",
+  icons: {
+    icon: "/logo/logo-icon.svg",
+    shortcut: "/logo/logo-icon.svg",
+    apple: "/logo/logo-icon.svg",
+  },
 };
 
 export default function RootLayout({
