@@ -18,12 +18,14 @@ import {
   MapPin,
 } from "lucide-react";
 import type { Customer } from "@/types";
+import { Skeleton } from "../ui/Skeleton";
 
 interface CustomerTableProps {
   customers: Customer[];
   onEdit: (customer: Customer) => void;
   onDelete: (customerId: string) => void;
   onView: (customer: Customer) => void;
+  isLoading: boolean;
 }
 
 type CustomerCategory = Customer["category"];
@@ -122,16 +124,17 @@ const CustomerRow = memo(function CustomerRow({
       <td className="p-4">
         <div className="flex items-center gap-3">
           <div
-            className={`h-10 w-10 rounded-xl flex items-center justify-center ${config.variant === "info"
-              ? "bg-info/10"
-              : config.variant === "purple"
-                ? "bg-purple/10"
-                : config.variant === "success"
-                  ? "bg-success/10"
-                  : config.variant === "warning"
-                    ? "bg-warning/10"
-                    : "bg-muted"
-              }`}
+            className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+              config.variant === "info"
+                ? "bg-info/10"
+                : config.variant === "purple"
+                  ? "bg-purple/10"
+                  : config.variant === "success"
+                    ? "bg-success/10"
+                    : config.variant === "warning"
+                      ? "bg-warning/10"
+                      : "bg-muted"
+            }`}
           >
             <Users className={`h-5 w-5 ${config.color}`} />
           </div>
@@ -210,16 +213,17 @@ const CustomerMobileCard = memo(function CustomerMobileCard({
     >
       <div className="flex items-start gap-3">
         <div
-          className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center ${config.variant === "info"
-            ? "bg-info/10"
-            : config.variant === "purple"
-              ? "bg-purple/10"
-              : config.variant === "success"
-                ? "bg-success/10"
-                : config.variant === "warning"
-                  ? "bg-warning/10"
-                  : "bg-muted"
-            }`}
+          className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center ${
+            config.variant === "info"
+              ? "bg-info/10"
+              : config.variant === "purple"
+                ? "bg-purple/10"
+                : config.variant === "success"
+                  ? "bg-success/10"
+                  : config.variant === "warning"
+                    ? "bg-warning/10"
+                    : "bg-muted"
+          }`}
         >
           <Users className={`h-5 w-5 ${config.color}`} />
         </div>
@@ -227,22 +231,38 @@ const CustomerMobileCard = memo(function CustomerMobileCard({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">{customer.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{customer.email}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {customer.email}
+              </p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              <IconButton color="info" size="sm" onClick={() => onView(customer)}>
+              <IconButton
+                color="info"
+                size="sm"
+                onClick={() => onView(customer)}
+              >
                 <Eye className="h-4 w-4" />
               </IconButton>
-              <IconButton color="warning" size="sm" onClick={() => onEdit(customer)}>
+              <IconButton
+                color="warning"
+                size="sm"
+                onClick={() => onEdit(customer)}
+              >
                 <Edit className="h-4 w-4" />
               </IconButton>
-              <IconButton color="destructive" size="sm" onClick={() => onDelete(customer.id)}>
+              <IconButton
+                color="destructive"
+                size="sm"
+                onClick={() => onDelete(customer.id)}
+              >
                 <Trash2 className="h-4 w-4" />
               </IconButton>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <Badge variant={config.variant} dot>{config.label}</Badge>
+            <Badge variant={config.variant} dot>
+              {config.label}
+            </Badge>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Phone className="h-3 w-3 text-success" />
               <span>{customer.phone}</span>
@@ -250,7 +270,9 @@ const CustomerMobileCard = memo(function CustomerMobileCard({
           </div>
           <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
             <MapPin className="h-3 w-3 text-pink shrink-0" />
-            <span className="truncate">{customer.city}, {customer.province}</span>
+            <span className="truncate">
+              {customer.city}, {customer.province}
+            </span>
           </div>
         </div>
       </div>
@@ -306,7 +328,7 @@ const Pagination = memo(function Pagination({
             >
               {page}
             </Button>
-          )
+          ),
         )}
         <Button
           variant="outline"
@@ -327,6 +349,7 @@ export function CustomerTable({
   onEdit,
   onDelete,
   onView,
+  isLoading,
 }: CustomerTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -352,6 +375,9 @@ export function CustomerTable({
     setCurrentPage(page);
   }, []);
 
+  if (isLoading) {
+    return <CustomerTableSkeleton />;
+  }
   return (
     <div className="space-y-4">
       <Toolbar
@@ -372,7 +398,9 @@ export function CustomerTable({
                 </div>
                 <p className="text-base font-semibold">Tidak ada customer</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {searchQuery ? "Coba ubah kata kunci pencarian" : "Belum ada customer yang tersedia"}
+                  {searchQuery
+                    ? "Coba ubah kata kunci pencarian"
+                    : "Belum ada customer yang tersedia"}
                 </p>
               </div>
             </div>
@@ -395,11 +423,21 @@ export function CustomerTable({
           <table className="w-full">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customer</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kategori</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kontak</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Lokasi</th>
-                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">Aksi</th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Customer
+                </th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Kategori
+                </th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Kontak
+                </th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Lokasi
+                </th>
+                <th className="p-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide w-32">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -410,9 +448,13 @@ export function CustomerTable({
                       <div className="h-16 w-16 rounded-2xl bg-pink/10 flex items-center justify-center mx-auto mb-4">
                         <Users className="h-8 w-8 text-pink" />
                       </div>
-                      <p className="text-base font-semibold">Tidak ada customer</p>
+                      <p className="text-base font-semibold">
+                        Tidak ada customer
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {searchQuery ? "Coba ubah kata kunci pencarian" : "Belum ada customer yang tersedia"}
+                        {searchQuery
+                          ? "Coba ubah kata kunci pencarian"
+                          : "Belum ada customer yang tersedia"}
                       </p>
                     </div>
                   </td>
@@ -433,7 +475,7 @@ export function CustomerTable({
           </table>
         </div>
 
-        {filteredCustomers.length > 0 && (
+        {!isLoading && filteredCustomers.length > 0 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -447,3 +489,110 @@ export function CustomerTable({
     </div>
   );
 }
+
+const CustomerTableSkeleton = memo(function CustomerTableSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      {/* Mobile */}
+      <div className="md:hidden">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <div key={index} className="p-4 border-b last:border-b-0">
+            <div className="flex items-start gap-3">
+              <Skeleton className="h-12 w-12 rounded-full shrink-0" />
+
+              <div className="flex-1 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+
+                  <div className="flex gap-1">
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Skeleton className="h-5 w-24 rounded-full" />
+                  <Skeleton className="h-5 w-28 rounded-full" />
+                </div>
+
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-48" />
+                  <Skeleton className="h-3 w-36" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted/50 border-b">
+            <tr>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Customer
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Kategori
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Kontak
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase">
+                Lokasi
+              </th>
+              <th className="p-4 text-left text-xs font-semibold uppercase w-32">
+                Aksi
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <tr key={index} className="border-b">
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-28" />
+                    </div>
+                  </div>
+                </td>
+
+                <td className="p-4">
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </td>
+
+                <td className="p-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-40" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                </td>
+
+                <td className="p-4">
+                  <Skeleton className="h-4 w-36" />
+                </td>
+
+                <td className="p-4">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+});
